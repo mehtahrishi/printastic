@@ -1,3 +1,94 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "prod_1",
+      "description": "Abstract watercolor print with vibrant colors.",
+      "imageUrl": "https://images.unsplash.com/photo-1737040455054-f83c122176ef?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMHdhdGVyY29sb3J8ZW58MHx8fHwxNzY1NTIxODQzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract watercolor"
+    },
+    {
+      "id": "prod_2",
+      "description": "Minimalist mountain range illustration.",
+      "imageUrl": "https://images.unsplash.com/photo-1697201427909-292bc43d5a60?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwbW91bnRhaW58ZW58MHx8fHwxNzY1NTU5NjY5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "minimalist mountain"
+    },
+    {
+      "id": "prod_3",
+      "description": "Botanical illustration of a monstera leaf.",
+      "imageUrl": "https://images.unsplash.com/photo-1749754352548-5db29faf9606?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxib3RhbmljYWwlMjBsZWFmfGVufDB8fHx8MTc2NTU1OTY2OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "botanical leaf"
+    },
+    {
+      "id": "prod_4",
+      "description": "Geometric pattern in black and gold.",
+      "imageUrl": "https://images.unsplash.com/photo-1628160634750-a81a2a780805?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxnZW9tZXRyaWMlMjBwYXR0ZXJufGVufDB8fHx8MTc2NTQ2NjIzMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "geometric pattern"
+    },
+    {
+      "id": "prod_5",
+      "description": "Vintage world map print.",
+      "imageUrl": "https://images.unsplash.com/photo-1578403881967-084f9885be74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx2aW50YWdlJTIwbWFwfGVufDB8fHx8MTc2NTQ2MTYyNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "vintage map"
+    },
+    {
+      "id": "prod_6",
+      "description": "Serene beach landscape photograph.",
+      "imageUrl": "https://images.unsplash.com/photo-1541417904950-b855846fe074?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiZWFjaCUyMGxhbmRzY2FwZXxlbnwwfHx8fDE3NjU1NTMyNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach landscape"
+    },
+    {
+      "id": "prod_7",
+      "description": "Pop art-style portrait.",
+      "imageUrl": "https://images.unsplash.com/photo-1606489129187-1eee19a0a103?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cG9wJTIwYXJ0fGVufDB8fHx8MTc2NTU1OTY2OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pop art"
+    },
+    {
+      "id": "prod_8",
+      "description": "Architectural sketch of a famous landmark.",
+      "imageUrl": "https://images.unsplash.com/photo-1717445130361-10f51648fc7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhcmNoaXRlY3R1cmFsJTIwc2tldGNofGVufDB8fHx8MTc2NTQ5NzM4OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "architectural sketch"
+    },
+    {
+      "id": "prod_9",
+      "description": "Inspirational quote in modern calligraphy.",
+      "imageUrl": "https://images.unsplash.com/photo-1669477377105-0736689c9935?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxpbnNwaXJhdGlvbmFsJTIwcXVvdGV8ZW58MHx8fHwxNzY1NTQzNTExfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "inspirational quote"
+    },
+    {
+      "id": "prod_10",
+      "description": "Cute illustrated animal for a nursery.",
+      "imageUrl": "https://images.unsplash.com/photo-1566847438217-76e82d383f84?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjdXRlJTIwYW5pbWFsfGVufDB8fHx8MTc2NTQ1NzUwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cute animal"
+    },
+    {
+      "id": "prod_11",
+      "description": "Abstract line art of a face.",
+      "imageUrl": "https://images.unsplash.com/photo-1583339824000-5afecfd41835?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxsaW5lJTIwYXJ0fGVufDB8fHx8MTc2NTQ3MTIyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "line art"
+    },
+    {
+      "id": "prod_12",
+      "description": "Vibrant city skyline at night.",
+      "imageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjaXR5JTIwc2t5bGluZXxlbnwwfHx8fDE3NjU1MDQyNjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city skyline"
+    },
+    {
+      "id": "preview_living_room",
+      "description": "A modern living room with a neutral-colored sofa.",
+      "imageUrl": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxsaXZpbmclMjByb29tfGVufDB8fHx8MTc2NTQ3NDQxM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "living room"
+    },
+    {
+      "id": "preview_office",
+      "description": "A clean home office with a wooden desk.",
+      "imageUrl": "https://images.unsplash.com/photo-1544140708-514b7837e6b5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aG9tZSUyMG9mZmljZXxlbnwwfHx8fDE3NjU0NjA0MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "home office"
+    },
+    {
+      "id": "preview_bedroom",
+      "description": "A cozy bedroom with a large bed and soft lighting.",
+      "imageUrl": "https://images.unsplash.com/photo-1724582586413-6b69e1c94a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb3p5JTIwYmVkcm9vbXxlbnwwfHx8fDE3NjU0MzQ3MDB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cozy bedroom"
+    }
+  ]
 }
