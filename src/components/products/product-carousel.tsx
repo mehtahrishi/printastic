@@ -18,6 +18,12 @@ export function ProductCarousel() {
     Autoplay({ delay: 2000, stopOnInteraction: true })
   );
 
+  // Group products into chunks of 3 for each slide
+  const slides = [];
+  for (let i = 0; i < products.length; i += 3) {
+    slides.push(products.slice(i, i + 3));
+  }
+
   return (
     <Carousel
       opts={{
@@ -30,23 +36,25 @@ export function ProductCarousel() {
       className="w-full"
     >
       <CarouselContent>
-        {products.map((product) => (
-          <CarouselItem key={product.id} className="basis-1/3">
-            <div className="p-1">
-              <Card>
-                <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
+        {slides.map((slideProducts, index) => (
+          <CarouselItem key={index} className="flex gap-4">
+            {slideProducts.map((product) => (
+              <div key={product.id} className="p-1 basis-1/3">
+                <Card>
+                  <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
                     <Link href={`/products/${product.id}`} className="block h-full w-full">
-                        <Image
-                            src={product.imageUrl}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-300 hover:scale-105"
-                            data-ai-hint={product.imageHint}
-                        />
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        data-ai-hint={product.imageHint}
+                      />
                     </Link>
-                </CardContent>
-              </Card>
-            </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
           </CarouselItem>
         ))}
       </CarouselContent>
