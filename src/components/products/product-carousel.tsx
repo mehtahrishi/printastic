@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function ProductCarousel() {
   const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true })
+    Autoplay({ delay: 2000, stopOnInteraction: false })
   );
 
   // Group products into chunks of 3 for each slide
@@ -31,8 +31,6 @@ export function ProductCarousel() {
         loop: true,
       }}
       plugins={[plugin.current]}
-      onMouseEnter={plugin.current.stop}
-      onMouseLeave={plugin.current.reset}
       className="w-full"
     >
       <CarouselContent>
