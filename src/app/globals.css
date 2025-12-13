@@ -82,3 +82,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes blink-twice {
+    0%, 100% { opacity: 1; }
+    25% { opacity: 0; }
+    50% { opacity: 1; }
+    75% { opacity: 0; }
+  }
+  
+  .animate-blink-twice {
+    animation: blink-twice 1s ease-in-out;
+  }
+}
