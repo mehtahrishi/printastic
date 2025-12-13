@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { orders } from "@/lib/data";
+import { ClientOnly } from "@/components/client-only";
+import { SalesChartClient } from "@/components/admin/sales-chart-client";
 
 export default function DashboardPage() {
     const totalRevenue = orders.reduce((acc, order) => acc + order.total, 0);
@@ -58,7 +60,9 @@ export default function DashboardPage() {
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <div className="lg:col-span-4">
-            <SalesChart />
+            <ClientOnly>
+                <SalesChartClient />
+            </ClientOnly>
         </div>
         <div className="lg:col-span-3">
             <Card>
