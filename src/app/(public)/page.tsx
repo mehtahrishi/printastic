@@ -5,6 +5,12 @@ import { ProductCarousel } from "@/components/products/product-carousel";
 export default function HomePage() {
   return (
     <div>
+      <section className="py-12 md:py-20">
+        <div className="container">
+          <ProductCarousel />
+        </div>
+      </section>
+
       <section className="text-center py-16 md:py-24 bg-muted/40">
         <div className="container">
           <h1 className="text-4xl md:text-6xl font-bold text-primary tracking-tight">
@@ -14,13 +20,6 @@ export default function HomePage() {
             Discover and buy unique, high-quality prints from independent artists to
             perfectly match your space and style.
           </p>
-        </div>
-      </section>
-
-      <section className="py-12 md:py-20">
-        <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-10">Featured Artwork</h2>
-          <ProductCarousel />
         </div>
       </section>
 
