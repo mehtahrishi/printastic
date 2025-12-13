@@ -5,7 +5,7 @@ import { ProductCarousel } from "@/components/products/product-carousel";
 export default function HomePage() {
   return (
     <div>
-      <section className="py-12 md:py-20">
+      <section>
         <div className="container">
           <ProductCarousel />
         </div>
