@@ -42,7 +42,7 @@ export function ProductCarousel() {
               <div key={product.id} className="p-1 basis-1/3">
                 <Card>
                   <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
-                    <Link href={`/products/${product.id}`} className="block h-full w-full">
+                    <Link href={`/products/${product.id}`} className="block h-full w-full relative">
                       <Image
                         src={product.imageUrl}
                         alt={product.name}
