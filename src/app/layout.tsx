@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import { CookieConsent } from "@/components/cookie-consent";
 
 export const metadata: Metadata = {
   title: "Printastic",
@@ -25,6 +26,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <CookieConsent />
       </body>
     </html>
   );
