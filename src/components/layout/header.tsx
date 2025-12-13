@@ -1,17 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Heart, Brush, ChevronDown } from "lucide-react";
+import {
+  ShoppingCart,
+  Heart,
+  Brush,
+  Sun,
+  Moon,
+  Menu,
+  UserRound,
+  ChevronDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
-import { SVGProps } from "react";
+import { SVGProps, useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const tShirtIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
@@ -97,6 +118,34 @@ const navItems = [
 export function Header() {
   const { itemCount: cartItemCount } = useCart();
   const { itemCount: wishlistItemCount } = useWishlist();
+  const [isDark, setIsDark] = useState(false);
+  const [tShirtOpen, setTShirtOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+
+  useEffect(() => {
+    // Check initial theme from localStorage and system preference
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    
+    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+      setIsDark(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      setIsDark(false);
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -105,19 +154,17 @@ export function Header() {
           <Brush className="h-6 w-6 text-primary" />
           <span className="font-bold text-lg">Printastic</span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm font-medium">
+
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80 cursor-pointer bg-transparent border-none p-0"
               >
                 <div className="flex items-center">
-                  {tShirtIcon({ className: "h-6 w-6 mb-1" })}
+                  {tShirtIcon({ className: "h-6 w-6" })}
                 </div>
-                <div className="flex items-center">
-                  <span>T-Shirts</span>
-                  <ChevronDown className="h-4 w-4 ml-1" />
-                </div>
+                <span className="text-xs font-medium">T-Shirts</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -139,24 +186,19 @@ export function Header() {
               href={item.href}
               className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80"
             >
-              <item.icon className="h-6 w-6 mb-1" />
-              <span>{item.name}</span>
+              <item.icon className="h-6 w-6" />
+              <span className="text-xs font-medium">{item.name}</span>
             </Link>
           ))}
         </nav>
+
         <div className="flex flex-1 items-center justify-end gap-2">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/wishlist">
-              <Heart className="h-5 w-5" />
-              {wishlistItemCount > 0 && (
-                <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs">
-                  {wishlistItemCount}
-                </span>
-              )}
-              <span className="sr-only">Wishlist</span>
-            </Link>
+          <Button variant="ghost" size="icon" onClick={toggleTheme} title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            <span className="sr-only">Toggle theme</span>
           </Button>
-          <Button variant="ghost" size="icon" asChild>
+
+          <Button variant="ghost" size="icon" asChild className="hidden md:flex">
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {cartItemCount > 0 && (
@@ -164,9 +206,152 @@ export function Header() {
                   {cartItemCount}
                 </span>
               )}
-              <span className="sr-only">Shopping Cart</span>
+              <span className="sr-only">Cart</span>
             </Link>
           </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="hidden md:flex">
+                <UserRound className="h-5 w-5" />
+                <span className="sr-only">Account</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/account">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/wishlist">Wishlist</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/orders">Orders</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/signout">Sign out</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Mobile sidebar menu (opens from right, positioned after cart) */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-72 sm:w-80">
+                <SheetHeader>
+                  <div className="flex items-center gap-2">
+                    <Brush className="h-6 w-6 text-primary" />
+                    <SheetTitle>Printastic</SheetTitle>
+                  </div>
+                </SheetHeader>
+                <div className="mt-6 flex flex-col gap-2">
+                  {/* T-Shirts with collapsible dropdown */}
+                  <Collapsible open={tShirtOpen} onOpenChange={setTShirtOpen}>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent">
+                      <div className="flex items-center gap-2">
+                        {tShirtIcon({ className: "h-5 w-5" })}
+                        <span className="text-sm font-medium">T-Shirts</span>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${
+                          tShirtOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="ml-7 mt-2 flex flex-col gap-2">
+                      <Link
+                        href="/category/t-shirts"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        All T-Shirts
+                      </Link>
+                      <Link
+                        href="/category/oversize-t-shirt"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        Oversize T-Shirts
+                      </Link>
+                      <Link
+                        href="/category/kids-t-shirts"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        Kids T-Shirts
+                      </Link>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* Other nav items */}
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="flex items-center gap-2 p-2 rounded-md text-foreground/80 hover:text-foreground hover:bg-accent"
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span className="text-sm font-medium">{item.name}</span>
+                    </Link>
+                  ))}
+
+                  {/* My Account with dropdown */}
+                  <Collapsible open={accountOpen} onOpenChange={setAccountOpen}>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent">
+                      <div className="flex items-center gap-2">
+                        <UserRound className="h-5 w-5" />
+                        <span className="text-sm font-medium">My Account</span>
+                      </div>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${
+                          accountOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="ml-7 mt-2 flex flex-col gap-2">
+                      <Link
+                        href="/account"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href="/wishlist"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        My Wishlist
+                      </Link>
+                      <Link
+                        href="/cart"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent flex items-center justify-between"
+                      >
+                        <span>Cart</span>
+                        {cartItemCount > 0 && (
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
+                            {cartItemCount}
+                          </span>
+                        )}
+                      </Link>
+                      <Link
+                        href="/orders"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        Orders
+                      </Link>
+                      <Link
+                        href="/signout"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                      >
+                        Sign out
+                      </Link>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
