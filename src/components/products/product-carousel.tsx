@@ -34,13 +34,12 @@ export function ProductCarousel() {
           <CarouselItem key={product.id} className="basis-full sm:basis-1/2 md:basis-1/3">
             <div className="p-1">
               <Card>
-                <CardContent className="flex aspect-square items-center justify-center p-0 overflow-hidden rounded-lg">
+                <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
                     <Link href={`/products/${product.id}`} className="block h-full w-full">
                         <Image
                             src={product.imageUrl}
                             alt={product.name}
-                            width={600}
-                            height={600}
+                            fill
                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                             data-ai-hint={product.imageHint}
                         />
