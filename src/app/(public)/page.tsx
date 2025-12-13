@@ -1,5 +1,6 @@
 import { products } from "@/lib/data";
 import { ProductCard } from "@/components/products/product-card";
+import { ProductCarousel } from "@/components/products/product-carousel";
 
 export default function HomePage() {
   return (
@@ -18,7 +19,14 @@ export default function HomePage() {
 
       <section className="py-12 md:py-20">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-10">Our Collection</h2>
+          <h2 className="text-3xl font-bold text-center mb-10">Featured Artwork</h2>
+          <ProductCarousel />
+        </div>
+      </section>
+
+      <section className="py-12 md:py-20 bg-muted/40">
+        <div className="container">
+          <h2 className="text-3xl font-bold text-center mb-10">Our Full Collection</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
