@@ -108,8 +108,8 @@ export function Header() {
         <nav className="flex items-center gap-6 text-sm font-medium">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div
-                className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80 cursor-pointer"
+              <button
+                className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80 cursor-pointer bg-transparent border-none p-0"
               >
                 <div className="flex items-center">
                   {tShirtIcon({ className: "h-6 w-6 mb-1" })}
@@ -118,7 +118,7 @@ export function Header() {
                   <span>T-Shirts</span>
                   <ChevronDown className="h-4 w-4 ml-1" />
                 </div>
-              </div>
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
