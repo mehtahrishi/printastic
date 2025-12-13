@@ -31,7 +31,7 @@ export function ProductCarousel() {
     >
       <CarouselContent>
         {products.map((product) => (
-          <CarouselItem key={product.id} className="basis-full sm:basis-1/2 md:basis-1/3">
+          <CarouselItem key={product.id} className="basis-1/3">
             <div className="p-1">
               <Card>
                 <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
@@ -40,7 +40,7 @@ export function ProductCarousel() {
                             src={product.imageUrl}
                             alt={product.name}
                             fill
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            className="object-cover transition-transform duration-300 hover:scale-105"
                             data-ai-hint={product.imageHint}
                         />
                     </Link>
