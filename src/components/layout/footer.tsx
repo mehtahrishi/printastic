@@ -50,8 +50,8 @@ export function Footer() {
   return (
     <footer className="bg-muted text-muted-foreground">
       <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-          <div className="col-span-2 lg:col-span-1">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Brush className="h-6 w-6 text-primary" />
               <span className="font-bold text-lg text-foreground">Printastic</span>
@@ -64,8 +64,6 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/" className="text-sm hover:text-primary">All Products</Link></li>
               <li><Link href="#" className="text-sm hover:text-primary">New Arrivals</Link></li>
-              <li><Link href="#" className="text-sm hover:text-primary">Best Sellers</Link></li>
-              <li><Link href="#" className="text-sm hover:text-primary">Sale</Link></li>
             </ul>
           </div>
 
@@ -74,7 +72,6 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/about-us" className="text-sm hover:text-primary">About Us</Link></li>
               <li><Link href="/contact-us" className="text-sm hover:text-primary">Contact Us</Link></li>
-              <li><Link href="#" className="text-sm hover:text-primary">Careers</Link></li>
             </ul>
           </div>
           
@@ -86,9 +83,6 @@ export function Footer() {
               <li><Link href="/shipping-policy" className="text-sm hover:text-primary">Shipping Policy</Link></li>
               <li><Link href="/refund-policy" className="text-sm hover:text-primary">Refund Policy</Link></li>
             </ul>
-          </div>
-
-          <div className="col-span-2 md:col-span-4 lg:col-span-1">
           </div>
         </div>
 
