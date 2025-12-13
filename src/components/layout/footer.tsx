@@ -3,20 +3,7 @@
 
 import { Brush, Facebook, Instagram, Twitter } from "lucide-react";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { SVGProps } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useToast } from "@/hooks/use-toast";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
 
 const VisaIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" role="img" aria-labelledby="pi-visa" {...props}>
@@ -51,34 +38,14 @@ const GPayIcon = (props: SVGProps<SVGSVGElement>) => (
             <path fill="#5F6368" d="M19.1 10.9h-5.9v2.2h4.9c-.2 1.3-1.6 2.3-3.6 2.3-2.1 0-3.9-1.8-3.9-4s1.7-4 3.9-4c1.2 0 2 .5 2.5 1l1.5-1.5C22.4 5.9 21 5.2 19 5.2c-3.7 0-6.7 3-6.7 6.8s3 6.7 6.7 6.7c3.8 0 6.5-2.7 6.5-6.6 0-.5-.1-.9-.1-1.2z"/>
             <path fill="#4285F4" d="M26.6 9.8h-2.2V7.6h-1.6v2.2h-2.2v1.6h2.2v2.2h1.6v-2.2h2.2z"/>
             <path fill="#34A853" d="M19 5.2c1.9 0 3.6.7 4.9 1.9l-1.5 1.5c-.8-.8-1.9-1.2-3.4-1.2-2.2 0-4.1 1.2-5.1 3h6.6v-2z"/>
-            <path fill="#FBBC04" d="M13.9 12c0-1.8 1.9-3 5.1-3 1.5 0 2.6.5 3.4 1.2l1.5-1.5C22.5 7.1 20.9 6.2 19 6.2c-3.7 0-6.7 3-6.7 6.8 0 .5.1.9.1 1.4 0 0 3.3-1.9 3.5-2.4z"/>
+            <path fill="#FBBC04" d="M13.9 12c0-1.8 1.9-3 5.1-3 1.5 0 2.6.5 3.4 1.2l-1.5-1.5C22.5 7.1 20.9 6.2 19 6.2c-3.7 0-6.7 3-6.7 6.8 0 .5.1.9.1 1.4 0 0 3.3-1.9 3.5-2.4z"/>
             <path fill="#EA4335" d="M19.1 15.4c-2 0-3.4-.9-3.6-2.3h7.2c.1-.4.1-.7.1-1.1 0-4-2.7-6.6-6.5-6.6-3.7 0-6.7 3-6.7 6.8s3 6.7 6.7 6.7c3 0 5.3-1.8 6.2-4.4l-1.6-.7c-.6 1.4-2 2.3-4.6 2.3z"/>
         </g>
     </svg>
 );
 
-const newsletterFormSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-});
-
 
 export function Footer() {
-  const { toast } = useToast();
-  const form = useForm<z.infer<typeof newsletterFormSchema>>({
-    resolver: zodResolver(newsletterFormSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof newsletterFormSchema>) {
-    console.log("Newsletter signup:", values);
-    toast({
-      title: "Subscribed!",
-      description: "Thanks for signing up for our newsletter.",
-    });
-    form.reset();
-  }
 
   return (
     <footer className="bg-muted text-muted-foreground">
@@ -122,25 +89,6 @@ export function Footer() {
           </div>
 
           <div className="col-span-2 md:col-span-4 lg:col-span-1">
-            <h4 className="font-semibold text-foreground mb-4">Subscribe to our newsletter</h4>
-            <p className="text-sm mb-4">Get the latest on sales, new releases and more.</p>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Input placeholder="Enter your email" {...field} className="bg-background"/>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit">Subscribe</Button>
-              </form>
-            </Form>
           </div>
         </div>
 
