@@ -1,52 +1,36 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, Heart, Brush } from "lucide-react";
+import { ShoppingCart, Heart, Brush, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { SVGProps } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const tShirtIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
+  </svg>
+);
 
 const navItems = [
-  {
-    name: "T-Shirts",
-    href: "/category/t-shirts",
-    icon: (props: SVGProps<SVGSVGElement>) => (
-      <svg
-        {...props}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Oversize T-Shirt",
-    href: "/category/oversize-t-shirt",
-    icon: (props: SVGProps<SVGSVGElement>) => (
-        <svg 
-            {...props}
-            xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round">
-            <path d="M21.54 6.24a2.3 2.3 0 0 0-1.9-1.94 2.3 2.3 0 0 0-2.31.24l-1.33 1a3 3 0 0 1-3.79.2L8.2 3.54a2 2 0 0 0-2.4 0L2.2 6.54a2 2 0 0 0 0 2.8l2.9 2.9a1 1 0 0 0 1.41 0l1.2-1.2a1 1 0 0 1 1.41 0l2.12 2.12a1 1 0 0 1 0 1.41L9 17.18a1 1 0 0 0 0 1.41l2.9 2.9a2 2 0 0 0 2.8 0l6.54-6.54a2 2 0 0 0 0-2.8Z"/>
-        </svg>
-    ),
-  },
   {
     name: "Hoodies",
     href: "/category/hoodies",
@@ -67,25 +51,6 @@ const navItems = [
         <path d="M15 11V6.5" />
         <path d="M10 16h4" />
       </svg>
-    ),
-  },
-  {
-    name: "Kids T-Shirts",
-    href: "/category/kids-t-shirts",
-    icon: (props: SVGProps<SVGSVGElement>) => (
-        <svg 
-            {...props}
-            xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round">
-           <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
-        </svg>
     ),
   },
   {
@@ -146,6 +111,33 @@ export function Header() {
           <span className="font-bold text-lg">Printastic</span>
         </Link>
         <nav className="flex items-center gap-6 text-sm font-medium">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div
+                className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80 cursor-pointer"
+              >
+                <div className="flex items-center">
+                  {tShirtIcon({ className: "h-6 w-6 mb-1" })}
+                </div>
+                <div className="flex items-center">
+                  <span>T-Shirts</span>
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </div>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link href="/category/t-shirts">All T-Shirts</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/category/oversize-t-shirt">Oversize T-Shirts</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/category/kids-t-shirts">Kids T-Shirts</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {navItems.map((item) => (
             <Link
               key={item.name}
