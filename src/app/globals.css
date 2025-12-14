@@ -84,13 +84,28 @@
 }
 
 @layer utilities {
-  @keyframes blink-twice {
-    0%, 100% { opacity: 1; }
-    25% { opacity: 0; }
-    50% { opacity: 1; }
-    75% { opacity: 0; }
+  .bg-grid {
+    background-image: linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 2.5rem 2.5rem; /* 40px */
   }
-  
+
+  @keyframes blink-twice {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    25% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    75% {
+      opacity: 0;
+    }
+  }
+
   .animate-blink-twice {
     animation: blink-twice 1s ease-in-out;
   }
