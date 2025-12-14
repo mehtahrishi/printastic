@@ -54,7 +54,7 @@ export default function TermsAndConditionsPage() {
           </p>
           <p>
             This site may contain certain historical information. Historical information, necessarily, is not current and is provided for your reference only. We reserve the right to modify the contents of this site at any time, but we have no obligation to update any information on our site. You agree that it is your responsibility to monitor changes to our site.
-          p>
+          </p>
 
           <h2>SECTION 4 – MODIFICATIONS TO THE SERVICE AND PRICES</h2>
           <p>
@@ -220,5 +220,7 @@ export default function TermsAndConditionsPage() {
       </div>
     );
   }
+
+    
 
     
