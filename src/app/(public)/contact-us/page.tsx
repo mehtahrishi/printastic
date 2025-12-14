@@ -38,13 +38,27 @@ export default function ContactUsPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Contact form submitted:", values);
-    toast({
-      title: "Message Sent!",
-      description: "Thanks for reaching out. We'll get back to you soon.",
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send message");
+      toast({
+        title: "Message sent",
+        description: "Thanks for reaching out. We'll reply soon.",
+      });
+      form.reset();
+    } catch (err: any) {
+      toast({
+        title: "Failed to send",
+        description: err.message || "Please try again later.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -128,7 +142,7 @@ export default function ContactUsPage() {
                     </div>
                     <div>
                         <h4 className="font-semibold text-lg">Our Address</h4>
-                        <p className="text-muted-foreground">123 Art Avenue, Creativity City, 12345, USA</p>
+                        <p className="text-muted-foreground">Khoparkhaine</p>
                     </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -137,7 +151,7 @@ export default function ContactUsPage() {
                     </div>
                     <div>
                         <h4 className="font-semibold text-lg">Email Us</h4>
-                        <a href="mailto:support@printastic.com" className="text-muted-foreground hover:text-primary">support@printastic.com</a>
+                        <a href="mailto:contact@honestyprinthouse.in" className="text-muted-foreground hover:text-primary">contact@honestyprinthouse.in</a>
                     </div>
                 </div>
                 <div className="flex items-start gap-4">
