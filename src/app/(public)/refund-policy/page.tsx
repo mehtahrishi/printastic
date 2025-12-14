@@ -29,14 +29,6 @@ export default function RefundPolicyPage() {
                     </div>
                 </div>
 
-                <Alert variant="destructive">
-                    <PackageX className="h-5 w-5" />
-                    <AlertTitle className="font-bold">No Returns or Exchanges</AlertTitle>
-                    <AlertDescription>
-                        We do not accept returns for any reason, including sizing issues. All products are printed on demand, and returned items are considered dead stock. Please ensure you choose the correct size before placing your order. Each product is made to order, and returned items are considered dead stock.
-                    </AlertDescription>
-                </Alert>
-
                 <div className="flex items-start gap-4">
                     <Truck className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                     <div>
@@ -56,6 +48,14 @@ export default function RefundPolicyPage() {
                         </p>
                     </div>
                 </div>
+
+                <Alert variant="destructive">
+                    <PackageX className="h-5 w-5" />
+                    <AlertTitle className="font-bold">No Returns or Exchanges</AlertTitle>
+                    <AlertDescription>
+                        We do not accept returns for any reason, including sizing issues. All products are printed on demand, and returned items are considered dead stock. Please ensure you choose the correct size before placing your order. Each product is made to order, and returned items are considered dead stock.
+                    </AlertDescription>
+                </Alert>
 
             </CardContent>
         </Card>
