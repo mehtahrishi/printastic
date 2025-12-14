@@ -141,7 +141,7 @@ export default function PrivacyPolicyPage() {
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>
-                <div className="flex items-start gap-4 pt-6 border-t">
+                <div className="flex items-start gap-4">
                     <Mail className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                     <div>
                         <h3 className="font-semibold text-lg text-foreground">Contact Us</h3>
