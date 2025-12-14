@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -18,6 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { handleContactForm } from "./actions";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -39,6 +39,7 @@ export default function ContactUsPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+<<<<<<< HEAD
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -58,6 +59,22 @@ export default function ContactUsPage() {
         description: err.message || "Please try again later.",
         variant: "destructive",
       });
+=======
+    const result = await handleContactForm(values);
+
+    if (result.success) {
+      toast({
+        title: "Message Sent!",
+        description: "Thanks for reaching out. We'll get back to you soon.",
+      });
+      form.reset();
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Something went wrong",
+            description: "Could not send your message. Please try again later.",
+        });
+>>>>>>> b741ce8f9fd81873133443de5da0fa6feefbe941
     }
   }
 
@@ -126,7 +143,9 @@ export default function ContactUsPage() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" size="lg">Send Message</Button>
+                  <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? "Sending..." : "Send Message"}
+                  </Button>
                 </form>
               </Form>
             </CardContent>

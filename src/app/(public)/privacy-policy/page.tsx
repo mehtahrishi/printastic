@@ -1,65 +1,158 @@
 
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+  } from "@/components/ui/accordion"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ShieldCheck, User, Database, Lock, Link as LinkIcon, Mail } from "lucide-react";
+import Link from "next/link";
+
+
 export default function PrivacyPolicyPage() {
     return (
-      <div className="container py-16 md:py-24 max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-primary mb-6">Privacy Policy</h1>
-        <div className="prose dark:prose-invert max-w-none text-foreground/80">
-          <p className="text-sm text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
-          <p className="text-lg">
-            Printastic ("us", "we", or "our") operates the Printastic website (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.
-          </p>
-  
-          <h2>Information Collection and Use</h2>
-          <p>
-            We collect several different types of information for various purposes to provide and improve our Service to you.
-          </p>
-          <h3>Types of Data Collected</h3>
-          <h4>Personal Data</h4>
-          <p>
-            While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you ("Personal Data"). Personally identifiable information may include, but is not limited to:
-          </p>
-          <ul>
-            <li>Email address</li>
-            <li>First name and last name</li>
-            <li>Phone number</li>
-            <li>Address, State, Province, ZIP/Postal code, City</li>
-            <li>Cookies and Usage Data</li>
-          </ul>
-  
-          <h4>Usage Data</h4>
-          <p>
-            We may also collect information on how the Service is accessed and used ("Usage Data"). This Usage Data may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, unique device identifiers and other diagnostic data.
-          </p>
-  
-          <h2>Use of Data</h2>
-          <p>Printastic uses the collected data for various purposes:</p>
-          <ul>
-            <li>To provide and maintain our Service</li>
-            <li>To notify you about changes to our Service</li>
-            <li>To allow you to participate in interactive features of our Service when you choose to do so</li>
-            <li>To provide customer support</li>
-            <li>To gather analysis or valuable information so that we can improve our Service</li>
-            <li>To monitor the usage of our Service</li>
-            <li>To detect, prevent and address technical issues</li>
-            <li>To provide you with news, special offers and general information about other goods, services and events which we offer that are similar to those that you have already purchased or enquired about unless you have opted not to receive such information</li>
-          </ul>
-  
-          <h2>Security of Data</h2>
-          <p>
-            The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
-          </p>
-  
-          <h2>Changes to This Privacy Policy</h2>
-          <p>
-            We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the "last updated" date at the top of this Privacy Policy.
-          </p>
-  
-          <h2>Contact Us</h2>
-          <p>
-            If you have any questions about this Privacy Policy, please <a href="/contact-us">contact us</a>.
-          </p>
-        </div>
+      <div className="container py-12 md:py-16">
+        <Card className="max-w-4xl mx-auto">
+            <CardHeader className="text-center">
+                <div className="mx-auto bg-primary/10 text-primary p-4 rounded-full w-fit mb-4">
+                    <ShieldCheck className="h-10 w-10" />
+                </div>
+                <CardTitle className="text-3xl md:text-4xl">Privacy Policy</CardTitle>
+                <CardDescription className="text-lg pt-2">
+                    Your privacy is important to us. Here’s how we handle your data.
+                </CardDescription>
+                <p className="text-sm text-muted-foreground pt-4">Last updated: {new Date().toLocaleDateString()}</p>
+            </CardHeader>
+            <CardContent className="space-y-8 pt-8 text-foreground/80">
+                <p>
+                    “This Privacy Policy (“Policy”) is published in accordance with the provisions of Rule 3(1) of the Information Technology (Intermediaries Guidelines) Rules, 2011. The Policy is an ‘electronic record’ as contemplated under section 2(t) of the Information Technology Act, 2000 and the rules. This Policy being an electronic record is generated by a computer system and does not require any physical or digital signature.”
+                </p>
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="item-1">
+                        <AccordionTrigger className="text-lg font-semibold text-foreground">
+                            <div className="flex items-center gap-3">
+                                <User className="h-5 w-5 text-primary" />
+                                <span>Introduction</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="prose dark:prose-invert max-w-none text-foreground/80 pl-8">
+                            <p>
+                                The online store www.honestyprinthouse.in (“Online Store”) is owned and operated by Honesty Enterprise, under the laws of India having its registered office at Shop No.9, Plot No.387,Matoshree CHS, Sector-19C, Koparkhairane, Navi Mumbai – 4400709.
+                            </p>
+                            <p>
+                                Users are requested to read and understand the Policy very carefully before using or accessing the Online Store. Through this Policy, Honesty Enterprise intends to convey the manner in which the user’s information is collated and used by Honesty Enterprise Shopping while providing the services of the Online Store. This Policy is binding on every user of the Online Store and users who do not agree with the terms of this Policy should not use or access the Online Store.
+                            </p>
+                            <p>
+                                Honesty Enterprise reserves its right to change, edit, alter, amend, modify, review, revise or substitute this Policy with or without notice. By using the Online Store, the user’s signify they have carefully read, understood and agree to be bound by this Policy and the users expressly and voluntarily accept this Policy including any change, modification or substitution made to the Policy from time to time. Honesty Enterprise reserves its right to refuse services to any user who does not accept or violates the terms of this Policy.
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                        <AccordionTrigger className="text-lg font-semibold text-foreground">
+                            <div className="flex items-center gap-3">
+                                <Database className="h-5 w-5 text-primary" />
+                                <span>User Information</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="prose dark:prose-invert max-w-none text-foreground/80 pl-8">
+                            <p>
+                                User Information typically refers to the personal data or details that are collected from individuals when they interact with a service, website, or online platform. It includes a range of data such as:
+                            </p>
+                            <ul>
+                                <li><strong>Personal Identification Details:</strong> Name, address, email, phone number, date of birth, etc.</li>
+                                <li><strong>Account Details:</strong> Username, password, purchase history, preferences, etc.</li>
+                                <li><strong>Payment Information:</strong> Credit card details, billing address, payment preferences.</li>
+                                <li><strong>Usage Data:</strong> Browsing behavior, device information, IP address, cookies, and location data.</li>
+                                <li><strong>Communication Data:</strong> Customer service interactions, feedback, reviews, and support requests.</li>
+                            </ul>
+                            <p>
+                                The collection, use, and protection of this information are typically outlined in a Privacy Policy to ensure users understand how their data will be handled.
+                            </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                        <AccordionTrigger className="text-lg font-semibold text-foreground">
+                            <div className="flex items-center gap-3">
+                                <ShieldCheck className="h-5 w-5 text-primary" />
+                                <span>Use of Information & Disclosure</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="prose dark:prose-invert max-w-none text-foreground/80 pl-8">
+                            <h3>Use of Information:</h3>
+                            <ul>
+                                <li><strong>Service Improvement:</strong> To personalize and enhance user experience, improve services, and develop new features.</li>
+                                <li><strong>Transactional Purposes:</strong> To process orders, payments, and shipments, and to communicate regarding transactions.</li>
+                                <li><strong>Marketing and Promotions:</strong> To send promotional materials, offers, or newsletters (usually with user consent).</li>
+                                <li><strong>Legal Compliance:</strong> To comply with laws and regulations, prevent fraud, or resolve disputes.</li>
+                            </ul>
+                            <h3>Disclosure of Information:</h3>
+                            <ul>
+                                <li><strong>Third-Party Service Providers:</strong> Information may be shared with trusted third parties for payment processing, delivery, or other necessary services.</li>
+                                <li><strong>Legal Requirements:</strong> Information may be disclosed if required by law, court orders, or governmental authorities.</li>
+                                <li><strong>Business Transfers:</strong> In case of mergers, acquisitions, or bankruptcy, user data may be transferred to new owners.</li>
+                                <li><strong>Public Forums:</strong> Any information shared publicly by users in forums, reviews, or social media may be disclosed and visible to others.</li>
+                            </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-4">
+                        <AccordionTrigger className="text-lg font-semibold text-foreground">
+                            <div className="flex items-center gap-3">
+                                <Lock className="h-5 w-5 text-primary" />
+                                <span>Security & User Restriction</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="prose dark:prose-invert max-w-none text-foreground/80 pl-8">
+                            <h3>Security Measures:</h3>
+                            <ul>
+                                <li><strong>Data Encryption:</strong> Protecting sensitive user information like payment details and personal data through encryption technology.</li>
+                                <li><strong>Secure Transactions:</strong> Ensuring that all transactions conducted on the platform are secure and protected from unauthorized access.</li>
+                                <li><strong>Access Control:</strong> Limiting access to sensitive data only to authorized personnel or systems to prevent misuse.</li>
+                                <li><strong>Regular Audits and Monitoring:</strong> Continuous monitoring of the system to identify and prevent security threats and vulnerabilities.</li>
+                            </ul>
+                            <h3>User Restrictions:</h3>
+                            <ul>
+                                <li><strong>Prohibited Activities:</strong> Users are restricted from engaging in illegal activities such as hacking, phishing, spamming, or posting harmful content.</li>
+                                <li><strong>Account Misuse:</strong> Users should not share their account credentials with others, and they must keep their passwords confidential.</li>
+                                <li><strong>Violation of Terms:</strong> Users who violate the platform’s terms, such as misusing services or posting unauthorized content, may be restricted or banned from using the service.</li>
+                                <li><strong>Access to Certain Features:</strong> Some features of the platform may only be accessible to users who meet specific criteria or have appropriate permissions.</li>
+                            </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-5">
+                        <AccordionTrigger className="text-lg font-semibold text-foreground">
+                            <div className="flex items-center gap-3">
+                                <LinkIcon className="h-5 w-5 text-primary" />
+                                <span>Third Party Websites and Links</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="prose dark:prose-invert max-w-none text-foreground/80 pl-8">
+                            <h3>External Links:</h3>
+                            <ul>
+                                <li><strong>Links to Third-Party Websites:</strong> The platform may contain links to external websites that are not under its control. These third-party sites may have different privacy practices and policies.</li>
+                                <li><strong>Responsibility:</strong> The platform is not responsible for the content, privacy practices, or security measures of any third-party websites linked from the platform. Users are encouraged to review the privacy policies of any external sites they visit.</li>
+                                <li><strong>Affiliate Links:</strong> Some links may be affiliate links, meaning the platform may earn a commission or referral fee if users make purchases through those links.</li>
+                            </ul>
+                            <h3>Disclaimer:</h3>
+                            <ul>
+                                <li><strong>No Control Over Third-Party Sites:</strong> The platform disclaims any responsibility for the accuracy, content, or availability of third-party websites or services. The inclusion of links does not imply endorsement or approval of the external website.</li>
+                                <li><strong>Use at Your Own Risk:</strong> Users click on third-party links at their own risk, and the platform is not liable for any issues that arise from interacting with these external sites.</li>
+                            </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                <div className="flex items-start gap-4">
+                    <Mail className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                        <h3 className="font-semibold text-lg text-foreground">Contact Us</h3>
+                        <p className="text-muted-foreground mt-1">
+                            If you have any questions about this Privacy Policy, please <Link href="/contact-us" className="text-primary underline">contact us</Link>.
+                        </p>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
       </div>
     );
-  }
-  
+}
+    
