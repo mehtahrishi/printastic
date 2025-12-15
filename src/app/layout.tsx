@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import { CookieConsent } from "@/components/cookie-consent";
 import { SplashScreen } from "@/components/ui/splash-screen";
+import { ChatWidget } from "@/components/chat-widget";
 
 const tanBuster = localFont({
   src: "../fonts/TanBuster.otf",
@@ -40,6 +41,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <ChatWidget />
         <CookieConsent />
         <SplashScreen />
       </body>
