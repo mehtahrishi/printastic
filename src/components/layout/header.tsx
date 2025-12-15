@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { SVGProps, useEffect, useState } from "react";
@@ -118,40 +119,14 @@ const navItems = [
 export function Header() {
   const { itemCount: cartItemCount } = useCart();
   const { itemCount: wishlistItemCount } = useWishlist();
-  const [isDark, setIsDark] = useState(false);
   const [tShirtOpen, setTShirtOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
-  useEffect(() => {
-    // Check initial theme from localStorage
-    const savedTheme = localStorage.getItem("theme");
-    
-    if (savedTheme === "dark") {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  };
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <Link href="/" className="flex items-center gap-2 mr-6">
-          <Brush className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">Printastic</span>
+      <div className="container flex h-18 items-center">
+        <Link href="/" className="flex items-center gap-2 mr-6 md:mr-12 text-xl md:text-2xl pt-3 md:-ml-10 mx-auto md:mx-0">
+          <Logo className="w-auto h-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -163,7 +138,9 @@ export function Header() {
                 <div className="flex items-center">
                   {tShirtIcon({ className: "h-6 w-6" })}
                 </div>
-                <span className="text-xs font-medium">T-Shirts</span>
+                <span className="text-xs font-medium flex items-center gap-1">
+                  T-Shirts <ChevronDown className="h-3 w-3" />
+                </span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -192,10 +169,7 @@ export function Header() {
         </nav>
 
         <div className="flex flex-1 items-center justify-end gap-2">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
-            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+
 
           <Button variant="ghost" size="icon" asChild className="hidden md:flex">
             <Link href="/cart">
@@ -243,9 +217,9 @@ export function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-72 sm:w-80">
                 <SheetHeader>
-                  <div className="flex items-center gap-2">
-                    <Brush className="h-6 w-6 text-primary" />
-                    <SheetTitle>Printastic</SheetTitle>
+                  <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+                  <div className="flex items-center gap-2 text-2xl">
+                    <Logo className="w-auto h-auto" />
                   </div>
                 </SheetHeader>
                 <div className="mt-6 flex flex-col gap-2">
@@ -257,9 +231,8 @@ export function Header() {
                         <span className="text-sm font-medium">T-Shirts</span>
                       </div>
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
-                          tShirtOpen ? "rotate-180" : ""
-                        }`}
+                        className={`h-4 w-4 transition-transform ${tShirtOpen ? "rotate-180" : ""
+                          }`}
                       />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="ml-7 mt-2 flex flex-col gap-2">
@@ -304,9 +277,8 @@ export function Header() {
                         <span className="text-sm font-medium">My Account</span>
                       </div>
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
-                          accountOpen ? "rotate-180" : ""
-                        }`}
+                        className={`h-4 w-4 transition-transform ${accountOpen ? "rotate-180" : ""
+                          }`}
                       />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="ml-7 mt-2 flex flex-col gap-2">
