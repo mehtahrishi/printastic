@@ -10,7 +10,7 @@ import {
     Package,
 } from "lucide-react";
 
-const sidebarItems = [
+export const sidebarItems = [
     {
         name: "Dashboard",
         href: "/admin/dashboard",
