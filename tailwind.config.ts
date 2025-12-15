@@ -22,6 +22,7 @@ const config = {
         body: ["Inter", "sans-serif"],
         headline: ["Inter", "sans-serif"],
         code: ["monospace"],
+        tanBuster: ["var(--font-tan-buster)"],
       },
       colors: {
         border: "hsl(var(--border))",
