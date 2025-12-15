@@ -61,7 +61,6 @@ export function LuxuryLoader({ className }: LuxuryLoaderProps) {
                         }}
                     >
                         {text}
-                        <span className="animate-blink ml-1 border-r-2 border-accent h-12 inline-block align-middle"></span>
                     </span>
                 </div>
             </div>
