@@ -197,24 +197,25 @@ export const AccountForm = ({ user }: { user: User }) => {
                         <Separator />
 
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between">
+                            <div className="grid grid-cols-2 items-center">
                                 <h3 className="text-lg font-semibold">Shipping Address</h3>
-                                {!isEditing && (
-                                    <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                                        <Pencil className="w-4 h-4 mr-2" />
-                                        Edit
-                                    </Button>
-                                )}
-                            </div>
-
-                            {isEditing ? (
-                                <>
-                                    <div className="flex items-center justify-end">
+                                <div className="flex items-center justify-end">
+                                    {isEditing ? (
                                         <Button type="button" variant="outline" size="sm" onClick={detectLocation}>
                                             <MapPin className="w-4 h-4 mr-2" />
                                             Detect Location
                                         </Button>
-                                    </div>
+                                    ) : (
+                                        <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                                            <Pencil className="w-4 h-4 mr-2" />
+                                            Edit
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {isEditing ? (
+                                <>
                                     <FormField
                                         control={form.control}
                                         name="address"
