@@ -36,7 +36,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="text-center py-16 md:py-24">
+      <section className="text-center py-8 md:py-12">
         <div className="container">
           <h1 className="text-4xl md:text-6xl font-bold text-primary tracking-tight">
             Art That Speaks to You
