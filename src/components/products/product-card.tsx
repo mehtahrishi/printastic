@@ -106,20 +106,20 @@ export function ProductCard({ product }: ProductCardProps) {
           <Badge variant="destructive" className="absolute top-2 left-2">Sale</Badge>
         )}
       </CardHeader>
-      <CardContent className="p-3 md:p-4 flex-grow">
-        <Link href={`/products/${product.id}`}>
+      <CardContent className="p-3 md:p-4 flex flex-col flex-grow">
+        <Link href={`/products/${product.id}`} className="flex-grow">
           <CardTitle className="text-base md:text-lg font-semibold hover:text-primary transition-colors leading-tight">
             {product.name}
           </CardTitle>
         </Link>
-      </CardContent>
-      <CardFooter className="p-3 md:p-4 pt-0 flex-col items-start gap-2">
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-baseline gap-2 mt-2">
             <p className="text-lg md:text-xl font-bold text-primary">${price.toFixed(2)}</p>
             {onSale && (
                 <p className="text-sm text-muted-foreground line-through">${originalPrice.toFixed(2)}</p>
             )}
         </div>
+      </CardContent>
+      <CardFooter className="p-3 md:p-4 pt-0">
         <Button onClick={handleAddToCart} className="w-full h-9 text-sm">
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart
