@@ -1,8 +1,32 @@
-import { products } from "@/lib/data";
+import { getProducts } from "@/app/actions/products";
 import { ProductCard } from "@/components/products/product-card";
 import { ProductCarousel } from "@/components/products/product-carousel";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const fetchedProducts = await getProducts(false);
+
+  const products = fetchedProducts.map(p => ({
+    ...p,
+    originalPrice: p.originalPrice ?? undefined,
+    category: p.category ?? undefined,
+    sizes: p.sizes ?? undefined,
+    colors: p.colors ?? undefined,
+    images: (() => {
+      const imgs = p.images as unknown;
+      if (Array.isArray(imgs)) return imgs as string[];
+      if (typeof imgs === 'string') {
+        try {
+          const parsed = JSON.parse(imgs);
+          if (Array.isArray(parsed)) return parsed as string[];
+        } catch { }
+        return (imgs as string).split(',').map((s: string) => s.trim()).filter(Boolean);
+      }
+      return [];
+    })(),
+    isTrending: p.isTrending ?? undefined,
+    isVisible: p.isVisible ?? undefined,
+  }));
+
   return (
     <div>
       <section>

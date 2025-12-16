@@ -15,12 +15,26 @@ interface ProductCardProps {
   product: Product;
 }
 
+function getFirstImage(images: string[] | string | undefined): string {
+  if (!images) return '';
+  if (Array.isArray(images)) return images[0] || '';
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      return Array.isArray(parsed) ? parsed[0] || '' : '';
+    } catch {
+      return images.split(',')[0]?.trim() || '';
+    }
+  }
+  return '';
+}
+
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
 
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = isInWishlist(product.id.toString());
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -32,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const handleWishlistToggle = () => {
     if (isWishlisted) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(product.id.toString());
       toast({
         title: "Removed from Wishlist",
         description: `${product.name} has been removed from your wishlist.`,
@@ -50,14 +64,22 @@ export function ProductCard({ product }: ProductCardProps) {
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg">
       <CardHeader className="p-0 relative">
         <Link href={`/products/${product.id}`} className="block">
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            width={600}
-            height={800}
-            className="w-full h-auto object-cover aspect-[3/4] transition-transform duration-300 group-hover:scale-105"
-            data-ai-hint={product.imageHint}
-          />
+          {(() => {
+            const imageUrl = getFirstImage(product.images);
+            return imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={product.name}
+                width={600}
+                height={800}
+                className="w-full h-auto object-cover aspect-[3/4] transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted text-muted-foreground text-sm">
+                No Image
+              </div>
+            );
+          })()}
         </Link>
         <Button
           variant="ghost"
@@ -84,7 +106,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
+        <p className="text-xl font-bold text-primary">${Number(product.price).toFixed(2)}</p>
         <Button onClick={handleAddToCart}>
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart

@@ -25,6 +25,8 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 
+import { getProductsCount } from "@/app/actions/products";
+
 export default async function DashboardPage() {
     // Check for admin session
     const cookieStore = await cookies();
@@ -36,6 +38,9 @@ export default async function DashboardPage() {
 
     // Fetch total customer count
     const customerCount = await db.select().from(users).then(res => res.length);
+
+    // Fetch active products count
+    const activeProductsCount = await getProductsCount(true);
 
     // Basic stats calculation
     const totalRevenue = orders.reduce((acc, order) => acc + order.total, 0);
@@ -77,7 +82,7 @@ export default async function DashboardPage() {
                 />
                 <StatCard
                     title="Active Products"
-                    value="12"
+                    value={activeProductsCount.toString()}
                     description="Inventory status"
                     icon={Package}
                 />

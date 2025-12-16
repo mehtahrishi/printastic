@@ -1,15 +1,19 @@
 export type Product = {
-  id: string;
+  id: number | string;
   name: string;
+  slug: string;
   description: string;
-  price: number;
-  imageUrl: string;
-  imageHint: string;
-  category: string;
-  previews: {
+  price: number | string;
+  originalPrice?: number | string;
+  category?: string;
+  sizes?: string[]; // Arrays from JSON
+  colors?: string[];
+  images: string[];
+  isTrending?: boolean;
+  isVisible?: boolean;
+  previews?: {
     id: string;
     imageUrl: string;
-    imageHint: string;
     setting: string;
   }[];
 };

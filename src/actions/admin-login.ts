@@ -16,7 +16,17 @@ export const adminLogin = async (values: z.infer<typeof LoginSchema>) => {
 
     const { email, password } = validatedFields.data;
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    // Strictly check against Environment Variables
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    // Fail if env vars are not set
+    if (!adminEmail || !adminPassword) {
+        console.error("Admin credentials are not configured in environment variables.");
+        return { error: "Server configuration error." };
+    }
+
+    if (email === adminEmail && password === adminPassword) {
         // Create admin session
         const cookieStore = await cookies();
         cookieStore.set("admin_session", "true", {

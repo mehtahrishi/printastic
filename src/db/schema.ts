@@ -1,4 +1,4 @@
-import { mysqlTable, int, varchar, text, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, int, varchar, text, timestamp, decimal, boolean, json } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
     id: int("id").autoincrement().primaryKey(),
@@ -13,4 +13,29 @@ export const users = mysqlTable("users", {
     role: varchar("role", { length: 50 }).default("USER"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const products = mysqlTable("products", {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    description: text("description").notNull(),
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+    originalPrice: decimal("original_price", { precision: 10, scale: 2 }),
+    category: varchar("category", { length: 100 }),
+    sizes: json("sizes").$type<string[]>(),
+    colors: json("colors").$type<string[]>(),
+    images: json("images").$type<string[]>().notNull(),
+    isTrending: boolean("is_trending").default(false),
+    isVisible: boolean("is_visible").default(true),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+export const productPreviews = mysqlTable("product_previews", {
+    id: int("id").autoincrement().primaryKey(),
+    productId: int("product_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+    setting: varchar("setting", { length: 100 }).notNull(),
+    imageUrl: text("image_url").notNull(),
+    imageHint: text("image_hint"),
 });

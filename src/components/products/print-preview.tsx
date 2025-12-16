@@ -10,17 +10,17 @@ interface PrintPreviewProps {
 }
 
 export function PrintPreview({ product }: PrintPreviewProps) {
-  const [activePreview, setActivePreview] = useState(product.imageUrl);
-  const [activeHint, setActiveHint] = useState(product.imageHint);
+  const mainImage = product.images?.[0] || '';
+  const [activePreview, setActivePreview] = useState(mainImage);
+  const [activeHint, setActiveHint] = useState<string | undefined>(undefined);
 
   const allPreviews = [
     {
       id: "original",
-      imageUrl: product.imageUrl,
-      imageHint: product.imageHint,
+      imageUrl: mainImage,
       setting: "Original",
     },
-    ...product.previews,
+    ...(product.previews || []),
   ];
 
   return (
@@ -40,7 +40,7 @@ export function PrintPreview({ product }: PrintPreviewProps) {
             key={preview.id}
             onClick={() => {
               setActivePreview(preview.imageUrl);
-              setActiveHint(preview.imageHint);
+              setActiveHint(undefined);
             }}
             className={cn(
               "relative aspect-square overflow-hidden rounded-md border-2 transition-all",
@@ -55,7 +55,6 @@ export function PrintPreview({ product }: PrintPreviewProps) {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 25vw, 10vw"
-              data-ai-hint={preview.imageHint}
             />
             {preview.setting !== "Original" && (
               <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
