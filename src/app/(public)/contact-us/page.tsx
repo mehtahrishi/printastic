@@ -212,7 +212,7 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Our Address</h4>
                     <p className="text-sm text-muted-foreground">
-                      Khoparkhaine
+                      Shop No.9, Matoshree chs ltd, plot no. 387, Gyan VIkas Road, 19/C , Sector 19, Kopar Khairane, Navi mmumbai, maharashtra 400709, India
                     </p>
                   </div>
                 </div>
@@ -224,10 +224,10 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Email Us</h4>
                     <a 
-                      href="mailto:contact@honestyprinthouse.in" 
+                      href="mailto:info@honestyprinthouse.in" 
                       className="text-sm text-primary hover:underline"
                     >
-                      contact@honestyprinthouse.in
+                      info@honestyprinthouse.in
                     </a>
                   </div>
                 </div>
@@ -239,10 +239,16 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Call Us</h4>
                     <a 
-                      href="tel:+1234567890" 
+                      href="tel:+919920214202" 
                       className="text-sm text-primary hover:underline block"
                     >
-                      (123) 456-7890
+                      +91 9920214202
+                    </a>
+                     <a 
+                      href="tel:+918828569484" 
+                      className="text-sm text-primary hover:underline block"
+                    >
+                      +91 8828569484
                     </a>
                   </div>
                 </div>

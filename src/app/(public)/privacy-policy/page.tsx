@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
                         </AccordionTrigger>
                         <AccordionContent className="prose dark:prose-invert max-w-none text-foreground/80 pl-8">
                             <p>
-                                The online store www.honestyprinthouse.in (“Online Store”) is owned and operated by Honesty Enterprise, under the laws of India having its registered office at Shop No.9, Plot No.387,Matoshree CHS, Sector-19C, Koparkhairane, Navi Mumbai – 4400709.
+                                The online store www.honestyprinthouse.in (“Online Store”) is owned and operated by Honesty Enterprise, under the laws of India having its registered office at Shop No.9, Matoshree chs ltd, plot no. 387, Gyan VIkas Road, 19/C , Sector 19, Kopar Khairane, Navi mmumbai, maharashtra 400709, India.
                             </p>
                             <p>
                                 Users are requested to read and understand the Policy very carefully before using or accessing the Online Store. Through this Policy, Honesty Enterprise intends to convey the manner in which the user’s information is collated and used by Honesty Enterprise Shopping while providing the services of the Online Store. This Policy is binding on every user of the Online Store and users who do not agree with the terms of this Policy should not use or access the Online Store.
