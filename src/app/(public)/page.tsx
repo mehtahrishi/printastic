@@ -1,6 +1,7 @@
 import { getProducts } from "@/app/actions/products";
 import { ProductCard } from "@/components/products/product-card";
 import { ProductCarousel } from "@/components/products/product-carousel";
+import { ProductGridClient } from "@/components/products/product-grid-client";
 
 export default async function HomePage() {
   const fetchedProducts = await getProducts(false);
@@ -35,7 +36,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="text-center py-16 md:py-24 bg-muted/40">
+      <section className="text-center py-16 md:py-24">
         <div className="container">
           <h1 className="text-4xl md:text-6xl font-bold text-primary tracking-tight">
             Art That Speaks to You
@@ -47,14 +48,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="py-12 md:py-20 bg-muted/40">
+      <section className="py-12 md:py-20">
         <div className="container">
           <h2 className="text-3xl font-bold text-center mb-10">Our Full Collection</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <ProductGridClient initialProducts={products} />
         </div>
       </section>
     </div>

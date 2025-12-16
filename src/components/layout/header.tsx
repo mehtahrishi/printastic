@@ -53,7 +53,15 @@ const tShirtIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const tshirtNavItems = [
+  { name: "All T-Shirts", href: "/category/t-shirts", icon: tShirtIcon },
+  { name: "Oversize T-Shirts", href: "/category/oversize-t-shirt", icon: tShirtIcon },
+  { name: "Kids T-Shirts", href: "/category/kids-t-shirts", icon: tShirtIcon },
+  { name: "Regular T-Shirts", href: "/category/regular-t-shirts", icon: tShirtIcon },
+];
+
 const navItems = [
+  ...tshirtNavItems,
   {
     name: "Hoodies",
     href: "/category/hoodies",
@@ -88,7 +96,6 @@ const navItems = [
 export function Header({ user }: { user?: { name: string | null } | null }) {
   const { itemCount: cartItemCount } = useCart();
   const { itemCount: wishlistItemCount } = useWishlist();
-  const [tShirtOpen, setTShirtOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
 
   return (
@@ -99,35 +106,6 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80 cursor-pointer bg-transparent border-none p-0"
-              >
-                <div className="flex items-center">
-                  {tShirtIcon({ className: "h-6 w-6" })}
-                </div>
-                <span className="text-xs font-medium flex items-center gap-1">
-                  T-Shirts <ChevronDown className="h-3 w-3" />
-                </span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem asChild>
-                <Link href="/category/t-shirts">All T-Shirts</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/category/oversize-t-shirt">Oversize T-Shirts</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/category/kids-t-shirts">Kids T-Shirts</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/category/regular-t-shirts">Regular T-Shirts</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -207,47 +185,6 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                   </div>
                 </SheetHeader>
                 <div className="mt-6 flex flex-col gap-2">
-                  {/* T-Shirts with collapsible dropdown */}
-                  <Collapsible open={tShirtOpen} onOpenChange={setTShirtOpen}>
-                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent">
-                      <div className="flex items-center gap-2">
-                        {tShirtIcon({ className: "h-5 w-5" })}
-                        <span className="text-sm font-medium">T-Shirts</span>
-                      </div>
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform ${tShirtOpen ? "rotate-180" : ""
-                          }`}
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="ml-7 mt-2 flex flex-col gap-2">
-                      <Link
-                        href="/category/t-shirts"
-                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                      >
-                        All T-Shirts
-                      </Link>
-                      <Link
-                        href="/category/oversize-t-shirt"
-                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                      >
-                        Oversize T-Shirts
-                      </Link>
-                      <Link
-                        href="/category/kids-t-shirts"
-                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                      >
-                        Kids T-Shirts
-                      </Link>
-                      <Link
-                        href="/category/regular-t-shirts"
-                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                      >
-                        Regular T-Shirts
-                      </Link>
-                    </CollapsibleContent>
-                  </Collapsible>
-
-                  {/* Other nav items */}
                   {navItems.map((item) => (
                     <Link
                       key={item.name}
