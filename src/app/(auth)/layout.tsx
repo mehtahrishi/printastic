@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { TypingQuote } from "@/components/layout/typing-quote";
 
 const AuthLayout = async ({
     children
@@ -27,17 +28,7 @@ const AuthLayout = async ({
                 <div className="flex min-h-screen flex-col">
                     <Header user={user} />
                     <main className="flex-1">{children}</main>
-                    <div className="py-12 text-center">
-                        <p
-                          className="text-4xl md:text-5xl"
-                          style={{
-                            fontFamily: "var(--font-moon-time)",
-                            color: "#7B3F00",
-                          }}
-                        >
-                          "Crystal clear prints, from our House to yours."
-                        </p>
-                    </div>
+                    <TypingQuote />
                     <Footer />
                 </div>
             </WishlistProvider>
