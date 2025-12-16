@@ -120,15 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     <p className="text-sm text-muted-foreground line-through">₹{originalPrice.toFixed(2)}</p>
                 )}
             </div>
-            {/* Desktop: Icon Button */}
-            <div className="hidden sm:flex justify-end">
-              <Button onClick={handleAddToCart} size="icon" variant="outline" className="shrink-0 h-9 w-9">
-                <ShoppingCart className="h-4 w-4" />
-                <span className="sr-only">Add to Cart</span>
-              </Button>
-            </div>
-             {/* Mobile: Full Button */}
-            <div className="sm:hidden">
+            <div>
               <Button onClick={handleAddToCart} size="sm" className="w-full">
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 Add to cart
