@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartProvider } from "@/hooks/use-cart";
@@ -26,7 +27,7 @@ const AuthLayout = async ({
                 <div className="flex min-h-screen flex-col">
                     <Header user={user} />
                     <main className="flex-1">{children}</main>
-                    <div className="py-12 text-center bg-background">
+                    <div className="py-12 text-center">
                         <p
                           className="text-4xl md:text-5xl"
                           style={{
