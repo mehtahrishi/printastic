@@ -301,39 +301,6 @@ export default function ContactUsPage() {
               </CardContent>
             </Card>
 
-            {/* FAQ Quick Links */}
-            <Card className="shadow-lg border-border/50 bg-card">
-              <CardHeader>
-                <CardTitle className="text-xl">Quick Help</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <a 
-                  href="/shipping-policy" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Shipping Information
-                </a>
-                <a 
-                  href="/refund-policy" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Returns & Refunds
-                </a>
-                <a 
-                  href="/terms-and-conditions" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Terms & Conditions
-                </a>
-                <a 
-                  href="/privacy-policy" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Privacy Policy
-                </a>
-              </CardContent>
-            </Card>
-            
             <Card className="shadow-lg border-border/50 overflow-hidden">
                 <CardHeader className="pb-4">
                     <CardTitle className="text-xl flex items-center gap-2">
@@ -370,3 +337,5 @@ export default function ContactUsPage() {
     </div>
   );
 }
+
+    
