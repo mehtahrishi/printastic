@@ -12,9 +12,12 @@ import { useWishlist } from "@/hooks/use-wishlist";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
+import { ToastAction } from "@/components/ui/toast";
 
 interface ProductCardProps {
   product: Product;
+  user?: { name: string | null } | null;
 }
 
 function getFirstImage(images: string[] | string | undefined): string {
@@ -31,14 +34,32 @@ function getFirstImage(images: string[] | string | undefined): string {
   return '';
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, user }: ProductCardProps) {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
+  const router = useRouter();
 
   const isWishlisted = isInWishlist(product.id.toString());
 
+  const showAuthToast = () => {
+    toast({
+      title: "Authentication Required",
+      description: "Please log in or create an account to continue.",
+      variant: "destructive",
+      action: (
+        <ToastAction altText="Login" onClick={() => router.push("/login")}>
+          Login
+        </ToastAction>
+      ),
+    });
+  };
+
   const handleAddToCart = () => {
+    if (!user) {
+      showAuthToast();
+      return;
+    }
     addToCart(product);
     toast({
       title: "Added to Cart",
@@ -47,6 +68,10 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleWishlistToggle = () => {
+    if (!user) {
+      showAuthToast();
+      return;
+    }
     if (isWishlisted) {
       removeFromWishlist(product.id.toString());
       toast({
@@ -108,24 +133,24 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </CardHeader>
       <CardContent className="p-3 md:p-4 flex flex-col flex-grow">
-        <Link href={`/products/${product.id}`} className="block mb-2">
-          <CardTitle className="text-base md:text-lg font-semibold hover:text-primary transition-colors leading-tight">
-            {product.name}
-          </CardTitle>
-        </Link>
-        <div className="mt-auto space-y-2">
-            <div className="flex items-baseline gap-2">
+        <div className="flex-grow">
+            <Link href={`/products/${product.id}`} className="block mb-2">
+            <CardTitle className="text-base md:text-lg font-semibold hover:text-primary transition-colors leading-tight">
+                {product.name}
+            </CardTitle>
+            </Link>
+            <div className="flex items-baseline gap-2 mt-2">
                 <p className="text-lg md:text-xl font-bold text-primary">₹{price.toFixed(2)}</p>
                 {onSale && (
                     <p className="text-sm text-muted-foreground line-through">₹{originalPrice.toFixed(2)}</p>
                 )}
             </div>
-            <div>
-              <Button onClick={handleAddToCart} size="sm" className="w-full">
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                Add to cart
-              </Button>
-            </div>
+        </div>
+        <div className="mt-4">
+            <Button onClick={handleAddToCart} size="sm" className="w-full">
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            Add to cart
+            </Button>
         </div>
       </CardContent>
     </Card>
