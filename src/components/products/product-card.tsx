@@ -10,6 +10,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   product: Product;
@@ -60,10 +61,14 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
+  const price = Number(product.price);
+  const originalPrice = product.originalPrice ? Number(product.originalPrice) : null;
+  const onSale = originalPrice && originalPrice > price;
+
   return (
-    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg">
+    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg group">
       <CardHeader className="p-0 relative">
-        <Link href={`/products/${product.id}`} className="block">
+        <Link href={`/products/${product.id}`} className="block overflow-hidden">
           {(() => {
             const imageUrl = getFirstImage(product.images);
             return imageUrl ? (
@@ -84,12 +89,12 @@ export function ProductCard({ product }: ProductCardProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-2 right-2 bg-background/50 hover:bg-background/80 rounded-full"
+          className="absolute top-2 right-2 bg-background/50 hover:bg-background/80 rounded-full h-8 w-8"
           onClick={handleWishlistToggle}
         >
           <Heart
             className={cn(
-              "h-5 w-5",
+              "h-4 w-4",
               isWishlisted ? "text-red-500 fill-current" : "text-foreground"
             )}
           />
@@ -97,17 +102,25 @@ export function ProductCard({ product }: ProductCardProps) {
             {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           </span>
         </Button>
+        {onSale && (
+          <Badge variant="destructive" className="absolute top-2 left-2">Sale</Badge>
+        )}
       </CardHeader>
-      <CardContent className="p-4 flex-grow">
+      <CardContent className="p-3 md:p-4 flex-grow">
         <Link href={`/products/${product.id}`}>
-          <CardTitle className="text-lg font-semibold hover:text-primary transition-colors">
+          <CardTitle className="text-base md:text-lg font-semibold hover:text-primary transition-colors leading-tight">
             {product.name}
           </CardTitle>
         </Link>
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <p className="text-xl font-bold text-primary">${Number(product.price).toFixed(2)}</p>
-        <Button onClick={handleAddToCart}>
+      <CardFooter className="p-3 md:p-4 pt-0 flex-col items-start gap-2">
+        <div className="flex items-baseline gap-2">
+            <p className="text-lg md:text-xl font-bold text-primary">${price.toFixed(2)}</p>
+            {onSale && (
+                <p className="text-sm text-muted-foreground line-through">${originalPrice.toFixed(2)}</p>
+            )}
+        </div>
+        <Button onClick={handleAddToCart} className="w-full h-9 text-sm">
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart
         </Button>
