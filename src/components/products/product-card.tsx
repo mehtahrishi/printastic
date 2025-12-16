@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -5,7 +6,7 @@ import Link from "next/link";
 import { Heart, ShoppingCart } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useToast } from "@/hooks/use-toast";
@@ -107,24 +108,24 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </CardHeader>
       <CardContent className="p-3 md:p-4 flex flex-col flex-grow">
-        <Link href={`/products/${product.id}`} className="flex-grow">
+        <Link href={`/products/${product.id}`} className="block mb-2">
           <CardTitle className="text-base md:text-lg font-semibold hover:text-primary transition-colors leading-tight">
             {product.name}
           </CardTitle>
         </Link>
-        <div className="flex items-baseline gap-2 mt-2">
-            <p className="text-lg md:text-xl font-bold text-primary">${price.toFixed(2)}</p>
-            {onSale && (
-                <p className="text-sm text-muted-foreground line-through">${originalPrice.toFixed(2)}</p>
-            )}
+        <div className="mt-auto flex justify-between items-center">
+            <div className="flex items-baseline gap-2">
+                <p className="text-lg md:text-xl font-bold text-primary">${price.toFixed(2)}</p>
+                {onSale && (
+                    <p className="text-sm text-muted-foreground line-through">${originalPrice.toFixed(2)}</p>
+                )}
+            </div>
+            <Button onClick={handleAddToCart} size="icon" variant="outline" className="shrink-0 h-9 w-9">
+              <ShoppingCart className="h-4 w-4" />
+              <span className="sr-only">Add to Cart</span>
+            </Button>
         </div>
       </CardContent>
-      <CardFooter className="p-3 md:p-4 pt-0">
-        <Button onClick={handleAddToCart} className="w-full h-9 text-sm">
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Add to Cart
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
