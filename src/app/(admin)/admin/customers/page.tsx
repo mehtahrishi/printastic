@@ -1,3 +1,4 @@
+
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { Button } from "@/components/ui/button";
@@ -151,7 +152,7 @@ export default async function CustomersPage({
                                         <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                                             <CreditCard className="h-3 w-3" /> Total Spent
                                         </span>
-                                        <span className="text-lg font-bold text-primary">$0.00</span>
+                                        <span className="text-lg font-bold text-primary">₹0.00</span>
                                     </div>
                                 </div>
 
@@ -253,7 +254,7 @@ export default async function CustomersPage({
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                <span className="text-sm font-medium">$0.00</span>
+                                                <span className="text-sm font-medium">₹0.00</span>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">

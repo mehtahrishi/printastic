@@ -61,7 +61,7 @@ export default async function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="Total Revenue"
-                    value={`$${totalRevenue.toLocaleString("en-US", {
+                    value={`₹${totalRevenue.toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                     })}`}
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
-                                                ${order.total.toFixed(2)}
+                                                ₹{order.total.toFixed(2)}
                                             </TableCell>
                                         </TableRow>
                                     ))}

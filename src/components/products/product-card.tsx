@@ -115,9 +115,9 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
         <div className="mt-auto flex justify-between items-center">
             <div className="flex items-baseline gap-2">
-                <p className="text-lg md:text-xl font-bold text-primary">${price.toFixed(2)}</p>
+                <p className="text-lg md:text-xl font-bold text-primary">₹{price.toFixed(2)}</p>
                 {onSale && (
-                    <p className="text-sm text-muted-foreground line-through">${originalPrice.toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground line-through">₹{originalPrice.toFixed(2)}</p>
                 )}
             </div>
             <Button onClick={handleAddToCart} size="icon" variant="outline" className="shrink-0 h-9 w-9">

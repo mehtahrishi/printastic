@@ -1,3 +1,4 @@
+
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 
 import {
@@ -33,7 +34,7 @@ export function SalesChart({data}: SalesChartProps) {
                       fontSize={12}
                       tickLine={false}
                       axisLine={false}
-                      tickFormatter={(value) => `$${value}`}
+                      tickFormatter={(value) => `₹${value}`}
                   />
                   <Tooltip
                       content={<ChartTooltipContent />}
