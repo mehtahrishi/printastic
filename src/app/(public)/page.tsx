@@ -48,7 +48,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="py-12 md:py-20">
+      <section className="pb-12 md:pb-20">
         <div className="container">
           <h2 className="text-3xl font-bold text-center mb-10">Our Full Collection</h2>
           <ProductGridClient initialProducts={products} />
