@@ -154,8 +154,8 @@ export const AccountForm = ({ user }: { user: User }) => {
     return (
         <div className="bg-card p-6 rounded-xl border shadow-sm">
             <div className="space-y-6">
-                <div className="flex justify-center mb-4">
-                    <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-4xl">
+                <div className="flex justify-center mb-4 mt-8">
+                    <div className="text-7xl font-tanBuster text-primary">
                         {user.name?.[0].toUpperCase()}
                     </div>
                 </div>
@@ -202,8 +202,8 @@ export const AccountForm = ({ user }: { user: User }) => {
                                 <div className="flex items-center justify-end">
                                     {isEditing ? (
                                         <Button type="button" variant="outline" size="sm" onClick={detectLocation}>
-                                            <MapPin className="w-4 h-4 mr-2" />
-                                            Detect Location
+                                            <MapPin className="w-4 h-4 sm:mr-2" />
+                                            <span className="hidden sm:inline">Detect Location</span>
                                         </Button>
                                     ) : (
                                         <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(true)}>
