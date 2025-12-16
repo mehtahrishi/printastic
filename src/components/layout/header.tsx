@@ -36,8 +36,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "../ui/toast";
+import { useRouter } from "next/navigation";
 
-const tShirtIcon = (props: SVGProps<SVGSVGElement>) => (
+const OversizeTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -73,43 +76,60 @@ const KidsTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const tshirtNavItems = [
-  { name: "All T-Shirts", href: "/category/t-shirts", icon: tShirtIcon },
-  { name: "Oversize T-Shirts", href: "/category/oversize-t-shirt", icon: tShirtIcon },
-  { name: "Kids T-Shirts", href: "/category/kids-t-shirts", icon: KidsTShirtIcon },
-  { name: "Regular T-Shirts", href: "/category/regular-t-shirts", icon: tShirtIcon },
-];
+const RegularTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg 
+    {...props}
+    fill="currentColor" 
+    width="24" 
+    height="24" 
+    version="1.1" 
+    id="Icons" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlnsXlink="http://www.w3.org/1999/xlink" 
+    viewBox="0 0 32 32" 
+    xmlSpace="preserve">
+    <path d="M29.7,10.3l-3.7-3.7c-1.7-1.7-4-2.6-6.4-2.6h-0.2c-0.4,0-0.7,0.2-0.9,0.5C18,5.4,17.1,6,16,6s-2-0.6-2.6-1.5
+      C13.2,4.2,12.9,4,12.6,4h-0.2C9.9,4,7.6,4.9,5.9,6.6l-3.7,3.7c-0.4,0.4-0.4,0.9-0.1,1.3l4,5C6.4,16.8,6.7,17,6.9,17
+      c0.3,0,0.6-0.1,0.8-0.3L9,15.4V27c0,0.6,0.4,1,1,1h12c0.6,0,1-0.4,1-1V15.4l1.3,1.3c0.2,0.2,0.5,0.3,0.8,0.3c0.3,0,0.5-0.2,0.7-0.4
+      l4-5C30.1,11.2,30.1,10.7,29.7,10.3z"/>
+  </svg>
+);
+
+const HoodieIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 304.43 304.43"
+      fill="currentColor"
+    >
+      <path d="M176.2,218.497h-47.971c-0.603,9.548-3.716,20.083-8.962,29.98c-2.266,4.273-4.859,8.296-7.69,11.963h81.275
+        c-2.831-3.667-5.425-7.69-7.691-11.963C179.916,238.581,176.804,228.046,176.2,218.497z"/>
+      <path d="M302.819,183.478l-84.082-85.638c-4.173-4.25-9.878-6.644-15.834-6.644h-14.341c7.845-15.915,12.623-33.403,12.623-43.027
+        c0-20.619-21.925-42.333-48.971-42.333s-48.971,21.715-48.971,42.333c0,9.492,4.65,26.634,12.304,42.372v0.655h-14.022
+        c-5.956,0-11.662,2.394-15.834,6.644L1.61,183.478c-2.045,2.083-2.155,5.385-0.254,7.6l17.576,20.47
+        c1.96,2.282,5.369,2.617,7.735,0.76l53.12-41.687L63.928,286.117c-0.432,3.144,0.518,6.321,2.603,8.712
+        c2.086,2.392,5.104,3.764,8.277,3.764h154.813c3.173,0,6.191-1.373,8.277-3.764c2.086-2.392,3.035-5.569,2.603-8.712
+        l-15.859-115.496l53.12,41.687c2.366,1.857,5.775,1.522,7.735-0.76l17.576-20.47C304.975,188.862,304.865,185.561,302.819,183.478z
+        M152.215,41.502c13.636,0,24.69,10.948,24.69,21.343s-11.054,38.99-24.69,38.99c-13.636,0-24.69-28.594-24.69-38.99
+        S138.579,41.502,152.215,41.502z M218.222,270.218c-0.991,3.11-3.881,5.223-7.146,5.223H93.353c-3.265,0-6.154-2.112-7.146-5.223
+        c-0.992-3.11,0.143-6.505,2.806-8.395c6.41-4.547,12.447-11.782,17-20.371c5.378-10.144,8.052-21.232,7.154-29.661
+        c-0.225-2.115,0.459-4.227,1.881-5.809c1.423-1.582,3.45-2.485,5.577-2.485h63.178c2.127,0,4.154,0.903,5.577,2.485
+        c1.422,1.582,2.105,3.693,1.881,5.809c-0.898,8.431,1.776,19.518,7.153,29.661c0,0,0,0,0.001,0c4.553,8.589,10.59,15.824,17,20.371
+        C218.079,263.713,219.214,267.108,218.222,270.218z"/>
+    </svg>
+);
+
 
 const navItems = [
-  ...tshirtNavItems,
+  { name: "Oversize T-Shirts", href: "/products?category=Oversize+T-Shirts", icon: OversizeTShirtIcon },
+  { name: "Kids T-Shirts", href: "/products?category=Kids+T-Shirts", icon: KidsTShirtIcon },
+  { name: "Regular T-Shirts", href: "/products?category=Regular+T-Shirts", icon: RegularTShirtIcon },
   {
     name: "Hoodies",
-    href: "/category/hoodies",
-    icon: (props: SVGProps<SVGSVGElement>) => (
-      <svg
-        {...props}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 304.43 304.43"
-        fill="currentColor"
-      >
-        <path d="M176.2,218.497h-47.971c-0.603,9.548-3.716,20.083-8.962,29.98c-2.266,4.273-4.859,8.296-7.69,11.963h81.275
-          c-2.831-3.667-5.425-7.69-7.691-11.963C179.916,238.581,176.804,228.046,176.2,218.497z"/>
-        <path d="M302.819,183.478l-84.082-85.638c-4.173-4.25-9.878-6.644-15.834-6.644h-14.341c7.845-15.915,12.623-33.403,12.623-43.027
-          c0-20.619-21.925-42.333-48.971-42.333s-48.971,21.715-48.971,42.333c0,9.492,4.65,26.634,12.304,42.372v0.655h-14.022
-          c-5.956,0-11.662,2.394-15.834,6.644L1.61,183.478c-2.045,2.083-2.155,5.385-0.254,7.6l17.576,20.47
-          c1.96,2.282,5.369,2.617,7.735,0.76l53.12-41.687L63.928,286.117c-0.432,3.144,0.518,6.321,2.603,8.712
-          c2.086,2.392,5.104,3.764,8.277,3.764h154.813c3.173,0,6.191-1.373,8.277-3.764c2.086-2.392,3.035-5.569,2.603-8.712
-          l-15.859-115.496l53.12,41.687c2.366,1.857,5.775,1.522,7.735-0.76l17.576-20.47C304.975,188.862,304.865,185.561,302.819,183.478z
-          M152.215,41.502c13.636,0,24.69,10.948,24.69,21.343s-11.054,38.99-24.69,38.99c-13.636,0-24.69-28.594-24.69-38.99
-          S138.579,41.502,152.215,41.502z M218.222,270.218c-0.991,3.11-3.881,5.223-7.146,5.223H93.353c-3.265,0-6.154-2.112-7.146-5.223
-          c-0.992-3.11,0.143-6.505,2.806-8.395c6.41-4.547,12.447-11.782,17-20.371c5.378-10.144,8.052-21.232,7.154-29.661
-          c-0.225-2.115,0.459-4.227,1.881-5.809c1.423-1.582,3.45-2.485,5.577-2.485h63.178c2.127,0,4.154,0.903,5.577,2.485
-          c1.422,1.582,2.105,3.693,1.881,5.809c-0.898,8.431,1.776,19.518,7.153,29.661c0,0,0,0,0.001,0c4.553,8.589,10.59,15.824,17,20.371
-          C218.079,263.713,219.214,267.108,218.222,270.218z"/>
-      </svg>
-    ),
+    href: "/products?category=Hoodie",
+    icon: HoodieIcon
   },
 ];
 
@@ -117,6 +137,31 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
   const { itemCount: cartItemCount } = useCart();
   const { itemCount: wishlistItemCount } = useWishlist();
   const [accountOpen, setAccountOpen] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const showAuthToast = () => {
+    toast({
+      title: "Authentication Required",
+      description: "Please log in or create an account to continue.",
+      variant: "destructive",
+      action: (
+        <ToastAction altText="Login" onClick={() => router.push("/login")}>
+          Login
+        </ToastAction>
+      ),
+    });
+  };
+
+  const handleProtectedLink = (e: React.MouseEvent, href: string) => {
+    if (!user) {
+      e.preventDefault();
+      showAuthToast();
+    } else {
+      router.push(href);
+    }
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -141,7 +186,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
         <div className="flex flex-1 items-center justify-end gap-2">
 
 
-          <Button variant="ghost" size="icon" asChild className="hidden md:flex">
+          <Button variant="ghost" size="icon" asChild className="hidden md:flex" onClick={(e) => handleProtectedLink(e, "/cart")}>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {cartItemCount > 0 && (
@@ -231,18 +276,21 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                     <CollapsibleContent className="ml-7 mt-2 flex flex-col gap-2">
                       <Link
                         href="/account"
+                        onClick={(e) => handleProtectedLink(e, "/account")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
                       >
                         Profile
                       </Link>
                       <Link
                         href="/wishlist"
+                        onClick={(e) => handleProtectedLink(e, "/wishlist")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
                       >
                         My Wishlist
                       </Link>
                       <Link
                         href="/cart"
+                        onClick={(e) => handleProtectedLink(e, "/cart")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent flex items-center justify-between"
                       >
                         <span>Cart</span>
@@ -254,16 +302,35 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                       </Link>
                       <Link
                         href="/orders"
+                        onClick={(e) => handleProtectedLink(e, "/orders")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
                       >
                         Orders
                       </Link>
-                      <Link
-                        href="/signout"
-                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                      >
-                        Sign out
-                      </Link>
+                      {user ? (
+                        <Link
+                          href="/signout"
+                          className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                        >
+                          Sign out
+                        </Link>
+                      ) : (
+                        <>
+                        <Link
+                          href="/login"
+                          className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                        >
+                          Login
+                        </Link>
+                         <Link
+                          href="/register"
+                          className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                        >
+                          Sign Up
+                        </Link>
+                        </>
+                      )}
+
                     </CollapsibleContent>
                   </Collapsible>
                 </div>
@@ -275,5 +342,3 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
     </header>
   );
 }
-
-    
