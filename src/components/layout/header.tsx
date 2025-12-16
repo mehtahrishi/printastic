@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -53,10 +54,29 @@ const tShirtIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const KidsTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    {...props}
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke="currentColor"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M9 5h-.16667c-.86548 0-1.70761.28071-2.4.8L3.5 8l2 3.5L8 10v9h8v-9l2.5 1.5 2-3.5-2.9333-2.2c-.6924-.51929-1.5346-.8-2.4-.8H15M9 5c0 1.5 1.5 3 3 3s3-1.5 3-3M9 5h6"
+    />
+  </svg>
+);
+
 const tshirtNavItems = [
   { name: "All T-Shirts", href: "/category/t-shirts", icon: tShirtIcon },
   { name: "Oversize T-Shirts", href: "/category/oversize-t-shirt", icon: tShirtIcon },
-  { name: "Kids T-Shirts", href: "/category/kids-t-shirts", icon: tShirtIcon },
+  { name: "Kids T-Shirts", href: "/category/kids-t-shirts", icon: KidsTShirtIcon },
   { name: "Regular T-Shirts", href: "/category/regular-t-shirts", icon: tShirtIcon },
 ];
 
@@ -255,3 +275,5 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
     </header>
   );
 }
+
+    
