@@ -6,6 +6,21 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
+function parseJsonOrString(data: any): string[] {
+    if (Array.isArray(data)) return data;
+    if (typeof data === 'string') {
+        try {
+            // First, try to parse it as JSON
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+            // If it's not a valid JSON string, treat it as a comma-separated string
+            return data.split(',').map(s => s.trim()).filter(Boolean);
+        }
+    }
+    return [];
+}
+
 export default async function HomePage() {
   const fetchedProducts = await getProducts(false);
 
@@ -15,20 +30,9 @@ export default async function HomePage() {
       ...p,
       originalPrice: p.originalPrice ?? undefined,
       category: p.category ?? undefined,
-      sizes: p.sizes ?? undefined,
-      colors: p.colors ?? undefined,
-      images: (() => {
-        const imgs = p.images as unknown;
-        if (Array.isArray(imgs)) return imgs as string[];
-        if (typeof imgs === 'string') {
-          try {
-            const parsed = JSON.parse(imgs);
-            if (Array.isArray(parsed)) return parsed as string[];
-          } catch { }
-          return (imgs as string).split(',').map((s: string) => s.trim()).filter(Boolean);
-        }
-        return [];
-      })(),
+      sizes: parseJsonOrString(p.sizes),
+      colors: parseJsonOrString(p.colors),
+      images: parseJsonOrString(p.images),
       isTrending: p.isTrending ?? undefined,
       isVisible: p.isVisible ?? undefined,
     }));

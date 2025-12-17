@@ -14,6 +14,22 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
+function parseJsonOrString(data: any): string[] {
+    if (Array.isArray(data)) return data;
+    if (typeof data === 'string') {
+        try {
+            // First, try to parse it as JSON
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) return parsed;
+        } catch (e) {
+            // If it's not a valid JSON string, treat it as a comma-separated string
+            return data.split(',').map(s => s.trim()).filter(Boolean);
+        }
+    }
+    return [];
+}
+
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -35,21 +51,9 @@ export default async function ProductDetailPage({
     ...product,
     price: Number(product.price),
     originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
-    sizes: product.sizes as string[] || [],
-    colors: product.colors as string[] || [],
-    images: (() => {
-      if (!product.images) return [];
-      if (Array.isArray(product.images)) return product.images;
-      if (typeof product.images === 'string') {
-        try {
-          const parsed = JSON.parse(product.images);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch {
-          return (product.images as string).split(',').map((s: string) => s.trim()).filter(Boolean);
-        }
-      }
-      return [];
-    })(),
+    sizes: parseJsonOrString(product.sizes),
+    colors: parseJsonOrString(product.colors),
+    images: parseJsonOrString(product.images),
     previews: previews.map(p => ({
       id: p.id.toString(),
       imageUrl: p.imageUrl,
