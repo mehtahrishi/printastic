@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Heart, ShoppingCart, Loader2 } from "lucide-react";
+import { Heart, ShoppingCart, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
@@ -13,6 +13,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "../ui/toast";
 import { addToCart } from "@/actions/cart";
+import Link from "next/link";
 
 interface ProductDetailClientProps {
     product: any;
@@ -158,31 +159,39 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                     )}
                 </div>
 
-                <div className="mt-8 flex items-center gap-4">
-                    <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isPending || isAddToCartDisabled}>
-                        {isPending ? (
-                            <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                Adding...
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingCart className="mr-2 h-5 w-5" />
-                                Add to Cart
-                            </>
-                        )}
-                    </Button>
-                    <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
-                        <Heart
-                            className={cn(
-                                "h-5 w-5",
-                                isWishlisted ? "text-red-500 fill-current" : "text-foreground"
+                <div className="mt-auto pt-8">
+                    <div className="flex items-center gap-2">
+                        <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isPending || isAddToCartDisabled}>
+                            {isPending ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Adding...
+                                </>
+                            ) : (
+                                <>
+                                    <ShoppingCart className="mr-2 h-5 w-5" />
+                                    Add to Cart
+                                </>
                             )}
-                        />
-                        <span className="sr-only">
-                            {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                        </span>
-                    </Button>
+                        </Button>
+                         <Button size="lg" variant="outline" asChild>
+                            <Link href="/cart">
+                                Go to Cart
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
+                            <Heart
+                                className={cn(
+                                    "h-5 w-5",
+                                    isWishlisted ? "text-red-500 fill-current" : "text-foreground"
+                                )}
+                            />
+                            <span className="sr-only">
+                                {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                            </span>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
