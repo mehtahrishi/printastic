@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Heart, ShoppingCart } from "lucide-react";
@@ -95,13 +96,11 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                     )}
                 </div>
 
-                <Separator className="my-6" />
-
-                <div className="prose prose-sm max-w-none text-foreground/80 dark:prose-invert">
+                <div className="prose prose-sm max-w-none text-foreground/80 dark:prose-invert mt-6">
                     <p className="text-base leading-relaxed">{product.description}</p>
                 </div>
 
-                <div className="mt-8 space-y-6">
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                     {product.sizes && product.sizes.length > 0 && (
                         <div>
                             <span className="font-semibold mb-3 block">Size</span>
