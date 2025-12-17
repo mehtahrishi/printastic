@@ -3,7 +3,6 @@
 
 import { Heart, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useToast } from "@/hooks/use-toast";
@@ -76,6 +75,10 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
         }
     };
 
+    const isAddToCartDisabled =
+        (product.sizes && product.sizes.length > 0 && !selectedSize) ||
+        (product.colors && product.colors.length > 0 && !selectedColor);
+
     return (
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             <div>
@@ -137,7 +140,7 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                 </div>
 
                 <div className="mt-8 flex items-center gap-4">
-                    <Button size="lg" className="flex-1" onClick={handleAddToCart}>
+                    <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isAddToCartDisabled}>
                         <ShoppingCart className="mr-2 h-5 w-5" />
                         Add to Cart
                     </Button>
