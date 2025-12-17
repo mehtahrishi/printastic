@@ -32,14 +32,8 @@ function getFirstImage(product: any): string {
 
 export function ProductCarousel() {
   const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: false })
+    Autoplay({ delay: 2500, stopOnInteraction: true })
   );
-
-  // Group products into chunks of 3 for each slide
-  const slides = [];
-  for (let i = 0; i < products.length; i += 3) {
-    slides.push(products.slice(i, i + 3));
-  }
 
   return (
     <Carousel
@@ -49,40 +43,39 @@ export function ProductCarousel() {
       }}
       plugins={[plugin.current]}
       className="w-full"
+      onMouseEnter={plugin.current.stop}
+      onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
-        {slides.map((slideProducts, index) => (
-          <CarouselItem key={index} className="flex gap-4">
-            {slideProducts.map((product) => {
-              const imageUrl = getFirstImage(product);
-              return (
-                <div key={product.id} className="p-1 basis-1/3">
-                  <Card>
-                    <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg bg-muted/20">
-                      <Link href={`/products/${product.id}`} className="block h-full w-full relative">
-                        {imageUrl ? (
-                          <Image
-                            src={imageUrl}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-300 hover:scale-105"
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center h-full w-full text-muted-foreground text-sm">
-                            No Image
-                          </div>
-                        )}
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })}
-          </CarouselItem>
-        ))}
+        {products.map((product, index) => {
+          const imageUrl = getFirstImage(product);
+          return (
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+              <div className="p-1">
+                <Card>
+                  <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
+                    <Link href={`/products/${product.id}`} className="block h-full w-full relative group">
+                      {imageUrl ? (
+                        <Image
+                          src={imageUrl}
+                          alt={product.name}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground text-sm">
+                          No Image
+                        </div>
+                      )}
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </CarouselItem>
+          );
+        })}
       </CarouselContent>
     </Carousel>
   );
 }
-
-    
