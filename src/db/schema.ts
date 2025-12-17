@@ -39,3 +39,14 @@ export const productPreviews = mysqlTable("product_previews", {
     imageUrl: text("image_url").notNull(),
     imageHint: text("image_hint"),
 });
+
+export const cartItems = mysqlTable("cart_items", {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+    productId: int("product_id").notNull().references(() => products.id, { onDelete: 'cascade' }),
+    quantity: int("quantity").notNull().default(1),
+    size: varchar("size", { length: 50 }),
+    color: varchar("color", { length: 50 }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});

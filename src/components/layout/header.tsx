@@ -179,11 +179,11 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
         <div className="flex flex-1 items-center justify-end gap-2">
 
 
-          <Button variant="ghost" size="icon" asChild className="hidden md:flex" onClick={(e) => handleProtectedLink(e, "/cart")}>
+          <Button variant="ghost" size="icon" asChild className="hidden md:flex relative" onClick={(e) => handleProtectedLink(e, "/cart")}>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
               {cartItemCount > 0 && (
-                <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
+                <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
                   {cartItemCount}
                 </span>
               )}

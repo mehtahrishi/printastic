@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useMemo } from "react";
+import React, { createContext, useContext, useState, useMemo, useEffect } from "react";
 import type { Product, CartItem } from "@/lib/types";
 
 interface CartContextType {
@@ -19,6 +19,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = (product: Product, quantity = 1) => {
     setCartItems((prevItems) => {
@@ -59,10 +70,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const cartTotal = useMemo(() => {
-    return cartItems.reduce(
-      (total, item) => total + item.product.price * item.quantity,
-      0
-    );
+    return cartItems.reduce((total, item) => {
+      const price = item.product.price ? Number(item.product.price) : 0;
+      return total + price * item.quantity;
+    }, 0);
   }, [cartItems]);
   
   const itemCount = useMemo(() => {

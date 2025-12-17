@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
@@ -9,9 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { PrintPreview } from "@/components/products/print-preview";
 import type { Product } from "@/lib/types";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "../ui/toast";
+import { addToCart } from "@/actions/cart";
 
 interface ProductDetailClientProps {
     product: any;
@@ -19,7 +20,8 @@ interface ProductDetailClientProps {
 }
 
 export function ProductDetailClient({ product, user }: ProductDetailClientProps) {
-    const { addToCart } = useCart();
+    const [isPending, startTransition] = useTransition();
+    const { addToCart: addToCartLocal } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { toast } = useToast();
     const router = useRouter();
@@ -48,10 +50,27 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
             showAuthToast();
             return;
         }
-        addToCart(cartProduct);
-        toast({
-            title: "Added to Cart",
-            description: `${product.name} has been added to your cart.`,
+
+        startTransition(async () => {
+            const result = await addToCart(product.id, 1, {
+                size: selectedSize || undefined,
+                color: selectedColor || undefined,
+            });
+
+            if (result.error) {
+                toast({
+                    title: "Error",
+                    description: result.error,
+                    variant: "destructive",
+                });
+            } else {
+                toast({
+                    title: "Added to Cart",
+                    description: `${product.name} has been added to your cart.`,
+                });
+                // Also add to local cart for immediate UI update
+                addToCartLocal(cartProduct);
+            }
         });
     };
 
@@ -140,9 +159,18 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                 </div>
 
                 <div className="mt-8 flex items-center gap-4">
-                    <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isAddToCartDisabled}>
-                        <ShoppingCart className="mr-2 h-5 w-5" />
-                        Add to Cart
+                    <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isPending || isAddToCartDisabled}>
+                        {isPending ? (
+                            <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Adding...
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingCart className="mr-2 h-5 w-5" />
+                                Add to Cart
+                            </>
+                        )}
                     </Button>
                     <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
                         <Heart
