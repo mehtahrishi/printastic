@@ -13,6 +13,7 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { Home, ShoppingBag } from "lucide-react";
 
 function parseJsonOrString(data: any): string[] {
     if (Array.isArray(data)) return data;
@@ -71,11 +72,17 @@ export default async function ProductDetailPage({
       <Breadcrumb className="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/">
+              <Home className="h-4 w-4" />
+              <span className="sr-only">Home</span>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/products">Products</BreadcrumbLink>
+            <BreadcrumbLink href="/products">
+              <ShoppingBag className="h-4 w-4" />
+              <span className="sr-only">Products</span>
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
