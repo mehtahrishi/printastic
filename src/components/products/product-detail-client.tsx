@@ -86,8 +86,8 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
             </div>
             <div className="flex flex-col">
                 <div className="mb-2">
-                    {product.isTrending && (
-                        <span className="bg-primary/10 text-primary text-xs font-semibold px-2 py-1 rounded-full">Trending</span>
+                    {product.category && (
+                        <span className="bg-secondary text-secondary-foreground text-xs font-semibold px-2 py-1 rounded-full">{product.category}</span>
                     )}
                 </div>
 
