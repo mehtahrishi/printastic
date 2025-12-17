@@ -1,7 +1,7 @@
 
 "use client"
 
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import {
   Card,
   CardContent,
@@ -53,7 +53,7 @@ export function OrdersRevenueChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-          <BarChart accessibilityLayer data={DUMMY_DATA}>
+          <LineChart accessibilityLayer data={DUMMY_DATA}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
@@ -61,17 +61,40 @@ export function OrdersRevenueChart() {
               tickMargin={10}
               axisLine={false}
             />
-            <YAxis yAxisId="left" stroke="hsl(var(--chart-1))" />
-            <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--chart-2))" />
+            <YAxis
+              yAxisId="left"
+              stroke="var(--color-orders)"
+              tickFormatter={(value) => `${value}`}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              stroke="var(--color-revenue)"
+              tickFormatter={(value) => `₹${value / 1000}k`}
+            />
             
             <ChartTooltip
-              cursor={false}
+              cursor={true}
               content={<ChartTooltipContent indicator="dot" />}
             />
-             <ChartLegend content={<ChartLegendContent />} />
-            <Bar dataKey="orders" fill="var(--color-orders)" radius={4} yAxisId="left" />
-            <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} yAxisId="right" />
-          </BarChart>
+            <ChartLegend content={<ChartLegendContent />} />
+            <Line
+              dataKey="orders"
+              type="monotone"
+              stroke="var(--color-orders)"
+              strokeWidth={2}
+              dot={true}
+              yAxisId="left"
+            />
+            <Line
+              dataKey="revenue"
+              type="monotone"
+              stroke="var(--color-revenue)"
+              strokeWidth={2}
+              dot={true}
+              yAxisId="right"
+            />
+          </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>
