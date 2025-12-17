@@ -24,16 +24,16 @@ export function PrintPreview({ product }: PrintPreviewProps) {
   const [activePreview, setActivePreview] = useState(allPreviews[0]?.imageUrl || '');
 
   return (
-    <div className="sticky top-24">
-        <div className="max-w-md mx-auto">
-            <div className="relative mb-4 overflow-hidden rounded-lg border bg-card aspect-[4/5]">
+    <div>
+        <div className="max-w-sm mx-auto">
+            <div className="relative mb-4 overflow-hidden rounded-lg border bg-card aspect-square">
                 {activePreview && (
                     <Image
                     src={activePreview}
                     alt={`Preview of ${product.name}`}
                     fill
-                    className="object-cover transition-opacity duration-300"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain transition-opacity duration-300"
+                    sizes="(max-width: 768px) 100vw, 40vw"
                     data-ai-hint={allPreviews.find((p: any) => p.imageUrl === activePreview)?.imageHint}
                     />
                 )}
