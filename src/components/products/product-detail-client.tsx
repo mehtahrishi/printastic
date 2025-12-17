@@ -156,11 +156,6 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                         </span>
                     </Button>
                 </div>
-
-                <div className="mt-8 text-sm text-foreground/60">
-                    <p><span className="font-medium">Category:</span> {product.category || "Uncategorized"}</p>
-                    <p><span className="font-medium">SKU:</span> {product.slug}</p>
-                </div>
             </div>
         </div>
     );
