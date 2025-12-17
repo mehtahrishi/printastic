@@ -45,7 +45,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="text-center py-0 md:py-0">
+      <section className="text-center py-12 md:py-16">
         <div className="container">
           <h1 className="text-4xl md:text-6xl font-bold text-primary tracking-tight">
             Art That Speaks to You
@@ -59,7 +59,6 @@ export default async function HomePage() {
 
       <section className="pb-12 md:pb-20">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-10">Our Full Collection</h2>
           <ProductGridClient initialProducts={products} user={user} />
         </div>
       </section>
