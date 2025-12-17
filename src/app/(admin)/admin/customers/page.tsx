@@ -4,8 +4,6 @@ import { users } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { Mail, MapPin, Phone, CreditCard } from "lucide-react";
 import { CustomerPdfButton } from "@/components/admin/customer-pdf-button";
 import { SearchInput } from "@/components/admin/search-input";
@@ -34,14 +32,6 @@ export default async function CustomersPage({
 }: {
     searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-    // Check for admin session
-    const cookieStore = await cookies();
-    const isAdminLoggedIn = cookieStore.has("admin_session");
-
-    if (!isAdminLoggedIn) {
-        redirect("/admin/login");
-    }
-
     const resolvedSearchParams = await searchParams;
     const query = typeof resolvedSearchParams?.query === 'string' ? resolvedSearchParams.query.toLowerCase() : '';
 

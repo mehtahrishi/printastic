@@ -20,22 +20,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { orders } from "@/lib/data";
 
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 
 import { getProductsCount } from "@/app/actions/products";
 
 export default async function DashboardPage() {
-    // Check for admin session
-    const cookieStore = await cookies();
-    const isAdminLoggedIn = cookieStore.has("admin_session");
-
-    if (!isAdminLoggedIn) {
-        redirect("/admin/login");
-    }
-
     // Fetch total customer count
     const customerCount = await db.select().from(users).then(res => res.length);
 
