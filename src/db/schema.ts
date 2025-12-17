@@ -50,3 +50,24 @@ export const cartItems = mysqlTable("cart_items", {
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
+
+export const orders = mysqlTable("orders", {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+    total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+    status: varchar("status", { length: 50 }).notNull().default("Pending"), // e.g., Pending, Processing, Shipped, Delivered, Cancelled
+    shippingAddress: text("shipping_address").notNull(),
+    paymentMethod: varchar("payment_method", { length: 50 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+export const orderItems = mysqlTable("order_items", {
+    id: int("id").autoincrement().primaryKey(),
+    orderId: int("order_id").notNull().references(() => orders.id, { onDelete: 'cascade' }),
+    productId: int("product_id").notNull().references(() => products.id, { onDelete: 'cascade' }),
+    quantity: int("quantity").notNull(),
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Price at the time of purchase
+    size: varchar("size", { length: 50 }),
+    color: varchar("color", { length: 50 }),
+});
