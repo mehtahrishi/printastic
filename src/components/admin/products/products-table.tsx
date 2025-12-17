@@ -24,37 +24,48 @@ import {
 } from "@/components/ui/dialog";
 import { ProductForm } from "./product-form";
 import type { Product } from "@/lib/types";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 export function ProductsTable({ products }: { products: Product[] }) {
     return (
-        <div className="border rounded-md">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[80px]">Image</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead className="text-center">Trending</TableHead>
-                        <TableHead className="text-center">Visible</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {products.length === 0 ? (
-                        <TableRow>
-                            <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                                No products found.
-                            </TableCell>
-                        </TableRow>
-                    ) : (
-                        products.map((product) => (
-                            <ProductRow key={product.id} product={product} />
-                        ))
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+        <Card>
+            <CardHeader>
+                <CardTitle>All Products</CardTitle>
+                <CardDescription>
+                    A list of all products in your inventory. You can edit or delete them here.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="border rounded-md">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[80px]">Image</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Category</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead className="text-center">Trending</TableHead>
+                                <TableHead className="text-center">Visible</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                        No products found.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                products.map((product) => (
+                                    <ProductRow key={product.id} product={product} />
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 
