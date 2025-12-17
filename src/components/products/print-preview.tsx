@@ -10,61 +10,56 @@ interface PrintPreviewProps {
 }
 
 export function PrintPreview({ product }: PrintPreviewProps) {
-  const mainImage = product.images?.[0] || '';
-  const [activePreview, setActivePreview] = useState(mainImage);
-  const [activeHint, setActiveHint] = useState<string | undefined>(undefined);
+  // Combine main product images and preview images
+  const mainImages = product.images.map((url, index) => ({
+    id: `main_${index}`,
+    imageUrl: url,
+    setting: `Image ${index + 1}`,
+    imageHint: product.imageHint,
+  }));
+  const settingPreviews = product.previews || [];
+  
+  const allPreviews = [...mainImages, ...settingPreviews];
 
-  const allPreviews = [
-    {
-      id: "original",
-      imageUrl: mainImage,
-      setting: "Original",
-    },
-    ...(product.previews || []),
-  ];
+  const [activePreview, setActivePreview] = useState(allPreviews[0]?.imageUrl || '');
 
   return (
-    <div>
-      <div className="relative mb-4 overflow-hidden rounded-lg border bg-card aspect-square md:aspect-[4/3]">
+    <div className="sticky top-24">
+      <div className="relative mb-4 overflow-hidden rounded-lg border bg-card aspect-square md:aspect-[4/4]">
         <Image
           src={activePreview}
           alt={`Preview of ${product.name}`}
           fill
           className="object-cover transition-opacity duration-300"
-          data-ai-hint={activeHint}
+          data-ai-hint={allPreviews.find(p => p.imageUrl === activePreview)?.imageHint}
         />
       </div>
-      <div className="grid grid-cols-4 gap-2">
-        {allPreviews.map((preview) => (
-          <button
-            key={preview.id}
-            onClick={() => {
-              setActivePreview(preview.imageUrl);
-              setActiveHint(undefined);
-            }}
-            className={cn(
-              "relative aspect-square overflow-hidden rounded-md border-2 transition-all",
-              activePreview === preview.imageUrl
-                ? "border-primary ring-2 ring-primary ring-offset-2"
-                : "border-transparent hover:border-primary/50"
-            )}
-          >
-            <Image
-              src={preview.imageUrl}
-              alt={preview.setting}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 25vw, 10vw"
-            />
-            {preview.setting !== "Original" && (
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                 <span className="text-white text-xs font-bold text-center">{preview.setting}</span>
-              </div>
-            )}
-             {activePreview === preview.imageUrl && <div className="absolute inset-0 border-2 border-primary rounded-md"></div>}
-          </button>
-        ))}
-      </div>
+      
+      {allPreviews.length > 1 && (
+        <div className="grid grid-cols-5 gap-2">
+          {allPreviews.map((preview) => (
+            <button
+              key={preview.id}
+              onClick={() => setActivePreview(preview.imageUrl)}
+              className={cn(
+                "relative aspect-square overflow-hidden rounded-md border-2 transition-all",
+                activePreview === preview.imageUrl
+                  ? "border-primary ring-2 ring-primary ring-offset-2"
+                  : "border-transparent hover:border-primary/50"
+              )}
+            >
+              <Image
+                src={preview.imageUrl}
+                alt={preview.setting}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 20vw, 10vw"
+              />
+              {activePreview === preview.imageUrl && <div className="absolute inset-0 border-2 border-primary rounded-md"></div>}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

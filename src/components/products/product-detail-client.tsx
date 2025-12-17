@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Heart, ShoppingCart } from "lucide-react";
@@ -10,28 +9,45 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { PrintPreview } from "@/components/products/print-preview";
 import type { Product } from "@/lib/types";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ToastAction } from "../ui/toast";
 
-// Update type to be loose enough to accept what we pass but strict enough for components
-// We might need to cast specifically if types don't match perfectly
 interface ProductDetailClientProps {
-    product: any; // We'll cast inside or ensure it matches
+    product: any;
+    user?: { name: string | null } | null;
 }
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, user }: ProductDetailClientProps) {
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { toast } = useToast();
+    const router = useRouter();
 
-    // Map database ID (number) to string for hooks if necessary, or ensure hooks handle numbers
-    // The previous hooks used string IDs largely. Let's make sure we pass a compatible object.
-    const cartProduct = {
-        ...product,
-        id: product.id.toString(), // Ensure ID is string for cart consistency
-    };
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
+    const cartProduct = { ...product, id: product.id.toString() };
     const isWishlisted = isInWishlist(cartProduct.id);
 
+    const showAuthToast = () => {
+        toast({
+            title: "Authentication Required",
+            description: "Please log in or create an account to continue.",
+            variant: "destructive",
+            action: (
+                <ToastAction altText="Login" onClick={() => router.push("/login")}>
+                    Login
+                </ToastAction>
+            ),
+        });
+    };
+
     const handleAddToCart = () => {
+        if (!user) {
+            showAuthToast();
+            return;
+        }
         addToCart(cartProduct);
         toast({
             title: "Added to Cart",
@@ -40,6 +56,10 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     };
 
     const handleWishlistToggle = () => {
+        if (!user) {
+            showAuthToast();
+            return;
+        }
         if (isWishlisted) {
             removeFromWishlist(cartProduct.id);
             toast({
@@ -58,25 +78,12 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     return (
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             <div>
-                {/* PrintPreview likely expects a specific shape, we might need to adjust it or the prop */}
                 <PrintPreview product={cartProduct} />
-
-                {/* Additional Images Grid? */}
-                {product.images && product.images.length > 0 && (
-                    <div className="grid grid-cols-4 gap-2 mt-4">
-                        {product.images.map((img: string, idx: number) => (
-                            <img key={idx} src={img} alt={`Preview ${idx}`} className="rounded-md border aspect-square object-cover" />
-                        ))}
-                    </div>
-                )}
             </div>
             <div className="flex flex-col">
                 <div className="mb-2">
                     {product.isTrending && (
                         <span className="bg-primary/10 text-primary text-xs font-semibold px-2 py-1 rounded-full">Trending</span>
-                    )}
-                    {!product.isVisible && (
-                        <span className="bg-yellow-500/10 text-yellow-600 text-xs font-semibold px-2 py-1 rounded-full ml-2">Hidden</span>
                     )}
                 </div>
 
@@ -92,18 +99,21 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                 <div className="prose prose-sm max-w-none text-foreground/80 dark:prose-invert">
                     <p className="text-base leading-relaxed">{product.description}</p>
-
-
                 </div>
 
-                {/* Variants: Sizes & Colors */}
                 <div className="mt-8 space-y-6">
                     {product.sizes && product.sizes.length > 0 && (
                         <div>
-                            <span className="font-semibold mb-2 block">Available Sizes:</span>
+                            <span className="font-semibold mb-3 block">Size</span>
                             <div className="flex flex-wrap gap-2">
                                 {product.sizes.map((size: string) => (
-                                    <div key={size} className="border rounded-md px-3 py-1 text-sm">{size}</div>
+                                    <Button
+                                        key={size}
+                                        variant={selectedSize === size ? "default" : "outline"}
+                                        onClick={() => setSelectedSize(size)}
+                                    >
+                                        {size}
+                                    </Button>
                                 ))}
                             </div>
                         </div>
@@ -111,10 +121,16 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                     {product.colors && product.colors.length > 0 && (
                         <div>
-                            <span className="font-semibold mb-2 block">Available Colors:</span>
+                            <span className="font-semibold mb-3 block">Color</span>
                             <div className="flex flex-wrap gap-2">
                                 {product.colors.map((color: string) => (
-                                    <div key={color} className="border rounded-md px-3 py-1 text-sm">{color}</div>
+                                    <Button
+                                        key={color}
+                                        variant={selectedColor === color ? "default" : "outline"}
+                                        onClick={() => setSelectedColor(color)}
+                                    >
+                                        {color}
+                                    </Button>
                                 ))}
                             </div>
                         </div>
@@ -126,7 +142,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                         <ShoppingCart className="mr-2 h-5 w-5" />
                         Add to Cart
                     </Button>
-                    <Button size="lg" variant="outline" onClick={handleWishlistToggle}>
+                    <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
                         <Heart
                             className={cn(
                                 "h-5 w-5",
@@ -140,8 +156,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
                 </div>
 
                 <div className="mt-8 text-sm text-foreground/60">
-                    <p>Category: {product.category || "Uncategorized"}</p>
-                    <p>SKU/Slug: {product.slug}</p>
+                    <p><span className="font-medium">Category:</span> {product.category || "Uncategorized"}</p>
+                    <p><span className="font-medium">SKU:</span> {product.slug}</p>
                 </div>
             </div>
         </div>

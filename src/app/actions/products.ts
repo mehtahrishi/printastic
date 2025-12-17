@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { products } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { products, productPreviews } from "@/db/schema";
+import { eq, desc, or, like } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -166,6 +166,7 @@ export async function createProduct(prevState: any, formData: FormData) {
         console.log("[CreateProduct] Database insert successful:", result);
 
         revalidatePath("/admin/products");
+        revalidatePath(`/products/${insertData.slug}`);
         console.log("[CreateProduct] Product created successfully and cache revalidated");
         return { success: true, message: "Product created successfully" };
     } catch (error) {
@@ -267,6 +268,7 @@ export async function updateProduct(productId: number, prevState: any, formData:
         console.log("[UpdateProduct] Database update successful:", result);
 
         revalidatePath("/admin/products");
+        revalidatePath(`/products/${updateData.slug}`);
         console.log("[UpdateProduct] Product updated successfully and cache revalidated");
         return { success: true, message: "Product updated successfully" };
     } catch (error) {
@@ -281,8 +283,17 @@ export async function updateProduct(productId: number, prevState: any, formData:
 
 export async function deleteProduct(productId: number) {
     try {
+        // First, find the product to get its slug for revalidation
+        const productToDelete = await db.select({ slug: products.slug }).from(products).where(eq(products.id, productId)).then(res => res[0]);
+
         await db.delete(products).where(eq(products.id, productId));
+        
         revalidatePath("/admin/products");
+        revalidatePath("/");
+        revalidatePath("/products");
+        if (productToDelete) {
+            revalidatePath(`/products/${productToDelete.slug}`);
+        }
         return { success: true, message: "Product deleted successfully" };
     } catch (error) {
         console.error("Failed to delete product:", error);
@@ -297,16 +308,6 @@ export async function getProducts(includeHidden = false) {
             fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
         } else {
             fetchedProducts = await db.select().from(products).where(eq(products.isVisible, true)).orderBy(desc(products.createdAt));
-        }
-        
-        // Log first product to debug
-        if (fetchedProducts.length > 0) {
-            console.log("[GetProducts] Sample product data:", {
-                name: fetchedProducts[0].name,
-                images: fetchedProducts[0].images,
-                imagesType: typeof fetchedProducts[0].images,
-                imagesIsArray: Array.isArray(fetchedProducts[0].images)
-            });
         }
         
         return fetchedProducts;
@@ -330,12 +331,26 @@ export async function getProductsCount(onlyActive = false) {
     }
 }
 
-export async function getProduct(productId: number) {
+export async function getProduct(identifier: number | string) {
     try {
-        const product = await db.select().from(products).where(eq(products.id, productId)).then(res => res[0]);
+        const condition = typeof identifier === 'number'
+            ? eq(products.id, identifier)
+            : eq(products.slug, identifier);
+        
+        const product = await db.select().from(products).where(condition).then(res => res[0]);
         return product || null;
     } catch (error) {
         console.error("Failed to fetch product:", error);
         return null;
+    }
+}
+
+export async function getProductPreviews(productId: number) {
+    try {
+        const previews = await db.select().from(productPreviews).where(eq(productPreviews.productId, productId));
+        return previews;
+    } catch (error) {
+        console.error("Failed to fetch product previews:", error);
+        return [];
     }
 }

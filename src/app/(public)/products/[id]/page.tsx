@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getProduct } from "@/app/actions/products";
+import { getProduct, getProductPreviews } from "@/app/actions/products";
 import { ProductDetailClient } from "@/components/products/product-detail-client";
 import {
   Breadcrumb,
@@ -9,25 +9,28 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { db } from "@/lib/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 
 export default async function ProductDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
-  // Ensure we have an integer ID
-  const productId = parseInt(params.id);
-  if (isNaN(productId)) {
-    notFound();
-  }
-
-  const product = await getProduct(productId);
+  // The slug is passed as 'id', so we decode it
+  const slug = decodeURIComponent(params.id);
+  
+  const product = await getProduct(slug);
 
   if (!product) {
     notFound();
   }
 
-  // Convert basic product to the type expected by client (handling nulls if necessary)
+  const previews = await getProductPreviews(product.id as number);
+
+  // Convert basic product to the type expected by client
   const formattedProduct = {
     ...product,
     price: Number(product.price),
@@ -46,8 +49,18 @@ export default async function ProductDetailPage({
         }
       }
       return [];
-    })()
+    })(),
+    previews: previews.map(p => ({
+      id: p.id.toString(),
+      imageUrl: p.imageUrl,
+      setting: p.setting,
+      imageHint: p.imageHint || undefined
+    }))
   };
+
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("auth_session")?.value;
+  const user = userId ? await db.select({ name: users.name }).from(users).where(eq(users.id, parseInt(userId))).then(res => res[0] || null) : null;
 
   return (
     <div className="container py-8 md:py-12">
@@ -58,7 +71,7 @@ export default async function ProductDetailPage({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">Products</BreadcrumbLink>
+            <BreadcrumbLink href="/products">Products</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -67,7 +80,7 @@ export default async function ProductDetailPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <ProductDetailClient product={formattedProduct} />
+      <ProductDetailClient product={formattedProduct} user={user} />
     </div>
   );
 }

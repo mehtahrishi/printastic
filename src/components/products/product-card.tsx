@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -94,7 +93,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg group">
       <CardHeader className="p-0 relative">
-        <Link href={`/products/${product.id}`} className="block overflow-hidden">
+        <Link href={`/products/${product.slug}`} className="block overflow-hidden">
           {(() => {
             const imageUrl = getFirstImage(product.images);
             return imageUrl ? (
@@ -134,7 +133,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
       </CardHeader>
       <CardContent className="p-3 md:p-4 flex flex-col flex-grow">
         <div className="flex-grow">
-            <Link href={`/products/${product.id}`} className="block mb-2">
+            <Link href={`/products/${product.slug}`} className="block mb-2">
             <CardTitle className="text-base md:text-lg font-semibold hover:text-primary transition-colors leading-tight">
                 {product.name}
             </CardTitle>
