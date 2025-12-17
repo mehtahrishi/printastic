@@ -1,3 +1,4 @@
+
 "use server";
 
 import { db } from "@/lib/db";
@@ -81,19 +82,24 @@ export async function getCartItems() {
         }
 
         // Join with products table to get fresh data
-        const items = await db
+        const results = await db
             .select({
-                id: cartItems.id,
-                quantity: cartItems.quantity,
-                size: cartItems.size,
-                color: cartItems.color,
+                cartItem: cartItems,
                 product: products,
             })
             .from(cartItems)
             .innerJoin(products, eq(cartItems.productId, products.id))
             .where(eq(cartItems.userId, userId));
+        
+        // Drizzle returns nested objects, so we need to flatten them
+        return results.map(result => ({
+            id: result.cartItem.id,
+            quantity: result.cartItem.quantity,
+            size: result.cartItem.size,
+            color: result.cartItem.color,
+            product: result.product,
+        }));
 
-        return items;
     } catch (error) {
         console.error("Get cart items error:", error);
         return [];
