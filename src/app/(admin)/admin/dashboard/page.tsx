@@ -105,9 +105,9 @@ export default async function DashboardPage() {
                     icon={DollarSign}
                 />
                 <StatCard
-                    title="Sales"
-                    value={`+${totalSales.toLocaleString()}`}
-                    description="+180.1% from last month"
+                    title="Total Orders"
+                    value={totalSales.toLocaleString()}
+                    description="All-time order count"
                     icon={ShoppingCart}
                 />
                 <StatCard
