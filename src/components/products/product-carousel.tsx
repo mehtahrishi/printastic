@@ -1,80 +1,101 @@
-
 "use client";
 
 import * as React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import Autoplay from "embla-carousel-autoplay";
+import Link from "next/link";
 
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { products } from "@/lib/data";
-import { Card, CardContent } from "@/components/ui/card";
 
-function getFirstImage(product: any): string {
-    const { images, imageUrl } = product;
-    if (imageUrl) return imageUrl;
-    if (!images) return '';
-    if (Array.isArray(images)) return images[0] || '';
-    if (typeof images === 'string') {
-        try {
-            const parsed = JSON.parse(images);
-            return Array.isArray(parsed) ? parsed[0] || '' : '';
-        } catch {
-            return images.split(',')[0]?.trim() || '';
-        }
-    }
-    return '';
+interface Product {
+  id: number | string;
+  name: string;
+  slug: string;
+  images: string[];
 }
 
-export function ProductCarousel() {
+interface ProductCarouselProps {
+  trendingProducts?: Product[];
+}
+
+function getFirstImage(images: string[] | string | undefined): string {
+  if (!images) return '';
+  if (Array.isArray(images)) return images[0] || '';
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      return Array.isArray(parsed) ? parsed[0] || '' : '';
+    } catch {
+      return images.split(',')[0]?.trim() || '';
+    }
+  }
+  return '';
+}
+
+export function ProductCarousel({ trendingProducts = [] }: ProductCarouselProps) {
   const plugin = React.useRef(
-    Autoplay({ delay: 2500, stopOnInteraction: true })
+    Autoplay({ delay: 3000, stopOnInteraction: false })
   );
+
+  // Group products into slides of 3
+  const slides = [];
+  for (let i = 0; i < trendingProducts.length; i += 3) {
+    slides.push(trendingProducts.slice(i, i + 3));
+  }
+
+  if (trendingProducts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No trending products available</p>
+      </div>
+    );
+  }
 
   return (
     <Carousel
       opts={{
-        align: "start",
+        align: "center",
         loop: true,
       }}
       plugins={[plugin.current]}
       className="w-full"
-      onMouseEnter={plugin.current.stop}
-      onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
-        {products.map((product, index) => {
-          const imageUrl = getFirstImage(product);
-          return (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-              <div className="p-1">
-                <Card>
-                  <CardContent className="flex aspect-[3/4] items-center justify-center p-0 overflow-hidden rounded-lg">
-                    <Link href={`/products/${product.id}`} className="block h-full w-full relative group">
-                      {imageUrl ? (
-                        <Image
-                          src={imageUrl}
-                          alt={product.name}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground text-sm">
-                          No Image
-                        </div>
-                      )}
-                    </Link>
-                  </CardContent>
-                </Card>
-              </div>
-            </CarouselItem>
-          );
-        })}
+        {slides.map((slideProducts, slideIndex) => (
+          <CarouselItem key={slideIndex}>
+            <div className="grid grid-cols-3 gap-4">
+              {slideProducts.map((product, index) => {
+                const imageUrl = getFirstImage(product.images);
+                return (
+                  <Link 
+                    key={product.id} 
+                    href={`/products/${product.slug}`}
+                    className="relative w-full aspect-square group"
+                  >
+                    {imageUrl ? (
+                      <Image
+                        src={imageUrl}
+                        alt={product.name}
+                        fill
+                        priority={slideIndex === 0 && index === 0}
+                        className="object-contain transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground">
+                        No Image
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </CarouselItem>
+        ))}
       </CarouselContent>
     </Carousel>
   );

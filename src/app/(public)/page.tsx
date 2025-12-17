@@ -41,7 +41,7 @@ export default async function HomePage() {
     <div>
       <section>
         <div className="container">
-          <ProductCarousel />
+          <ProductCarousel trendingProducts={products} />
         </div>
       </section>
 
