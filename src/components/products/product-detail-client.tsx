@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Heart, ShoppingCart, Loader2, ArrowRight } from "lucide-react";
+import { Heart, ShoppingCart, Loader2, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { ToastAction } from "../ui/toast";
 import { addToCart } from "@/actions/cart";
 import Link from "next/link";
+import { Separator } from "@/components/ui/separator";
 
 interface ProductDetailClientProps {
     product: any;
@@ -27,8 +28,8 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
     const { toast } = useToast();
     const router = useRouter();
 
-    const [selectedSize, setSelectedSize] = useState<string | null>(null);
-    const [selectedColor, setSelectedColor] = useState<string | null>(null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.length === 1 ? product.sizes[0] : null);
+    const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.length === 1 ? product.colors[0] : null);
 
     const cartProduct = { ...product, id: product.id.toString() };
     const isWishlisted = isInWishlist(cartProduct.id);
@@ -69,7 +70,6 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                     title: "Added to Cart",
                     description: `${product.name} has been added to your cart.`,
                 });
-                // Also add to local cart for immediate UI update
                 addToCartLocal(cartProduct);
             }
         });
@@ -98,23 +98,25 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
     const isAddToCartDisabled =
         (product.sizes && product.sizes.length > 0 && !selectedSize) ||
         (product.colors && product.colors.length > 0 && !selectedColor);
+    
+    const onSale = product.originalPrice && product.originalPrice > product.price;
 
     return (
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            <div>
-                <PrintPreview product={cartProduct} />
-            </div>
+            <PrintPreview product={cartProduct} />
+            
             <div className="flex flex-col">
-                <div className="mb-2">
+                <div className="mb-4">
                     {product.category && (
-                        <span className="bg-secondary text-secondary-foreground text-xs font-semibold px-2 py-1 rounded-full">{product.category}</span>
+                        <span className="text-sm font-medium text-primary">{product.category}</span>
                     )}
                 </div>
 
                 <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
-                <div className="flex items-baseline gap-3 mt-2">
-                    <p className="text-2xl font-semibold text-primary">₹{product.price.toFixed(2)}</p>
-                    {product.originalPrice && (
+                
+                <div className="flex items-baseline gap-3 mt-4">
+                    <p className="text-3xl font-bold text-primary">₹{product.price.toFixed(2)}</p>
+                    {onSale && (
                         <p className="text-lg text-muted-foreground line-through">₹{product.originalPrice.toFixed(2)}</p>
                     )}
                 </div>
@@ -123,17 +125,20 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                     <p className="text-base leading-relaxed">{product.description}</p>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="mt-8 grid grid-cols-1 gap-6">
                     {product.sizes && product.sizes.length > 0 && (
                         <div>
-                            <span className="font-semibold mb-3 block">Size</span>
+                            <h3 className="text-sm font-semibold mb-3">Size: <span className="text-foreground">{selectedSize}</span></h3>
                             <div className="flex flex-wrap gap-2">
                                 {product.sizes.map((size: string) => (
                                     <Button
                                         key={size}
                                         variant={selectedSize === size ? "default" : "outline"}
+                                        size="sm"
                                         onClick={() => setSelectedSize(size)}
+                                        className="min-w-[40px]"
                                     >
+                                        {selectedSize === size && <Check className="w-4 h-4 mr-1 -ml-1" />}
                                         {size}
                                     </Button>
                                 ))}
@@ -143,14 +148,16 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
 
                     {product.colors && product.colors.length > 0 && (
                         <div>
-                            <span className="font-semibold mb-3 block">Color</span>
+                           <h3 className="text-sm font-semibold mb-3">Color: <span className="text-foreground">{selectedColor}</span></h3>
                             <div className="flex flex-wrap gap-2">
                                 {product.colors.map((color: string) => (
                                     <Button
                                         key={color}
                                         variant={selectedColor === color ? "default" : "outline"}
+                                        size="sm"
                                         onClick={() => setSelectedColor(color)}
                                     >
+                                        {selectedColor === color && <Check className="w-4 h-4 mr-1 -ml-1" />}
                                         {color}
                                     </Button>
                                 ))}
@@ -160,8 +167,8 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                 </div>
 
                 <div className="mt-auto pt-8">
-                    <div className="flex items-center gap-2">
-                        <Button size="lg" className="flex-1" onClick={handleAddToCart} disabled={isPending || isAddToCartDisabled}>
+                    <div className="flex flex-col gap-2">
+                        <Button size="lg" className="w-full" onClick={handleAddToCart} disabled={isPending || isAddToCartDisabled}>
                             {isPending ? (
                                 <>
                                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -174,23 +181,25 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                                 </>
                             )}
                         </Button>
-                         <Button size="lg" variant="outline" asChild>
-                            <Link href="/cart">
-                                Go to Cart
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                            </Link>
-                        </Button>
-                        <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
-                            <Heart
-                                className={cn(
-                                    "h-5 w-5",
-                                    isWishlisted ? "text-red-500 fill-current" : "text-foreground"
-                                )}
-                            />
-                            <span className="sr-only">
-                                {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                            </span>
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button size="lg" variant="outline" asChild className="flex-1">
+                                <Link href="/cart">
+                                    Go to Cart
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                            <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
+                                <Heart
+                                    className={cn(
+                                        "h-5 w-5 transition-colors duration-200",
+                                        isWishlisted ? "text-red-500 fill-current" : "text-foreground"
+                                    )}
+                                />
+                                <span className="sr-only">
+                                    {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                                </span>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>

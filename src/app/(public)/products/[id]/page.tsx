@@ -1,3 +1,4 @@
+
 import { notFound } from "next/navigation";
 import { getProduct, getProductPreviews } from "@/app/actions/products";
 import { ProductDetailClient } from "@/components/products/product-detail-client";
