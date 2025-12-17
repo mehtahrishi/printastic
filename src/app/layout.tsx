@@ -18,9 +18,35 @@ const moonTime = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Honesty Print House",
-  description: "High-quality professional printing services for all your needs.",
+  title: {
+    default: "Honesty Print House - High-Quality Printing Services",
+    template: "%s | Honesty Print House",
+  },
+  description: "Discover high-quality, professional printing services for all your needs. From custom apparel to unique art prints, we bring your ideas to life.",
+  openGraph: {
+    title: "Honesty Print House",
+    description: "High-quality professional printing services for all your needs.",
+    url: "https://honestyprinthouse.in",
+    siteName: "Honesty Print House",
+    images: [
+      {
+        url: "/image.png", // Path to your logo
+        width: 512,
+        height: 512,
+        alt: "Honesty Print House Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Honesty Print House",
+    description: "High-quality professional printing services for all your needs.",
+    images: ["/image.png"], // Path to your logo
+  },
 };
+
 
 export default function RootLayout({
   children,
@@ -30,6 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/image.png" type="image/png" sizes="any" />
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
       </head>
       <body
