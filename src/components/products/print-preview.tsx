@@ -6,16 +6,16 @@ import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface PrintPreviewProps {
-  product: Product;
+  product: any; // Using any to be more flexible with product data structure
 }
 
 export function PrintPreview({ product }: PrintPreviewProps) {
   // Combine main product images and preview images
-  const mainImages = product.images.map((url, index) => ({
+  const mainImages = (product.images || []).map((url: string, index: number) => ({
     id: `main_${index}`,
     imageUrl: url,
     setting: `Image ${index + 1}`,
-    imageHint: product.imageHint,
+    imageHint: (product as any).imageHint,
   }));
   const settingPreviews = product.previews || [];
   
@@ -25,19 +25,22 @@ export function PrintPreview({ product }: PrintPreviewProps) {
 
   return (
     <div className="sticky top-24">
-      <div className="relative mb-4 overflow-hidden rounded-lg border bg-card aspect-square md:aspect-[4/4]">
-        <Image
-          src={activePreview}
-          alt={`Preview of ${product.name}`}
-          fill
-          className="object-cover transition-opacity duration-300"
-          data-ai-hint={allPreviews.find(p => p.imageUrl === activePreview)?.imageHint}
-        />
+      <div className="relative mb-4 overflow-hidden rounded-lg border bg-card aspect-[4/5]">
+        {activePreview && (
+            <Image
+            src={activePreview}
+            alt={`Preview of ${product.name}`}
+            fill
+            className="object-cover transition-opacity duration-300"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            data-ai-hint={allPreviews.find((p: any) => p.imageUrl === activePreview)?.imageHint}
+            />
+        )}
       </div>
       
       {allPreviews.length > 1 && (
         <div className="grid grid-cols-5 gap-2">
-          {allPreviews.map((preview) => (
+          {allPreviews.map((preview: any) => (
             <button
               key={preview.id}
               onClick={() => setActivePreview(preview.imageUrl)}
