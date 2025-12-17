@@ -111,9 +111,9 @@ export default async function DashboardPage() {
                     icon={ShoppingCart}
                 />
                 <StatCard
-                    title="New Customers"
-                    value={`+${customerCount}`}
-                    description="+19% from last month"
+                    title="Total Customers"
+                    value={customerCount.toString()}
+                    description="All registered users"
                     icon={Users}
                 />
                 <StatCard
