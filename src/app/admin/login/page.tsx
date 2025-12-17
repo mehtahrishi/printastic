@@ -50,9 +50,9 @@ export default function AdminLoginPage() {
                         title: "Access Granted",
                         description: "Redirecting to dashboard...",
                     });
-                    // Instead of router.push, we refresh the page.
-                    // The middleware will handle the redirect to the dashboard.
-                    window.location.href = "/admin/dashboard";
+                    // On success, we just refresh the page. The middleware will
+                    // redirect us to the dashboard because we are now logged in.
+                    window.location.reload();
                 }
             });
         });
@@ -92,7 +92,7 @@ export default function AdminLoginPage() {
                                                 <Input
                                                     {...field}
                                                     disabled={isPending}
-                                                    placeholder="admin@printastic.com"
+                                                    placeholder="admin@example.com"
                                                     type="email"
                                                     className="bg-white/50 dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-ring transition-all rounded-xl h-12"
                                                 />
