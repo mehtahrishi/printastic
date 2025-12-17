@@ -25,6 +25,47 @@ import { users } from "@/db/schema";
 import { OrdersRevenueChart } from "@/components/admin/orders-revenue-chart";
 
 import { getProductsCount } from "@/app/actions/products";
+import { Order } from "@/lib/types";
+
+// Helper function to process orders for the chart
+const processOrderDataForChart = (orders: Order[]) => {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthlyData = new Map<string, { orders: number, revenue: number }>();
+
+    // Initialize the last 12 months
+    const today = new Date();
+    for (let i = 11; i >= 0; i--) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        const monthKey = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+        if (!monthlyData.has(monthKey)) {
+            monthlyData.set(monthKey, { orders: 0, revenue: 0 });
+        }
+    }
+
+    // Process orders from the last year
+    orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        const yearDiff = today.getFullYear() - orderDate.getFullYear();
+        const monthDiff = (yearDiff * 12) + (today.getMonth() - orderDate.getMonth());
+        
+        if (monthDiff < 12) {
+            const monthKey = `${monthNames[orderDate.getMonth()]} ${orderDate.getFullYear()}`;
+            if (monthlyData.has(monthKey)) {
+                const current = monthlyData.get(monthKey)!;
+                current.orders += 1;
+                current.revenue += order.total;
+            }
+        }
+    });
+
+    // Format for chart
+    return Array.from(monthlyData.entries()).map(([month, data]) => ({
+        month: month.split(' ')[0], // Just the month name for the label
+        orders: data.orders,
+        revenue: data.revenue
+    })).slice(-12);
+};
+
 
 export default async function DashboardPage() {
     // Fetch total customer count
@@ -39,6 +80,10 @@ export default async function DashboardPage() {
 
     // Most recent 5 orders
     const recentOrders = orders.slice(0, 5);
+
+    // Process data for the chart
+    const chartData = processOrderDataForChart(orders);
+
 
     return (
         <div className="container py-8 space-y-8">
@@ -81,7 +126,7 @@ export default async function DashboardPage() {
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
                 <div className="lg:col-span-4">
-                    <OrdersRevenueChart />
+                    <OrdersRevenueChart data={chartData} />
                 </div>
 
                 <div className="lg:col-span-3">

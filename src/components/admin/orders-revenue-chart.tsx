@@ -18,21 +18,6 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart"
 
-const DUMMY_DATA = [
-    { month: "Jan", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Feb", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Mar", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Apr", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "May", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Jun", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Jul", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Aug", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Sep", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Oct", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Nov", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-    { month: "Dec", orders: Math.floor(Math.random() * 50) + 10, revenue: Math.floor(Math.random() * 5000) + 1000 },
-]
-
 const chartConfig = {
   revenue: {
     label: "Revenue",
@@ -44,7 +29,15 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function OrdersRevenueChart() {
+interface OrdersRevenueChartProps {
+  data: {
+    month: string;
+    orders: number;
+    revenue: number;
+  }[];
+}
+
+export function OrdersRevenueChart({ data }: OrdersRevenueChartProps) {
   return (
     <Card>
       <CardHeader>
@@ -53,7 +46,7 @@ export function OrdersRevenueChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-          <LineChart accessibilityLayer data={DUMMY_DATA}>
+          <LineChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
