@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -44,6 +45,7 @@ export const LoginForm = () => {
                         description: data.error,
                     });
                 } else if (data.twoFactor) {
+                    setIsRedirecting(true);
                     toast({
                         title: "OTP Sent",
                         description: "Please check your email for the verification code.",
@@ -52,10 +54,14 @@ export const LoginForm = () => {
                         window.location.href = "/auth/verify-otp";
                     }, 500);
                 } else {
+                    setIsRedirecting(true);
                     toast({
                         title: "Success",
                         description: data.success,
                     });
+                    setTimeout(() => {
+                        window.location.href = "/account";
+                    }, 500);
                 }
             });
         });
@@ -137,12 +143,20 @@ export const LoginForm = () => {
                             </div>
 
                             <Button
-                                disabled={isPending}
+                                disabled={isPending || isRedirecting}
                                 type="submit"
-                                className="w-full bg-primary text-primary-foreground h-12 rounded-xl text-base font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                className="w-full bg-primary text-primary-foreground h-12 rounded-xl text-base font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                {isPending ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                {isRedirecting ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                        Redirecting...
+                                    </>
+                                ) : isPending ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                        Verifying...
+                                    </>
                                 ) : (
                                     <>
                                         Sign In

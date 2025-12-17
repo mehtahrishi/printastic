@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export const VerifyForm = () => {
     const [isPending, startTransition] = useTransition();
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
     const router = useRouter();
     const { toast } = useToast();
@@ -60,6 +61,7 @@ export const VerifyForm = () => {
                         description: data.error,
                     });
                 } else {
+                    setIsRedirecting(true);
                     toast({
                         title: "Success",
                         description: "Logged in successfully!",
@@ -123,12 +125,20 @@ export const VerifyForm = () => {
                             </div>
 
                             <Button
-                                disabled={isPending || timeLeft <= 0}
+                                disabled={isPending || isRedirecting || timeLeft <= 0}
                                 type="submit"
-                                className="w-full bg-primary text-primary-foreground h-12 rounded-xl text-base font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                className="w-full bg-primary text-primary-foreground h-12 rounded-xl text-base font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                {isPending ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                {isRedirecting ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                        Redirecting...
+                                    </>
+                                ) : isPending ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                        Verifying...
+                                    </>
                                 ) : (
                                     <>
                                         Verify & Login

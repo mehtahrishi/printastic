@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export const RegisterForm = () => {
     const [isPending, startTransition] = useTransition();
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const { toast } = useToast();
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -46,6 +47,7 @@ export const RegisterForm = () => {
                         description: data.error,
                     });
                 } else {
+                    setIsRedirecting(true);
                     toast({
                         title: "Success",
                         description: data.success,
@@ -166,12 +168,20 @@ export const RegisterForm = () => {
                             </div>
 
                             <Button
-                                disabled={isPending}
+                                disabled={isPending || isRedirecting}
                                 type="submit"
-                                className="w-full bg-primary text-primary-foreground h-12 rounded-xl text-base font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                className="w-full bg-primary text-primary-foreground h-12 rounded-xl text-base font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                {isPending ? (
-                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                {isRedirecting ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                        Redirecting...
+                                    </>
+                                ) : isPending ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                        Creating Account...
+                                    </>
                                 ) : (
                                     <>
                                         Create Account

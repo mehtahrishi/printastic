@@ -39,21 +39,26 @@ export const verifyOtp = async (values: z.infer<typeof VerifySchema>) => {
     cookieStore.delete("temp_otp_session");
 
     // 2. Set real session cookie
-    const existingUser = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
+    try {
+        const existingUser = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
 
-    if (!existingUser) {
-        return { error: "User not found!" };
+        if (!existingUser) {
+            return { error: "User not found!" };
+        }
+
+        // Create a minimal session cookie
+        // In a real app, use a session library or JWT
+        // Here we'll store the User ID
+        cookieStore.set("auth_session", existingUser.id.toString(), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: "/",
+        });
+
+        return { success: "Logged in successfully!" };
+    } catch (error) {
+        console.error("Database error during OTP verification:", error);
+        return { error: "Database connection error. Please try again." };
     }
-
-    // Create a minimal session cookie
-    // In a real app, use a session library or JWT
-    // Here we'll store the User ID
-    cookieStore.set("auth_session", existingUser.id.toString(), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-        path: "/",
-    });
-
-    return { success: "Logged in successfully!" };
 };

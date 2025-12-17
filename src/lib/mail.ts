@@ -19,63 +19,80 @@ function escapeHtml(str: string) {
 
 function renderShell(content: string, brand: { name: string; url: string; primary: string; accent: string; background: string; text: string; muted: string; border: string }) {
   return `
-  <div style="background:${brand.background};padding:32px 0;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="color:${brand.text}">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:16px;box-shadow:0 2px 12px rgba(30,41,59,0.08);overflow:hidden;border:1px solid ${brand.border}">
-            <tr>
-              <td style="background:linear-gradient(135deg, ${brand.primary} 0%, ${brand.primary}e6 100%);padding:32px 24px">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td>
-                      <div style="display:inline-flex;align-items:center;gap:8px">
-                         <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.02em">${brand.name}</span>
-                      </div>
-                      <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px">${brand.url.replace(/^https?:\/\//, '')}</div>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr><td style="padding:32px 24px">${content}</td></tr>
-            <tr>
-              <td style="padding:20px 24px;border-top:1px solid ${brand.border};background:${brand.background}">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td style="color:${brand.muted};font-size:12px">
-                      © ${new Date().getFullYear()} ${brand.name}. All rights reserved.
-                    </td>
-                    <td align="right">
-                      <a href="${brand.url}" style="color:${brand.primary};text-decoration:none;font-size:12px;font-weight:500">Visit Store</a>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </div>`;
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body style="margin:0;padding:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background-color:${brand.background}">
+    <div style="background-color:${brand.background};background-image:linear-gradient(to right,rgba(5,69,160,0.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(5,69,160,0.08) 1px,transparent 1px);background-size:40px 40px;padding:40px 20px;min-height:100vh">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(5,69,160,0.1);border:1px solid ${brand.border}">
+              <!-- Header -->
+              <tr>
+                <td style="background:linear-gradient(135deg,${brand.primary} 0%,#003d82 100%);padding:40px 32px;text-align:center">
+                  <h1 style="margin:0;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.02em">${brand.name}</h1>
+                  <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.9)">${brand.url.replace(/^https?:\/\//, '')}</p>
+                </td>
+              </tr>
+              <!-- Content -->
+              <tr>
+                <td style="padding:40px 32px">
+                  ${content}
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td style="padding:24px 32px;border-top:1px solid ${brand.border};background-color:${brand.background}">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td style="color:${brand.muted};font-size:13px;line-height:1.6">
+                        © ${new Date().getFullYear()} ${brand.name}. All rights reserved.
+                      </td>
+                      <td align="right">
+                        <a href="${brand.url}" style="display:inline-block;color:${brand.primary};text-decoration:none;font-size:13px;font-weight:600;padding:8px 16px;border:1px solid ${brand.primary};border-radius:6px;transition:all 0.2s">Visit Store</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+  </html>`;
 }
 
 function renderOtpEmail(otp: string, brand: any) {
   const body = `
-      <h2 style="margin:0 0 8px;font-size:24px;font-weight:700;color:${brand.text}">Verification Code</h2>
-      <p style="margin:0 0 24px;color:${brand.muted};font-size:15px">Please use the following OTP to complete your login procedure.</p>
-      
-      <div style="background-color: ${brand.background}; border-radius: 8px; padding: 20px; margin: 25px 0; text-align: center; border: 1px dashed ${brand.primary}">
-        <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: ${brand.primary}; font-family: monospace;">${otp}</span>
+      <div style="text-align:center">
+        <h2 style="margin:0 0 12px;font-size:26px;font-weight:700;color:${brand.text};letter-spacing:-0.02em">Verify Your Account</h2>
+        <p style="margin:0 0 32px;color:${brand.muted};font-size:15px;line-height:1.6">Please enter the verification code below to complete your login</p>
       </div>
       
-      <p style="margin:0 0 24px;color:${brand.muted};font-size:14px">This code is valid for <strong>2 minutes</strong>.</p>
+      <div style="background:linear-gradient(135deg,rgba(5,69,160,0.05) 0%,rgba(5,69,160,0.02) 100%);border-radius:12px;padding:32px;margin:32px 0;text-align:center;border:2px dashed ${brand.primary}">
+        <div style="font-size:11px;font-weight:600;color:${brand.primary};text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Your Verification Code</div>
+        <div style="font-size:42px;font-weight:700;letter-spacing:12px;color:${brand.primary};font-family:'Inter',monospace;margin:8px 0">${otp}</div>
+        <div style="font-size:13px;color:${brand.muted};margin-top:16px">Valid for <strong style="color:${brand.text}">2 minutes</strong></div>
+      </div>
       
-       <div style="margin-top:32px;padding-top:24px;border-top:1px solid ${brand.border}">
-         <p style="margin:0;font-size:13px;color:${brand.muted};line-height:1.5">
-           If you did not request this code, please ignore this email.
-         </p>
-       </div>
+      <div style="background-color:rgba(250,204,21,0.1);border-left:4px solid #facc15;padding:16px 20px;border-radius:8px;margin:32px 0">
+        <p style="margin:0;font-size:14px;color:${brand.text};line-height:1.6">
+          <strong>Security Tip:</strong> Never share this code with anyone. We'll never ask you for your verification code.
+        </p>
+      </div>
+      
+      <div style="margin-top:40px;padding-top:24px;border-top:1px solid ${brand.border};text-align:center">
+        <p style="margin:0;font-size:13px;color:${brand.muted};line-height:1.6">
+          If you didn't request this code, please ignore this email or <a href="${brand.url}" style="color:${brand.primary};text-decoration:none;font-weight:600">contact support</a>.
+        </p>
+      </div>
     `;
   return renderShell(body, brand);
 }
@@ -99,22 +116,22 @@ export const sendOtpEmail = async (email: string, otp: string) => {
   });
 
   const brand = {
-    name: process.env.BRAND_NAME || "Printastic",
+    name: process.env.BRAND_NAME || "Honesty Print House",
     url: process.env.BRAND_URL || "https://honestyprinthouse.in/",
-    primary: process.env.BRAND_PRIMARY || "#4F46E5",
-    accent: process.env.BRAND_ACCENT || "#c39961",
-    background: "#f1f5f9",
-    text: "#1e293b",
-    muted: "#64748b",
-    border: "#cbd5e1",
+    primary: "#0545A0",  // hsl(215, 100%, 34%) converted to hex
+    accent: "#FF6B35",   // hsl(19, 100%, 51%) converted to hex
+    background: "#F7F9FC", // hsl(215, 33%, 98%) converted to hex
+    text: "#1E3A5F",     // hsl(215, 40%, 15%) converted to hex
+    muted: "#64748B",    // hsl(215, 20%, 50%) converted to hex
+    border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
   };
 
   const htmlContent = renderOtpEmail(otp, brand);
 
   await transporter.sendMail({
-    from: `"${brand.name} Security" <${user}>`,
+    from: `"${brand.name} Security" <noreply@honestyprinthouse.in>`,
     to: email,
-    subject: "Your Login Verification Code",
+    subject: `Your ${brand.name} Verification Code`,
     html: htmlContent,
   });
 };
