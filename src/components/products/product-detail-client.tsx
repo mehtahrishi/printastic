@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Heart, ShoppingCart } from "lucide-react";
@@ -81,9 +82,9 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
                 <h1 className="text-3xl lg:text-4xl font-bold">{product.name}</h1>
                 <div className="flex items-baseline gap-3 mt-2">
-                    <p className="text-2xl font-semibold text-primary">${product.price.toFixed(2)}</p>
+                    <p className="text-2xl font-semibold text-primary">₹{product.price.toFixed(2)}</p>
                     {product.originalPrice && (
-                        <p className="text-lg text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</p>
+                        <p className="text-lg text-muted-foreground line-through">₹{product.originalPrice.toFixed(2)}</p>
                     )}
                 </div>
 

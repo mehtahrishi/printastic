@@ -6,7 +6,7 @@ import { Mail, Phone } from 'lucide-react';
 
 export default function AboutUsPage() {
   return (
-    <div className="bg-background">
+    <div className="bg-background bg-grid">
       <div className="container py-16 md:py-24">
         {/* Hero Section */}
         <section className="text-center">

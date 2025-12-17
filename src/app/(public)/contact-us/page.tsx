@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin, Send, Clock, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import Script from "next/script";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -193,6 +194,38 @@ export default function ContactUsPage() {
                 </Form>
               </CardContent>
             </Card>
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative overflow-hidden" style={{ maxHeight: '400px' }}>
+                  <blockquote
+                      className="instagram-media"
+                      data-instgrm-permalink="https://www.instagram.com/reel/DGvDBYMSZCy/?utm_source=ig_embed&amp;utm_campaign=loading"
+                      data-instgrm-version="14"
+                      style={{ background: '#FFF', border: 0, borderRadius: '3px', boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)', margin: '1px', maxWidth: '100%', minWidth: '280px', padding: 0, width: 'calc(100% - 2px)' }}
+                  >
+                  </blockquote>
+              </div>
+              <div className="relative overflow-hidden" style={{ maxHeight: '400px' }}>
+                <blockquote
+                  className="instagram-media"
+                  data-instgrm-captioned
+                  data-instgrm-permalink="https://www.instagram.com/reel/DI02p_9ysbr/?utm_source=ig_embed&amp;utm_campaign=loading"
+                  data-instgrm-version="14"
+                  style={{
+                    background: '#FFF',
+                    border: 0,
+                    borderRadius: '3px',
+                    boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
+                    margin: '1px',
+                    maxWidth: '540px',
+                    minWidth: '326px',
+                    padding: 0,
+                    width: 'calc(100% - 2px)',
+                  }}
+                >
+                </blockquote>
+              </div>
+              <Script async src="//www.instagram.com/embed.js" />
+            </div>
           </div>
 
           {/* Contact Information Sidebar */}
@@ -212,7 +245,7 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Our Address</h4>
                     <p className="text-sm text-muted-foreground">
-                      Khoparkhaine
+                      Shop No.9, Matoshree chs ltd, plot no. 387, Gyan VIkas Road, 19/C , Sector 19, Kopar Khairane, Navi mmumbai, maharashtra 400709, India
                     </p>
                   </div>
                 </div>
@@ -224,10 +257,10 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Email Us</h4>
                     <a 
-                      href="mailto:contact@honestyprinthouse.in" 
+                      href="mailto:info@honestyprinthouse.in" 
                       className="text-sm text-primary hover:underline"
                     >
-                      contact@honestyprinthouse.in
+                      info@honestyprinthouse.in
                     </a>
                   </div>
                 </div>
@@ -239,10 +272,16 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Call Us</h4>
                     <a 
-                      href="tel:+1234567890" 
+                      href="tel:+919920214202" 
                       className="text-sm text-primary hover:underline block"
                     >
-                      (123) 456-7890
+                      +91 9920214202
+                    </a>
+                     <a 
+                      href="tel:+918828569484" 
+                      className="text-sm text-primary hover:underline block"
+                    >
+                      +91 8828569484
                     </a>
                   </div>
                 </div>
@@ -262,37 +301,26 @@ export default function ContactUsPage() {
               </CardContent>
             </Card>
 
-            {/* FAQ Quick Links */}
-            <Card className="shadow-lg border-border/50 bg-card">
-              <CardHeader>
-                <CardTitle className="text-xl">Quick Help</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <a 
-                  href="/shipping-policy" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Shipping Information
-                </a>
-                <a 
-                  href="/refund-policy" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Returns & Refunds
-                </a>
-                <a 
-                  href="/terms-and-conditions" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Terms & Conditions
-                </a>
-                <a 
-                  href="/privacy-policy" 
-                  className="block text-sm text-primary hover:underline"
-                >
-                  → Privacy Policy
-                </a>
-              </CardContent>
+            <Card className="shadow-lg border-border/50 overflow-hidden">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-xl flex items-center gap-2">
+                        <MapPin className="h-5 w-5 text-primary" />
+                        Find Us Here
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden border">
+                        <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.0932570183004!2d72.99680527466573!3d19.10356435110773!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c156b7c2b7d7%3A0x29c68b4cd30ab0c7!2sHonesty%20Print%20House!5e0!3m2!1sen!2sin!4v1765914189428!5m2!1sen!2sin"
+                        width="100%"
+                        height="400"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </CardContent>
             </Card>
           </div>
         </div>

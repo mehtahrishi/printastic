@@ -20,22 +20,54 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { orders } from "@/lib/data";
 
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
+import { OrdersRevenueChart } from "@/components/admin/orders-revenue-chart";
 
 import { getProductsCount } from "@/app/actions/products";
+import { Order } from "@/lib/types";
 
-export default async function DashboardPage() {
-    // Check for admin session
-    const cookieStore = await cookies();
-    const isAdminLoggedIn = cookieStore.has("admin_session");
+// Helper function to process orders for the chart
+const processOrderDataForChart = (orders: Order[]) => {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthlyData = new Map<string, { orders: number, revenue: number }>();
 
-    if (!isAdminLoggedIn) {
-        redirect("/admin/login");
+    // Initialize the last 12 months
+    const today = new Date();
+    for (let i = 11; i >= 0; i--) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        const monthKey = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+        if (!monthlyData.has(monthKey)) {
+            monthlyData.set(monthKey, { orders: 0, revenue: 0 });
+        }
     }
 
+    // Process orders from the last year
+    orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        const yearDiff = today.getFullYear() - orderDate.getFullYear();
+        const monthDiff = (yearDiff * 12) + (today.getMonth() - orderDate.getMonth());
+        
+        if (monthDiff < 12) {
+            const monthKey = `${monthNames[orderDate.getMonth()]} ${orderDate.getFullYear()}`;
+            if (monthlyData.has(monthKey)) {
+                const current = monthlyData.get(monthKey)!;
+                current.orders += 1;
+                current.revenue += order.total;
+            }
+        }
+    });
+
+    // Format for chart
+    return Array.from(monthlyData.entries()).map(([month, data]) => ({
+        month: month.split(' ')[0], // Just the month name for the label
+        orders: data.orders,
+        revenue: data.revenue
+    })).slice(-12);
+};
+
+
+export default async function DashboardPage() {
     // Fetch total customer count
     const customerCount = await db.select().from(users).then(res => res.length);
 
@@ -49,6 +81,10 @@ export default async function DashboardPage() {
     // Most recent 5 orders
     const recentOrders = orders.slice(0, 5);
 
+    // Process data for the chart
+    const chartData = processOrderDataForChart(orders);
+
+
     return (
         <div className="container py-8 space-y-8">
             <div className="flex items-center justify-between">
@@ -61,23 +97,23 @@ export default async function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="Total Revenue"
-                    value={`$${totalRevenue.toLocaleString("en-US", {
+                    value={`₹${totalRevenue.toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                     })}`}
-                    description="+20.1% from last month"
+                    description="All-time revenue"
                     icon={DollarSign}
                 />
                 <StatCard
-                    title="Sales"
-                    value={`+${totalSales.toLocaleString()}`}
-                    description="+180.1% from last month"
+                    title="Total Orders"
+                    value={totalSales.toLocaleString()}
+                    description="All-time order count"
                     icon={ShoppingCart}
                 />
                 <StatCard
-                    title="New Customers"
-                    value={`+${customerCount}`}
-                    description="+19% from last month"
+                    title="Total Customers"
+                    value={customerCount.toString()}
+                    description="All registered users"
                     icon={Users}
                 />
                 <StatCard
@@ -89,17 +125,8 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
-                {/* Sales Chart Placeholder - Temporarily removed to fix errors */}
                 <div className="lg:col-span-4">
-                    <Card className="h-full">
-                        <CardHeader>
-                            <CardTitle>Sales Overview</CardTitle>
-                            <CardDescription>Monthly sales performance (Coming Soon)</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-center min-h-[300px] text-muted-foreground">
-                            Chart Component Updating...
-                        </CardContent>
-                    </Card>
+                    <OrdersRevenueChart data={chartData} />
                 </div>
 
                 <div className="lg:col-span-3">
@@ -135,7 +162,7 @@ export default async function DashboardPage() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
-                                                ${order.total.toFixed(2)}
+                                                ₹{order.total.toFixed(2)}
                                             </TableCell>
                                         </TableRow>
                                     ))}

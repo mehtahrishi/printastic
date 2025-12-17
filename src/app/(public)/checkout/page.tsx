@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -146,7 +147,7 @@ export default function CheckoutPage() {
                             </div>
                         </CardContent>
                     </Card>
-                    <Button type="submit" size="lg" className="w-full">Pay ${cartTotal.toFixed(2)}</Button>
+                    <Button type="submit" size="lg" className="w-full">Pay ₹{cartTotal.toFixed(2)}</Button>
                 </form>
             </Form>
         </div>
@@ -163,13 +164,13 @@ export default function CheckoutPage() {
                                     <p className="font-semibold">{item.product.name}</p>
                                     <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                                 </div>
-                                <p className="font-medium">${(item.product.price * item.quantity).toFixed(2)}</p>
+                                <p className="font-medium">₹{(item.product.price * item.quantity).toFixed(2)}</p>
                             </div>
                         ))}
                         <Separator />
                         <div className="flex justify-between font-bold text-lg">
                             <p>Total</p>
-                            <p>${cartTotal.toFixed(2)}</p>
+                            <p>₹{cartTotal.toFixed(2)}</p>
                         </div>
                     </div>
                 </CardContent>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { getProducts } from "@/app/actions/products";
@@ -15,15 +16,19 @@ import {
 
 type GridView = "4x4" | "3x3";
 
-export default function ProductsPage() {
+function ProductsPageComponent() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get("category") || "All";
+
   const [products, setProducts] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [gridView, setGridView] = useState<GridView>("4x4");
 
   useEffect(() => {
     async function fetchProducts() {
+      setLoading(true);
       const fetchedProducts = await getProducts();
       setProducts(fetchedProducts);
       
@@ -32,7 +37,7 @@ export default function ProductsPage() {
           fetchedProducts
             .map((p) => p.category)
             .filter((c) => c && c.trim() !== "")
-            .concat(["Kids T-Shirts", "Regular T-Shirts", "Hoodies"]) // Add desired categories
+            .concat(["Kids T-Shirts", "Regular T-Shirts", "Hoodies", "Oversize T-Shirts"]) // Add desired categories
         )
       ) as string[];
       
@@ -42,6 +47,14 @@ export default function ProductsPage() {
     
     fetchProducts();
   }, []);
+
+  // Update selected category if URL changes
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get("category");
+    if (categoryFromUrl && categoryFromUrl !== selectedCategory) {
+      setSelectedCategory(categoryFromUrl);
+    }
+  }, [searchParams, selectedCategory]);
 
   const filteredProducts =
     selectedCategory === "All"
@@ -177,4 +190,13 @@ export default function ProductsPage() {
       </div>
     </div>
   );
+}
+
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProductsPageComponent />
+    </Suspense>
+  )
 }

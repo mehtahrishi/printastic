@@ -1,10 +1,9 @@
+
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { Mail, MapPin, Phone, CreditCard } from "lucide-react";
 import { CustomerPdfButton } from "@/components/admin/customer-pdf-button";
 import { SearchInput } from "@/components/admin/search-input";
@@ -33,14 +32,6 @@ export default async function CustomersPage({
 }: {
     searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-    // Check for admin session
-    const cookieStore = await cookies();
-    const isAdminLoggedIn = cookieStore.has("admin_session");
-
-    if (!isAdminLoggedIn) {
-        redirect("/admin/login");
-    }
-
     const resolvedSearchParams = await searchParams;
     const query = typeof resolvedSearchParams?.query === 'string' ? resolvedSearchParams.query.toLowerCase() : '';
 
@@ -151,7 +142,7 @@ export default async function CustomersPage({
                                         <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                                             <CreditCard className="h-3 w-3" /> Total Spent
                                         </span>
-                                        <span className="text-lg font-bold text-primary">$0.00</span>
+                                        <span className="text-lg font-bold text-primary">₹0.00</span>
                                     </div>
                                 </div>
 
@@ -253,7 +244,7 @@ export default async function CustomersPage({
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                <span className="text-sm font-medium">$0.00</span>
+                                                <span className="text-sm font-medium">₹0.00</span>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
