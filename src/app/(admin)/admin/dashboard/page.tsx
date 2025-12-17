@@ -22,6 +22,7 @@ import { orders } from "@/lib/data";
 
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
+import { OrdersRevenueChart } from "@/components/admin/orders-revenue-chart";
 
 import { getProductsCount } from "@/app/actions/products";
 
@@ -79,17 +80,8 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
-                {/* Sales Chart Placeholder - Temporarily removed to fix errors */}
                 <div className="lg:col-span-4">
-                    <Card className="h-full">
-                        <CardHeader>
-                            <CardTitle>Sales Overview</CardTitle>
-                            <CardDescription>Monthly sales performance (Coming Soon)</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-center min-h-[300px] text-muted-foreground">
-                            Chart Component Updating...
-                        </CardContent>
-                    </Card>
+                    <OrdersRevenueChart />
                 </div>
 
                 <div className="lg:col-span-3">
