@@ -101,7 +101,7 @@ export default async function DashboardPage() {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                     })}`}
-                    description="+20.1% from last month"
+                    description="All-time revenue"
                     icon={DollarSign}
                 />
                 <StatCard
