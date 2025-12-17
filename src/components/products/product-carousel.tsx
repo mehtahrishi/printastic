@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -13,18 +14,20 @@ import {
 import { products } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 
-function getFirstImage(images: string[] | string | undefined): string {
-  if (!images) return '';
-  if (Array.isArray(images)) return images[0] || '';
-  if (typeof images === 'string') {
-    try {
-      const parsed = JSON.parse(images);
-      return Array.isArray(parsed) ? parsed[0] || '' : '';
-    } catch {
-      return images.split(',')[0]?.trim() || '';
+function getFirstImage(product: any): string {
+    const { images, imageUrl } = product;
+    if (imageUrl) return imageUrl;
+    if (!images) return '';
+    if (Array.isArray(images)) return images[0] || '';
+    if (typeof images === 'string') {
+        try {
+            const parsed = JSON.parse(images);
+            return Array.isArray(parsed) ? parsed[0] || '' : '';
+        } catch {
+            return images.split(',')[0]?.trim() || '';
+        }
     }
-  }
-  return '';
+    return '';
 }
 
 export function ProductCarousel() {
@@ -51,7 +54,7 @@ export function ProductCarousel() {
         {slides.map((slideProducts, index) => (
           <CarouselItem key={index} className="flex gap-4">
             {slideProducts.map((product) => {
-              const imageUrl = getFirstImage(product.images);
+              const imageUrl = getFirstImage(product);
               return (
                 <div key={product.id} className="p-1 basis-1/3">
                   <Card>
@@ -81,3 +84,5 @@ export function ProductCarousel() {
     </Carousel>
   );
 }
+
+    

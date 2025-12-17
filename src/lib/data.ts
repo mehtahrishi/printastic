@@ -1,3 +1,4 @@
+
 import type { Product, Customer, Order } from "./types";
 import { PlaceHolderImages } from "./placeholder-images";
 
@@ -27,6 +28,16 @@ const previewSettings = [
 ];
 
 export const products: Product[] = [
+  {
+    id: "13",
+    name: "Jujutsu Kaisen Tee",
+    description: "A stylish black t-shirt featuring a character from the popular anime Jujutsu Kaisen.",
+    price: 89.99,
+    category: "Anime",
+    imageUrl: "/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fproject-spark-301223.appspot.com%2Fstatic%2Fuser%2F169747864459-Yuji_Itadori_Jujutsu_Kaisen_t-shirt_mockup_on_a_hanger_in_a__9a37774e-e17f-4315-9c60-0a256a468d6c.png&w=3840&q=75",
+    imageHint: "anime t-shirt",
+    previews: previewSettings.map(p => ({ ...p, ...findImage(p.id) })),
+  },
   {
     id: "1",
     name: "Azure Dreams",
@@ -233,3 +244,5 @@ export const orders: Order[] = [
     items: [{ productId: "11", productName: "Simplistic Soul", quantity: 1, price: 42.99 }],
   },
 ];
+
+    
