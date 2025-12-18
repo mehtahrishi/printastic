@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { CookieConsent } from "@/components/cookie-consent";
 import { SplashScreen } from "@/components/ui/splash-screen";
 import { ChatWidget } from "@/components/chat-widget";
+import { CartProvider } from "@/hooks/use-cart";
+import { WishlistProvider } from "@/hooks/use-wishlist";
 
 const tanBuster = localFont({
   src: "../fonts/TanBuster.otf",
@@ -66,11 +68,15 @@ export default function RootLayout({
           moonTime.variable
         )}
       >
-        {children}
-        <Toaster />
-        <ChatWidget />
-        <CookieConsent />
-        <SplashScreen />
+        <CartProvider>
+          <WishlistProvider>
+            {children}
+            <Toaster />
+            <ChatWidget />
+            <CookieConsent />
+            <SplashScreen />
+          </WishlistProvider>
+        </CartProvider>
       </body>
     </html>
   );
