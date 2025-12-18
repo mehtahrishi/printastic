@@ -23,7 +23,7 @@ async function getAllOrders(query: string) {
 
         if (query) {
             const likeQuery = `%${query}%`;
-            allOrdersQuery = allOrdersQuery.where(or(
+            allOrdersQuery.where(or(
                 like(users.name, likeQuery),
                 like(users.email, likeQuery),
                 like(orders.status, likeQuery)
