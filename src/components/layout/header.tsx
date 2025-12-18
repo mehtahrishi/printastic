@@ -280,7 +280,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         onClick={(e) => handleProtectedLink(e, "/account")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
                       >
-                        Profile
+                        My Profile
                       </Link>
                       <Link
                         href="/wishlist"
@@ -299,7 +299,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         onClick={(e) => handleProtectedLink(e, "/cart")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent flex items-center justify-between"
                       >
-                        <span>Cart</span>
+                        <span>My Cart</span>
                         {user && cartItemCount > 0 && (
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
                             {cartItemCount}
@@ -311,7 +311,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         onClick={(e) => handleProtectedLink(e, "/orders")}
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
                       >
-                        Orders
+                        My Orders
                       </Link>
                       {user ? (
                         <Link
@@ -348,5 +348,3 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
     </header>
   );
 }
-
-    
