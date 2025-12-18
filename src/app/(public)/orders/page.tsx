@@ -80,6 +80,7 @@ export default async function OrdersPage() {
                                         <TableHead>Order ID</TableHead>
                                         <TableHead>Date</TableHead>
                                         <TableHead>Items</TableHead>
+                                        <TableHead>Payment</TableHead>
                                         <TableHead className="text-right">Total</TableHead>
                                         <TableHead className="text-center">Status</TableHead>
                                     </TableRow>
@@ -92,6 +93,7 @@ export default async function OrdersPage() {
                                             <TableCell className="text-muted-foreground">
                                                 {getItemSummary(order.items)}
                                             </TableCell>
+                                            <TableCell className="capitalize text-muted-foreground">{order.paymentMethod}</TableCell>
                                             <TableCell className="text-right font-medium">₹{order.total}</TableCell>
                                             <TableCell className="text-center">
                                                 <Badge variant="outline" className={cn("text-xs capitalize", getStatusClass(order.status))}>
