@@ -215,7 +215,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                   <Link href="/account">My Account</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/orders">Orders</Link>
+                  <Link href="/orders">My Orders</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -348,3 +348,5 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
     </header>
   );
 }
+
+    
