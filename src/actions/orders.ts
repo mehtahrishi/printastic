@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import { orders, orderItems, products } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
 
 async function getUserId() {
@@ -48,7 +48,7 @@ export async function getOrders() {
         })
         .from(orderItems)
         .innerJoin(products, eq(orderItems.productId, products.id))
-        .where(eq(orderItems.orderId, userOrders[0].id));
+        .where(inArray(orderItems.orderId, orderIds)); // Use inArray to fetch items for all orders
 
 
         const ordersWithItems = userOrders.map(order => {

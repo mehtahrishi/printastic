@@ -35,19 +35,7 @@ export default async function OrdersPage() {
 
     const getItemSummary = (items: any[]) => {
         if (!items || items.length === 0) return "No items";
-        const firstItemName = items[0].product.name;
-        const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
-
-        if (totalItems === 1) {
-            return firstItemName;
-        }
-        
-        const otherItemsCount = totalItems - items[0].quantity;
-
-        if (otherItemsCount > 0) {
-           return `${firstItemName} + ${otherItemsCount} other item(s)`;
-        }
-        return firstItemName;
+        return items.map(item => item.product.name).join(', ');
     }
 
 
@@ -90,7 +78,7 @@ export default async function OrdersPage() {
                                         <TableRow key={order.id}>
                                             <TableCell className="font-medium">#{order.id}</TableCell>
                                             <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                                            <TableCell className="text-muted-foreground">
+                                            <TableCell className="text-muted-foreground max-w-xs truncate">
                                                 {getItemSummary(order.items)}
                                             </TableCell>
                                             <TableCell className="capitalize text-muted-foreground">{order.paymentMethod}</TableCell>
