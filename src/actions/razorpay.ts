@@ -2,7 +2,7 @@
 
 import Razorpay from "razorpay";
 import { db } from "@/lib/db";
-import { orders, orderItems, cartItems } from "@/db/schema";
+import { orders, orderItems } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
@@ -84,12 +84,16 @@ export async function verifyPayment(
             const [newOrder] = await tx.insert(orders).values({
                 userId: userId,
                 total: orderData.total.toString(),
-                status: "Processing", // Or "Pending" if COD
+                status: "Processing",
                 shippingAddress: orderData.shippingAddress,
                 paymentMethod: orderData.paymentMethod,
             });
 
             const orderId = newOrder.insertId;
+
+            if (!orderId) {
+                throw new Error("Failed to create order.");
+            }
 
             const newOrderItems = orderData.items.map(item => ({
                 orderId: orderId,

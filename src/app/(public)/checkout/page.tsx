@@ -24,6 +24,7 @@ import { getCartItems } from "@/actions/cart";
 import { getUserDetails } from "@/actions/user";
 import { createOrder, verifyPayment } from "@/actions/razorpay";
 import { CreditCard, Truck } from "lucide-react";
+import { useCart } from "@/hooks/use-cart";
 
 const formSchema = z.object({
   // Shipping Info
@@ -48,6 +49,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { clearCart: clearCartLocal } = useCart();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -145,7 +147,7 @@ export default function CheckoutPage() {
     try {
         const orderResponse = await createOrder(amountToPay);
 
-        if (!orderResponse.success) {
+        if (!orderResponse.success || !orderResponse.order) {
             throw new Error(orderResponse.error || "Failed to create Razorpay order.");
         }
 
@@ -159,6 +161,7 @@ export default function CheckoutPage() {
             handler: async function (response: any) {
                 const verificationResult = await verifyPayment(response, orderDataForDb);
                 if (verificationResult.success) {
+                    clearCartLocal();
                     toast({ title: "Order Placed!", description: "Thank you for your purchase." });
                     router.push(`/`);
                 } else {
