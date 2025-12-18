@@ -215,9 +215,6 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                   <Link href="/account">My Account</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/wishlist">Wishlist</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/orders">Orders</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
