@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -156,4 +155,3 @@ export function OrderItem({ order }: { order: Order }) {
         </Card>
     );
 }
-
