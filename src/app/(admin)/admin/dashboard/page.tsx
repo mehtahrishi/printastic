@@ -18,17 +18,56 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { orders } from "@/lib/data";
-
 import { db } from "@/lib/db";
-import { users } from "@/db/schema";
+import { users, orders as ordersTable, orderItems, products } from "@/db/schema";
 import { OrdersRevenueChart } from "@/components/admin/orders-revenue-chart";
-
 import { getProductsCount } from "@/app/actions/products";
-import { Order } from "@/lib/types";
+import { eq, desc, inArray } from "drizzle-orm";
+import { cn } from "@/lib/utils";
+
+const getStatusClass = (status: string) => {
+    switch (status.toLowerCase()) {
+        case 'delivered':
+            return 'bg-green-100 text-green-800 border-green-200';
+        case 'shipped':
+            return 'bg-blue-100 text-blue-800 border-blue-200';
+        case 'processing':
+            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        case 'cancelled':
+            return 'bg-red-100 text-red-800 border-red-200';
+        default:
+            return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+};
+
+async function getAllOrders() {
+    try {
+        const allOrders = await db
+            .select({
+                order: ordersTable,
+                user: {
+                    name: users.name,
+                    email: users.email
+                }
+            })
+            .from(ordersTable)
+            .innerJoin(users, eq(ordersTable.userId, users.id))
+            .orderBy(desc(ordersTable.createdAt));
+
+        return allOrders.map(({ order, user }) => ({
+            ...order,
+            customerName: user.name,
+            customerEmail: user.email,
+        }));
+
+    } catch (error) {
+        console.error("Error fetching all orders for dashboard:", error);
+        return [];
+    }
+}
 
 // Helper function to process orders for the chart
-const processOrderDataForChart = (orders: Order[]) => {
+const processOrderDataForChart = (orders: Awaited<ReturnType<typeof getAllOrders>>) => {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthlyData = new Map<string, { orders: number, revenue: number }>();
 
@@ -44,7 +83,7 @@ const processOrderDataForChart = (orders: Order[]) => {
 
     // Process orders from the last year
     orders.forEach(order => {
-        const orderDate = new Date(order.date);
+        const orderDate = new Date(order.createdAt);
         const yearDiff = today.getFullYear() - orderDate.getFullYear();
         const monthDiff = (yearDiff * 12) + (today.getMonth() - orderDate.getMonth());
         
@@ -53,7 +92,7 @@ const processOrderDataForChart = (orders: Order[]) => {
             if (monthlyData.has(monthKey)) {
                 const current = monthlyData.get(monthKey)!;
                 current.orders += 1;
-                current.revenue += order.total;
+                current.revenue += parseFloat(order.total as any);
             }
         }
     });
@@ -68,21 +107,23 @@ const processOrderDataForChart = (orders: Order[]) => {
 
 
 export default async function DashboardPage() {
+    const allOrders = await getAllOrders();
+    
     // Fetch total customer count
     const customerCount = await db.select().from(users).then(res => res.length);
 
     // Fetch active products count
     const activeProductsCount = await getProductsCount(true);
 
-    // Basic stats calculation
-    const totalRevenue = orders.reduce((acc, order) => acc + order.total, 0);
-    const totalSales = orders.length;
+    // Basic stats calculation from live data
+    const totalRevenue = allOrders.reduce((acc, order) => acc + parseFloat(order.total as any), 0);
+    const totalSales = allOrders.length;
 
     // Most recent 5 orders
-    const recentOrders = orders.slice(0, 5);
+    const recentOrders = allOrders.slice(0, 5);
 
     // Process data for the chart
-    const chartData = processOrderDataForChart(orders);
+    const chartData = processOrderDataForChart(allOrders);
 
 
     return (
@@ -155,14 +196,14 @@ export default async function DashboardPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <Badge
-                                                    variant={order.status === 'Delivered' ? 'default' : 'secondary'}
-                                                    className="text-xs"
+                                                    variant="outline"
+                                                    className={cn("text-xs capitalize", getStatusClass(order.status))}
                                                 >
                                                     {order.status}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
-                                                ₹{order.total.toFixed(2)}
+                                                ₹{Number(order.total).toFixed(2)}
                                             </TableCell>
                                         </TableRow>
                                     ))}
