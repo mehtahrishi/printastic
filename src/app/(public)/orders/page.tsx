@@ -96,17 +96,17 @@ export default async function OrdersPage() {
                                             </TableCell>
                                             <TableCell className="capitalize text-muted-foreground">{order.paymentMethod}</TableCell>
                                             <TableCell className="text-right font-medium">
-                                                {order.paymentMethod === 'cod' ? (
-                                                    <div className="flex flex-col items-end text-xs">
-                                                        <div className="flex justify-between w-32">
+                                                {order.paymentMethod === 'cod' && order.status !== 'Delivered' ? (
+                                                    <div className="flex flex-col items-end gap-0.5">
+                                                        <div className="flex justify-between w-36 text-xs">
                                                             <span className="text-muted-foreground">Total:</span>
-                                                            <span className="font-bold text-foreground">₹{Number(order.total).toFixed(2)}</span>
+                                                            <span className="font-semibold text-foreground">₹{Number(order.total).toFixed(2)}</span>
                                                         </div>
-                                                        <div className="flex justify-between w-32 text-green-600">
+                                                        <div className="flex justify-between w-36 text-xs text-green-600">
                                                             <span className="text-muted-foreground">Paid:</span>
                                                             <span>₹50.00</span>
                                                         </div>
-                                                        <div className="flex justify-between w-32 text-red-600">
+                                                        <div className="flex justify-between w-36 text-xs text-red-600">
                                                             <span className="text-muted-foreground">Due:</span>
                                                             <span>₹{(Number(order.total) - 50).toFixed(2)}</span>
                                                         </div>
