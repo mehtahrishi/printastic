@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getUserDetails } from "@/actions/user";
+import type { User } from "@/db/schema";
 
 type GridView = "4x4" | "3x3";
 
@@ -25,12 +27,18 @@ function ProductsPageComponent() {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [gridView, setGridView] = useState<GridView>("4x4");
+  const [user, setUser] = useState<Awaited<ReturnType<typeof getUserDetails>> | null>(null);
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchProductsAndUser() {
       setLoading(true);
-      const fetchedProducts = await getProducts();
+      const [fetchedProducts, userDetails] = await Promise.all([
+        getProducts(),
+        getUserDetails()
+      ]);
+      
       setProducts(fetchedProducts);
+      setUser(userDetails);
       
       let finalCategories = Array.from(
         new Set(
@@ -45,7 +53,7 @@ function ProductsPageComponent() {
       setLoading(false);
     }
     
-    fetchProducts();
+    fetchProductsAndUser();
   }, []);
 
   // Update selected category if URL changes
@@ -164,6 +172,7 @@ function ProductsPageComponent() {
                 <ProductCard
                   key={product.id}
                   product={product as any}
+                  user={user}
                 />
               ))}
             </div>

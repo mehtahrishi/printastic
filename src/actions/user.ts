@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { users } from "@/db/schema";
+import { users, type User } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
@@ -14,7 +14,7 @@ async function getUserId() {
     return parseInt(userId);
 }
 
-export async function getUserDetails() {
+export async function getUserDetails(): Promise<(typeof users.$inferSelect) | null> {
     try {
         const userId = await getUserId();
         if (!userId) {
@@ -22,15 +22,7 @@ export async function getUserDetails() {
         }
 
         const user = await db
-            .select({
-                name: users.name,
-                email: users.email,
-                phone: users.phone,
-                address: users.address,
-                apartment: users.apartment,
-                city: users.city,
-                postalCode: users.postalCode,
-            })
+            .select()
             .from(users)
             .where(eq(users.id, userId))
             .then(res => res[0]);
