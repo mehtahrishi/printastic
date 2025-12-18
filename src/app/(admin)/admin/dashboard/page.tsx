@@ -135,7 +135,7 @@ export default async function DashboardPage() {
                 </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     title="Total Revenue"
                     value={`₹${totalRevenue.toLocaleString("en-IN", {
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
                 />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-7 lg:gap-8">
                 <div className="lg:col-span-4">
                     <OrdersRevenueChart data={chartData} />
                 </div>
