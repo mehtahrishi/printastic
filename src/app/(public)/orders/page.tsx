@@ -33,12 +33,6 @@ const getStatusClass = (status: string) => {
 export default async function OrdersPage() {
     const orders = await getOrders();
 
-    const getItemSummary = (items: any[]) => {
-        if (!items || items.length === 0) return "No items";
-        return items.map(item => item.product.name).join(', ');
-    }
-
-
     return (
         <div className="container py-12 md:py-16">
             <h1 className="text-3xl md:text-4xl font-bold mb-8">My Orders</h1>
@@ -78,8 +72,16 @@ export default async function OrdersPage() {
                                         <TableRow key={order.id}>
                                             <TableCell className="font-medium">#{order.id}</TableCell>
                                             <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                                            <TableCell className="text-muted-foreground max-w-xs truncate">
-                                                {getItemSummary(order.items)}
+                                            <TableCell className="text-muted-foreground max-w-xs">
+                                                {(!order.items || order.items.length === 0) ? (
+                                                    "No items"
+                                                ) : (
+                                                    <div className="flex flex-col">
+                                                        {order.items.map((item, index) => (
+                                                            <span key={index} className="truncate">{item.product.name}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </TableCell>
                                             <TableCell className="capitalize text-muted-foreground">{order.paymentMethod}</TableCell>
                                             <TableCell className="text-right font-medium">₹{order.total}</TableCell>
