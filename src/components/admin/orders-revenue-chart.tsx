@@ -58,12 +58,13 @@ export function OrdersRevenueChart({ data }: OrdersRevenueChartProps) {
               yAxisId="left"
               stroke="var(--color-orders)"
               tickFormatter={(value) => `${value}`}
+              allowDecimals={false}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
               stroke="var(--color-revenue)"
-              tickFormatter={(value) => `₹${value / 1000}k`}
+              tickFormatter={(value) => `₹${value}`}
             />
             
             <ChartTooltip
