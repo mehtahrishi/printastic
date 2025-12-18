@@ -178,11 +178,22 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
 
         <div className="flex flex-1 items-center justify-end gap-2">
 
+          <Button variant="ghost" size="icon" asChild className="hidden md:flex relative" onClick={(e) => handleProtectedLink(e, "/wishlist")}>
+            <Link href="/wishlist">
+              <Heart className="h-5 w-5" />
+              {user && wishlistItemCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
+                  {wishlistItemCount}
+                </span>
+              )}
+              <span className="sr-only">Wishlist</span>
+            </Link>
+          </Button>
 
           <Button variant="ghost" size="icon" asChild className="hidden md:flex relative" onClick={(e) => handleProtectedLink(e, "/cart")}>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
+              {user && cartItemCount > 0 && (
                 <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
                   {cartItemCount}
                 </span>
@@ -277,9 +288,14 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                       <Link
                         href="/wishlist"
                         onClick={(e) => handleProtectedLink(e, "/wishlist")}
-                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
+                        className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent flex justify-between"
                       >
-                        My Wishlist
+                        <span>My Wishlist</span>
+                         {user && wishlistItemCount > 0 && (
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
+                                {wishlistItemCount}
+                            </span>
+                         )}
                       </Link>
                       <Link
                         href="/cart"
@@ -287,7 +303,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent flex items-center justify-between"
                       >
                         <span>Cart</span>
-                        {cartItemCount > 0 && (
+                        {user && cartItemCount > 0 && (
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
                             {cartItemCount}
                           </span>

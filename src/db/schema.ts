@@ -51,6 +51,13 @@ export const cartItems = mysqlTable("cart_items", {
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 
+export const wishlistItems = mysqlTable("wishlist_items", {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+    productId: int("product_id").notNull().references(() => products.id, { onDelete: 'cascade' }),
+    createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const orders = mysqlTable("orders", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),

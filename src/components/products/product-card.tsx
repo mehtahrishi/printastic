@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -13,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
+import { addToCart as addToCartAction } from "@/actions/cart";
+import { useTransition } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -34,7 +37,8 @@ function getFirstImage(images: string[] | string | undefined): string {
 }
 
 export function ProductCard({ product, user }: ProductCardProps) {
-  const { addToCart } = useCart();
+  const [isPending, startTransition] = useTransition();
+  const { addToCart: addToCartLocal } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
   const router = useRouter();
@@ -59,10 +63,17 @@ export function ProductCard({ product, user }: ProductCardProps) {
       showAuthToast();
       return;
     }
-    addToCart(product);
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} has been added to your cart.`,
+    startTransition(async () => {
+      const result = await addToCartAction(Number(product.id));
+      if (result.error) {
+        toast({ title: "Error", description: result.error, variant: "destructive" });
+      } else {
+        addToCartLocal(product);
+        toast({
+          title: "Added to Cart",
+          description: `${product.name} has been added to your cart.`,
+        });
+      }
     });
   };
 
@@ -71,19 +82,13 @@ export function ProductCard({ product, user }: ProductCardProps) {
       showAuthToast();
       return;
     }
-    if (isWishlisted) {
-      removeFromWishlist(product.id.toString());
-      toast({
-        title: "Removed from Wishlist",
-        description: `${product.name} has been removed from your wishlist.`,
-      });
-    } else {
-      addToWishlist(product);
-      toast({
-        title: "Added to Wishlist",
-        description: `${product.name} has been added to your wishlist.`,
-      });
-    }
+    startTransition(async () => {
+        if (isWishlisted) {
+            await removeFromWishlist(product.id.toString());
+        } else {
+            await addToWishlist(product);
+        }
+    });
   };
 
   const price = Number(product.price);
@@ -116,6 +121,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
           size="icon"
           className="absolute top-2 right-2 bg-background/50 hover:bg-background/80 rounded-full h-8 w-8"
           onClick={handleWishlistToggle}
+          disabled={isPending}
         >
           <Heart
             className={cn(

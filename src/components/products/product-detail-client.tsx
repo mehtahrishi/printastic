@@ -12,7 +12,7 @@ import type { Product } from "@/lib/types";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "../ui/toast";
-import { addToCart } from "@/actions/cart";
+import { addToCart as addToCartAction } from "@/actions/cart";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 
@@ -22,7 +22,9 @@ interface ProductDetailClientProps {
 }
 
 export function ProductDetailClient({ product, user }: ProductDetailClientProps) {
-    const [isPending, startTransition] = useTransition();
+    const [isCartPending, startCartTransition] = useTransition();
+    const [isWishlistPending, startWishlistTransition] = useTransition();
+
     const { addToCart: addToCartLocal } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { toast } = useToast();
@@ -53,8 +55,8 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
             return;
         }
 
-        startTransition(async () => {
-            const result = await addToCart(product.id, 1, {
+        startCartTransition(async () => {
+            const result = await addToCartAction(product.id, 1, {
                 size: selectedSize || undefined,
                 color: selectedColor || undefined,
             });
@@ -80,19 +82,13 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
             showAuthToast();
             return;
         }
-        if (isWishlisted) {
-            removeFromWishlist(cartProduct.id);
-            toast({
-                title: "Removed from Wishlist",
-                description: `${product.name} has been removed from your wishlist.`,
-            });
-        } else {
-            addToWishlist(cartProduct);
-            toast({
-                title: "Added to Wishlist",
-                description: `${product.name} has been added to your wishlist.`,
-            });
-        }
+        startWishlistTransition(async () => {
+            if (isWishlisted) {
+                await removeFromWishlist(cartProduct.id);
+            } else {
+                await addToWishlist(cartProduct);
+            }
+        });
     };
 
     const isAddToCartDisabled =
@@ -168,8 +164,8 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
 
                 <div className="mt-auto pt-8">
                     <div className="flex flex-col gap-2">
-                        <Button size="lg" className="w-full" onClick={handleAddToCart} disabled={isPending || isAddToCartDisabled}>
-                            {isPending ? (
+                        <Button size="lg" className="w-full" onClick={handleAddToCart} disabled={isCartPending || isAddToCartDisabled}>
+                            {isCartPending ? (
                                 <>
                                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                     Adding...
@@ -188,13 +184,15 @@ export function ProductDetailClient({ product, user }: ProductDetailClientProps)
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>
                             </Button>
-                            <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3">
-                                <Heart
-                                    className={cn(
-                                        "h-5 w-5 transition-colors duration-200",
-                                        isWishlisted ? "text-red-500 fill-current" : "text-foreground"
-                                    )}
-                                />
+                            <Button size="lg" variant="outline" onClick={handleWishlistToggle} className="px-3" disabled={isWishlistPending}>
+                                {isWishlistPending ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+                                    <Heart
+                                        className={cn(
+                                            "h-5 w-5 transition-colors duration-200",
+                                            isWishlisted ? "text-red-500 fill-current" : "text-foreground"
+                                        )}
+                                    />
+                                )}
                                 <span className="sr-only">
                                     {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
                                 </span>
