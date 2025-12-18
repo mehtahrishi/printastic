@@ -76,10 +76,21 @@ export default async function OrdersPage() {
                                                 {(!order.items || order.items.length === 0) ? (
                                                     "No items"
                                                 ) : (
-                                                    <div className="flex flex-col">
-                                                        {order.items.map((item, index) => (
-                                                            <span key={index} className="truncate">{item.product.name}</span>
-                                                        ))}
+                                                    <div className="flex flex-col gap-1">
+                                                        {order.items.map((item, index) => {
+                                                            const details = [
+                                                                item.quantity && `${item.quantity}x`,
+                                                                item.size,
+                                                                item.color,
+                                                            ].filter(Boolean).join(' / ');
+
+                                                            return (
+                                                                <div key={index}>
+                                                                    <span className="text-foreground truncate">{item.product.name}</span>
+                                                                    {details && <span className="text-xs ml-2">({details})</span>}
+                                                                </div>
+                                                            )
+                                                        })}
                                                     </div>
                                                 )}
                                             </TableCell>
