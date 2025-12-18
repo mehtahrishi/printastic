@@ -17,6 +17,12 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
 const chartConfig = {
   revenue: {
@@ -37,7 +43,59 @@ interface OrdersRevenueChartProps {
   }[];
 }
 
+const ChartComponent = ({ data }: { data: any[] }) => (
+  <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+    <LineChart accessibilityLayer data={data}>
+      <CartesianGrid vertical={false} />
+      <XAxis
+        dataKey="month"
+        tickLine={false}
+        tickMargin={10}
+        axisLine={false}
+      />
+      <YAxis
+        yAxisId="left"
+        stroke="var(--color-orders)"
+        tickFormatter={(value) => `${value}`}
+        allowDecimals={false}
+      />
+      <YAxis
+        yAxisId="right"
+        orientation="right"
+        stroke="var(--color-revenue)"
+        tickFormatter={(value) => `₹${value}`}
+      />
+      
+      <ChartTooltip
+        cursor={true}
+        content={<ChartTooltipContent indicator="dot" />}
+      />
+      <ChartLegend content={<ChartLegendContent />} />
+      <Line
+        dataKey="orders"
+        type="monotone"
+        stroke="var(--color-orders)"
+        strokeWidth={2}
+        dot={true}
+        yAxisId="left"
+      />
+      <Line
+        dataKey="revenue"
+        type="monotone"
+        stroke="var(--color-revenue)"
+        strokeWidth={2}
+        dot={true}
+        yAxisId="right"
+      />
+    </LineChart>
+  </ChartContainer>
+);
+
+
 export function OrdersRevenueChart({ data }: OrdersRevenueChartProps) {
+  const firstHalf = data.slice(0, 6);
+  const secondHalf = data.slice(6, 12);
+
   return (
     <Card>
       <CardHeader>
@@ -45,51 +103,26 @@ export function OrdersRevenueChart({ data }: OrdersRevenueChartProps) {
         <CardDescription>Last 12 months</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-          <LineChart accessibilityLayer data={data}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-            />
-            <YAxis
-              yAxisId="left"
-              stroke="var(--color-orders)"
-              tickFormatter={(value) => `${value}`}
-              allowDecimals={false}
-            />
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              stroke="var(--color-revenue)"
-              tickFormatter={(value) => `₹${value}`}
-            />
-            
-            <ChartTooltip
-              cursor={true}
-              content={<ChartTooltipContent indicator="dot" />}
-            />
-            <ChartLegend content={<ChartLegendContent />} />
-            <Line
-              dataKey="orders"
-              type="monotone"
-              stroke="var(--color-orders)"
-              strokeWidth={2}
-              dot={true}
-              yAxisId="left"
-            />
-            <Line
-              dataKey="revenue"
-              type="monotone"
-              stroke="var(--color-revenue)"
-              strokeWidth={2}
-              dot={true}
-              yAxisId="right"
-            />
-          </LineChart>
-        </ChartContainer>
+        {/* Mobile View with Tabs */}
+        <div className="block sm:hidden">
+          <Tabs defaultValue="jan-jun">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="jan-jun">Jan - Jun</TabsTrigger>
+              <TabsTrigger value="jul-dec">Jul - Dec</TabsTrigger>
+            </TabsList>
+            <TabsContent value="jan-jun">
+              <ChartComponent data={firstHalf} />
+            </TabsContent>
+            <TabsContent value="jul-dec">
+              <ChartComponent data={secondHalf} />
+            </TabsContent>
+          </Tabs>
+        </div>
+        
+        {/* Desktop View */}
+        <div className="hidden sm:block">
+          <ChartComponent data={data} />
+        </div>
       </CardContent>
     </Card>
   )
