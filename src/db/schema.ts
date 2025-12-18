@@ -55,7 +55,7 @@ export const orders = mysqlTable("orders", {
     id: int("id").autoincrement().primaryKey(),
     userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     total: decimal("total", { precision: 10, scale: 2 }).notNull(),
-    status: varchar("status", { length: 50 }).notNull().default("Pending"), // e.g., Pending, Processing, Shipped, Delivered, Cancelled
+    status: varchar("status", { length: 50 }).notNull().default("Processing"), // Processing, On the way, Out for delivery, Delivered, Rejected, On hold
     shippingAddress: text("shipping_address").notNull(),
     paymentMethod: varchar("payment_method", { length: 50 }).notNull(),
     createdAt: timestamp("created_at").defaultNow(),

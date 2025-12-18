@@ -4,24 +4,8 @@ import { orders, users, orderItems, products } from "@/db/schema";
 import { eq, desc, inArray, or, like } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/admin/search-input";
-import { cn } from "@/lib/utils";
-
-const getStatusClass = (status: string) => {
-    switch (status.toLowerCase()) {
-        case 'delivered':
-            return 'bg-green-100 text-green-800 border-green-200';
-        case 'shipped':
-            return 'bg-blue-100 text-blue-800 border-blue-200';
-        case 'processing':
-            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-        case 'cancelled':
-            return 'bg-red-100 text-red-800 border-red-200';
-        default:
-            return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-};
+import { OrderStatusChanger } from "@/components/admin/orders/order-status-changer";
 
 async function getAllOrders(query: string) {
     try {
@@ -39,8 +23,6 @@ async function getAllOrders(query: string) {
 
         if (query) {
             const likeQuery = `%${query}%`;
-            // Drizzle doesn't support casting int to string for `like` directly.
-            // So we can only search text-based fields.
             allOrdersQuery = allOrdersQuery.where(or(
                 like(users.name, likeQuery),
                 like(users.email, likeQuery),
@@ -179,9 +161,7 @@ export default async function OrdersPage({
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <Badge variant="outline" className={cn("text-xs capitalize", getStatusClass(order.status))}>
-                                                    {order.status}
-                                                </Badge>
+                                                <OrderStatusChanger orderId={order.id} currentStatus={order.status} />
                                             </TableCell>
                                         </TableRow>
                                     ))

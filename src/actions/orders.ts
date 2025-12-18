@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { orders, orderItems, products } from "@/db/schema";
 import { eq, desc, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 async function getUserId() {
     const cookieStore = await cookies();
@@ -75,5 +76,19 @@ export async function getOrders() {
     } catch (error) {
         console.error("Error fetching orders:", error);
         return [];
+    }
+}
+
+export async function updateOrderStatus(orderId: number, status: string) {
+    try {
+        await db.update(orders)
+            .set({ status, updatedAt: new Date() })
+            .where(eq(orders.id, orderId));
+
+        revalidatePath("/admin/orders");
+        return { success: true, message: `Order #${orderId} status updated to ${status}` };
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        return { success: false, error: "Failed to update order status" };
     }
 }
