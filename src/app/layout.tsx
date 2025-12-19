@@ -8,6 +8,10 @@ import { SplashScreen } from "@/components/ui/splash-screen";
 import { ChatWidget } from "@/components/chat-widget";
 import { CartProvider } from "@/hooks/use-cart";
 import { WishlistProvider } from "@/hooks/use-wishlist";
+import { cookies } from "next/headers";
+import { db } from "@/lib/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 const tanBuster = localFont({
   src: "../fonts/TanBuster.otf",
@@ -55,11 +59,19 @@ export const metadata: Metadata = {
 };
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("auth_session")?.value;
+
+  let user = null;
+  if (userId && !isNaN(parseInt(userId))) {
+    user = await db.select({ id: users.id, name: users.name }).from(users).where(eq(users.id, parseInt(userId))).then(res => res[0] || null);
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -73,7 +85,7 @@ export default function RootLayout({
         )}
       >
         <CartProvider>
-          <WishlistProvider>
+          <WishlistProvider user={user}>
             {children}
             <Toaster />
             <ChatWidget />

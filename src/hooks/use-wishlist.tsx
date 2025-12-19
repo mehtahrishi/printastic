@@ -21,14 +21,23 @@ interface WishlistContextType {
   refetch: () => void;
 }
 
+type User = { id: number; name: string | null } | null;
+
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
-export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WishlistProvider: React.FC<{ children: React.ReactNode, user: User }> = ({ children, user }) => {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchWishlist = useCallback(async () => {
+    // Only fetch if there's a user
+    if (!user) {
+      setWishlistItems([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const items = await getWishlistItems();
@@ -39,11 +48,11 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, user]); // Add user as a dependency
 
   useEffect(() => {
     fetchWishlist();
-  }, [fetchWishlist]);
+  }, [fetchWishlist, user]); // Refetch when user changes
 
   const addToWishlist = async (product: Product) => {
     const result = await addToWishlistAction(Number(product.id));
