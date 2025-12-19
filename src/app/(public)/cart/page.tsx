@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ShoppingCart as ShoppingCartIcon, ArrowRight } from "lucide-react";
 import { getCartItems } from "@/actions/cart";
 import CartItemRow from "@/components/cart/cart-item-row";
+import { ProceedToCheckoutButton } from "@/components/cart/proceed-to-checkout-button";
 
 export default async function CartPage() {
   const cartItems = await getCartItems();
@@ -74,12 +75,7 @@ export default async function CartPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button size="lg" className="w-full" asChild>
-                    <Link href="/checkout">
-                        Proceed to Checkout
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
+                <ProceedToCheckoutButton />
               </CardFooter>
             </Card>
           </div>
