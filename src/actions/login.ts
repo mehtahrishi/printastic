@@ -78,13 +78,13 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     // Store OTP and Email in a new temporary HttpOnly cookie
-    const expiresAt = Date.now() + 2 * 60 * 1000; // 2 minutes
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
     const tempPayload = `${email}|${otp}|${expiresAt}`;
     
     cookieStore.set("temp_otp_session", tempPayload, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 2 * 60, // 2 minutes in seconds
+        maxAge: 5 * 60, // 5 minutes in seconds
         path: "/",
     });
 

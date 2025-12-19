@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTransition, useState, useEffect } from "react";
@@ -26,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 export const VerifyForm = () => {
     const [isPending, startTransition] = useTransition();
     const [isRedirecting, setIsRedirecting] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(120); // 2 minutes
+    const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
     const router = useRouter();
     const { toast } = useToast();
 
@@ -153,9 +154,9 @@ export const VerifyForm = () => {
                         <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             Didn&apos;t receive the code?{" "}
                             <button
-                                disabled={timeLeft > 0}
+                                disabled={timeLeft > 60}
                                 className="text-primary font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={() => window.location.reload()} // Simple reload to resend for now
+                                onClick={() => router.push("/login")}
                             >
                                 Resend
                             </button>
