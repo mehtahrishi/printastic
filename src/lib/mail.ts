@@ -29,7 +29,7 @@ function renderShell(content: string, brand: { name: string; url: string; primar
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body style="margin:0;padding:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background-color:${brand.background}">
-    <div style="background-color:${brand.background};background-image:linear-gradient(to right,rgba(5,69,160,0.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(5,69,160,0.08) 1px,transparent 1px);background-size:40px 40px;padding:40px 20px;min-height:100vh">
+    <div style="background-color:${brand.background};background-image:linear-gradient(to right,rgba(5,69,160,0.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(5,69,160,0.08) 1px,transparent-1px);background-size:40px 40px;padding:40px 20px;min-height:100vh">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
         <tr>
           <td align="center">
@@ -190,33 +190,43 @@ function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
 }
 
 export const sendOtpEmail = async (email: string, otp: string) => {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+    const host = process.env.SMTP_HOST;
+    const port = Number(process.env.SMTP_PORT || 587);
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
 
-  if (!host || !user || !pass) {
-    console.error("SMTP not configured in environment variables");
-    return;
-  }
+    if (!host || !user || !pass) {
+        console.error("SMTP not configured in environment variables. Cannot send OTP email.");
+        throw new Error("SMTP server is not configured.");
+    }
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
+    const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user, pass },
+        tls: {
+            // Do not fail on invalid certs
+            rejectUnauthorized: false
+        }
+    });
 
-  const brand = getBrandConfig();
-  const htmlContent = renderOtpEmail(otp, brand);
+    const brand = getBrandConfig();
+    const htmlContent = renderOtpEmail(otp, brand);
 
-  await transporter.sendMail({
-    from: `"${brand.name} Security" <noreply@honestyprinthouse.in>`,
-    to: email,
-    subject: `Your ${brand.name} Verification Code`,
-    html: htmlContent,
-  });
+    try {
+        await transporter.sendMail({
+            from: `"${brand.name} Security" <noreply@honestyprinthouse.in>`,
+            to: email,
+            subject: `Your ${brand.name} Verification Code`,
+            html: htmlContent,
+        });
+    } catch (error) {
+        console.error("Error sending OTP email:", error);
+        throw new Error("Could not send verification email.");
+    }
 };
+
 
 export const sendOrderConfirmationEmail = async (order: any, user: any) => {
     const host = process.env.SMTP_HOST;
@@ -226,7 +236,7 @@ export const sendOrderConfirmationEmail = async (order: any, user: any) => {
 
     if (!host || !smtpUser || !smtpPass) {
         console.error("SMTP not configured for order confirmation email");
-        return;
+        throw new Error("SMTP server is not configured for order emails.");
     }
 
     const transporter = nodemailer.createTransport({
@@ -234,15 +244,23 @@ export const sendOrderConfirmationEmail = async (order: any, user: any) => {
         port,
         secure: port === 465,
         auth: { user: smtpUser, pass: smtpPass },
+        tls: {
+            rejectUnauthorized: false
+        }
     });
     
     const brand = getBrandConfig();
     const htmlContent = renderOrderConfirmationEmail(order, user, brand);
 
-    await transporter.sendMail({
-        from: `"${brand.name}" <noreply@honestyprinthouse.in>`,
-        to: user.email,
-        subject: `Order Confirmation #${order.id} from ${brand.name}`,
-        html: htmlContent,
-    });
+    try {
+        await transporter.sendMail({
+            from: `"${brand.name}" <noreply@honestyprinthouse.in>`,
+            to: user.email,
+            subject: `Order Confirmation #${order.id} from ${brand.name}`,
+            html: htmlContent,
+        });
+    } catch (error) {
+        console.error("Error sending order confirmation email:", error);
+        throw new Error("Could not send order confirmation email.");
+    }
 };

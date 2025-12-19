@@ -23,25 +23,21 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     let passwordsMatch = false;
 
     // 1. Check Environment Variables for Admin Bypass
-    // This allows logging in with credentials from .env even if the user is not in the DB initially
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
 
     if (adminEmail && adminPassword && email === adminEmail && password === adminPassword) {
         passwordsMatch = true;
 
-        // Ensure Admin exists in DB (so we have an ID for the session)
         if (!existingUser) {
             console.log("Admin config detected but user not found in DB. Creating admin user...");
             try {
-                // Insert new admin user with a dummy hash (since we use Env for auth)
                 await db.insert(users).values({
                     name: "Admin",
                     email: adminEmail,
                     password: "$2b$10$dummyhashforadminuserauthviaenvvariablesonly",
                     role: "ADMIN",
                 });
-                // Fetch the newly created user to get the ID
                 existingUser = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
             } catch (error) {
                 console.error("Failed to create admin user:", error);
@@ -66,25 +62,18 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     // Send OTP
     try {
         await sendOtpEmail(email, otp);
+        console.log("--------------------------------");
+        console.log(`Generated and sent OTP for ${email}: ${otp}`);
+        console.log("--------------------------------");
     } catch (error) {
         console.error("Failed to send OTP email:", error);
-        // In production, we might want to return an error here, but for now we'll log it
-        // return { error: "Failed to send verification email." };
+        return { error: "Failed to send verification email. Please check server configuration." };
     }
 
-    console.log("--------------------------------");
-    console.log(`Generated OTP for ${email}: ${otp}`);
-    console.log("--------------------------------");
-
-    // In a real app we'd verify email sending success before proceeding.
-    // For this flow, we will mimic the "2FA" by setting a temp cookie.
-
     // Store OTP and Email in a temporary HttpOnly cookie
-    // Format: email|otp|expires_at
     const expiresAt = Date.now() + 2 * 60 * 1000; // 2 minutes
     const tempPayload = `${email}|${otp}|${expiresAt}`;
 
-    // We use the Next.js cookies API
     const cookieStore = await cookies();
     cookieStore.set("temp_otp_session", tempPayload, {
         httpOnly: true,
