@@ -1,12 +1,14 @@
+
 "use server";
 
 import Razorpay from "razorpay";
 import { db } from "@/lib/db";
-import { orders, orderItems } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { orders, orderItems, products, users } from "@/db/schema";
+import { eq, inArray } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { clearCart } from "./cart";
+import { sendOrderConfirmationEmail } from "@/lib/mail";
 
 async function getUserId() {
     const cookieStore = await cookies();
@@ -77,6 +79,8 @@ export async function verifyPayment(
         return { success: false, error: "Invalid payment signature." };
     }
     
+    let createdOrderId: number | null = null;
+
     // Signature is valid, now save the order to the database
     try {
         // Use a transaction to ensure all or nothing
@@ -87,9 +91,11 @@ export async function verifyPayment(
                 status: "Processing",
                 shippingAddress: orderData.shippingAddress,
                 paymentMethod: orderData.paymentMethod,
+                razorpayPaymentId: razorpay_payment_id,
             });
 
             const orderId = newOrder.insertId;
+            createdOrderId = orderId;
 
             if (!orderId) {
                 throw new Error("Failed to create order.");
@@ -107,8 +113,34 @@ export async function verifyPayment(
             await tx.insert(orderItems).values(newOrderItems);
         });
 
-        // Clear the cart
+        // Clear the cart after successful transaction
         await clearCart();
+        
+        // Send email confirmation
+        if (createdOrderId) {
+            try {
+                // Fetch full order details for the email
+                const user = await db.select().from(users).where(eq(users.id, userId)).then(res => res[0]);
+                const orderDetails = await db.select().from(orders).where(eq(orders.id, createdOrderId)).then(res => res[0]);
+                const items = await db.select({
+                    productName: products.name,
+                    quantity: orderItems.quantity,
+                    price: orderItems.price,
+                    size: orderItems.size,
+                    color: orderItems.color,
+                })
+                .from(orderItems)
+                .innerJoin(products, eq(orderItems.productId, products.id))
+                .where(eq(orderItems.orderId, createdOrderId));
+
+                if (user && orderDetails && items) {
+                    await sendOrderConfirmationEmail({ ...orderDetails, items }, user);
+                }
+            } catch (emailError) {
+                console.error("Failed to send order confirmation email:", emailError);
+                // Don't fail the whole request, just log it.
+            }
+        }
         
         return { success: true };
     } catch (error) {

@@ -168,7 +168,7 @@ export default function CheckoutPage() {
                 if (verificationResult.success) {
                     clearCartLocal();
                     toast({ title: "Order Placed!", description: "Thank you for your purchase." });
-                    router.push(`/`);
+                    router.push(`/orders`);
                 } else {
                     toast({ title: "Payment Failed", description: verificationResult.error, variant: "destructive" });
                     // Unfreeze UI if verification fails, allowing user to retry

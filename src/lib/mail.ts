@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 
 function escapeHtml(str: string) {
+  if (!str) return "";
   return String(str).replace(/[&<>"]+/g, (c) => {
     switch (c) {
       case "&":
@@ -54,7 +55,7 @@ function renderShell(content: string, brand: { name: string; url: string; primar
                         © ${new Date().getFullYear()} ${brand.name}. All rights reserved.
                       </td>
                       <td align="right">
-                        <a href="${brand.url}" style="display:inline-block;color:${brand.primary};text-decoration:none;font-size:13px;font-weight:600;padding:8px 16px;border:1px solid ${brand.primary};border-radius:6px;transition:all 0.2s">Visit Store</a>
+                        <a href="${brand.url}/orders" style="display:inline-block;color:${brand.primary};text-decoration:none;font-size:13px;font-weight:600;padding:8px 16px;border:1px solid ${brand.primary};border-radius:6px;transition:all 0.2s">View Your Orders</a>
                       </td>
                     </tr>
                   </table>
@@ -97,6 +98,73 @@ function renderOtpEmail(otp: string, brand: any) {
   return renderShell(body, brand);
 }
 
+const getBrandConfig = () => ({
+    name: process.env.BRAND_NAME || "Honesty Print House",
+    url: process.env.BRAND_URL || "https://honestyprinthouse.in/",
+    primary: "#0545A0",  // hsl(215, 100%, 34%) converted to hex
+    accent: "#FF6B35",   // hsl(19, 100%, 51%) converted to hex
+    background: "#F7F9FC", // hsl(215, 33%, 98%) converted to hex
+    text: "#1E3A5F",     // hsl(215, 40%, 15%) converted to hex
+    muted: "#64748B",    // hsl(215, 20%, 50%) converted to hex
+    border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
+});
+
+function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
+  const itemsHtml = order.items.map((item: any) => `
+    <tr style="border-bottom:1px solid ${brand.border}">
+      <td style="padding:12px 0;font-size:14px;color:${brand.text}">
+        ${escapeHtml(item.productName)}
+        <div style="font-size:12px;color:${brand.muted}">
+          Qty: ${item.quantity}
+          ${item.size ? ` | Size: ${item.size}` : ''}
+          ${item.color ? ` | Color: ${item.color}` : ''}
+        </div>
+      </td>
+      <td style="padding:12px 0;font-size:14px;color:${brand.text};text-align:right">₹${Number(item.price * item.quantity).toFixed(2)}</td>
+    </tr>
+  `).join('');
+
+  const body = `
+    <h2 style="margin:0 0 12px;font-size:26px;font-weight:700;color:${brand.text};letter-spacing:-0.02em">Your Order is Confirmed!</h2>
+    <p style="margin:0 0 24px;color:${brand.muted};font-size:15px;line-height:1.6">Hi ${escapeHtml(user.name)}, thanks for your purchase. We're getting your order ready.</p>
+    
+    <div style="border:1px solid ${brand.border};border-radius:12px;padding:24px;margin-bottom:24px;">
+      <h3 style="margin:0 0 16px;font-size:16px;font-weight:600;color:${brand.text}">Order Summary</h3>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+        ${itemsHtml}
+      </table>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-top:16px;">
+        <tr style="border-top:2px solid ${brand.border};">
+          <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px">Total</td>
+          <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px;text-align:right">₹${Number(order.total).toFixed(2)}</td>
+        </tr>
+      </table>
+    </div>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td style="width:50%;vertical-align:top;padding-right:12px">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:600;color:${brand.text}">Shipping to</h3>
+          <p style="margin:0;font-size:14px;color:${brand.muted};line-height:1.6">
+            ${escapeHtml(user.name)}<br>
+            ${escapeHtml(order.shippingAddress)}
+          </p>
+        </td>
+        <td style="width:50%;vertical-align:top;padding-left:12px">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:600;color:${brand.text}">Order Details</h3>
+          <p style="margin:0;font-size:14px;color:${brand.muted};line-height:1.6">
+            <strong>Order ID:</strong> #${order.id}<br>
+            <strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}<br>
+            <strong>Payment:</strong> ${escapeHtml(order.paymentMethod)}
+          </p>
+        </td>
+      </tr>
+    </table>
+  `;
+
+  return renderShell(body, brand);
+}
+
 export const sendOtpEmail = async (email: string, otp: string) => {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || 587);
@@ -115,17 +183,7 @@ export const sendOtpEmail = async (email: string, otp: string) => {
     auth: { user, pass },
   });
 
-  const brand = {
-    name: process.env.BRAND_NAME || "Honesty Print House",
-    url: process.env.BRAND_URL || "https://honestyprinthouse.in/",
-    primary: "#0545A0",  // hsl(215, 100%, 34%) converted to hex
-    accent: "#FF6B35",   // hsl(19, 100%, 51%) converted to hex
-    background: "#F7F9FC", // hsl(215, 33%, 98%) converted to hex
-    text: "#1E3A5F",     // hsl(215, 40%, 15%) converted to hex
-    muted: "#64748B",    // hsl(215, 20%, 50%) converted to hex
-    border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
-  };
-
+  const brand = getBrandConfig();
   const htmlContent = renderOtpEmail(otp, brand);
 
   await transporter.sendMail({
@@ -134,4 +192,33 @@ export const sendOtpEmail = async (email: string, otp: string) => {
     subject: `Your ${brand.name} Verification Code`,
     html: htmlContent,
   });
+};
+
+export const sendOrderConfirmationEmail = async (order: any, user: any) => {
+    const host = process.env.SMTP_HOST;
+    const port = Number(process.env.SMTP_PORT || 587);
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+
+    if (!host || !smtpUser || !smtpPass) {
+        console.error("SMTP not configured for order confirmation email");
+        return;
+    }
+
+    const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+    });
+    
+    const brand = getBrandConfig();
+    const htmlContent = renderOrderConfirmationEmail(order, user, brand);
+
+    await transporter.sendMail({
+        from: `"${brand.name}" <orders@honestyprinthouse.in>`,
+        to: user.email,
+        subject: `Order Confirmation #${order.id} from ${brand.name}`,
+        html: htmlContent,
+    });
 };

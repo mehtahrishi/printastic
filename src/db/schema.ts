@@ -65,6 +65,7 @@ export const orders = mysqlTable("orders", {
     status: varchar("status", { length: 50 }).notNull().default("Processing"), // Processing, On the way, Out for delivery, Delivered, Rejected, On hold
     shippingAddress: text("shipping_address").notNull(),
     paymentMethod: varchar("payment_method", { length: 50 }).notNull(),
+    razorpayPaymentId: varchar("razorpay_payment_id", { length: 255 }),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
