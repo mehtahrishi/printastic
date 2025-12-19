@@ -5,8 +5,8 @@ import * as z from "zod";
 import { VerifySchema } from "@/schemas";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { users, otpAttempts } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 
 export const verifyOtp = async (values: z.infer<typeof VerifySchema>) => {
     const validatedFields = VerifySchema.safeParse(values);
@@ -37,10 +37,26 @@ export const verifyOtp = async (values: z.infer<typeof VerifySchema>) => {
     }
 
     // OTP is correct!
-    // 1. Clear temp cookie
+    // 1. Mark OTP as used in database
+    try {
+        await db
+            .update(otpAttempts)
+            .set({ isUsed: true })
+            .where(
+                and(
+                    eq(otpAttempts.email, email),
+                    eq(otpAttempts.otp, otp)
+                )
+            );
+    } catch (error) {
+        console.error("Failed to mark OTP as used:", error);
+        // Continue even if this fails
+    }
+
+    // 2. Clear temp cookie
     cookieStore.delete("temp_otp_session");
 
-    // 2. Set real session cookie
+    // 3. Set real session cookie
     try {
         const existingUser = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
 

@@ -79,3 +79,12 @@ export const orderItems = mysqlTable("order_items", {
     size: varchar("size", { length: 50 }),
     color: varchar("color", { length: 50 }),
 });
+
+export const otpAttempts = mysqlTable("otp_attempts", {
+    id: int("id").autoincrement().primaryKey(),
+    email: varchar("email", { length: 255 }).notNull(),
+    otp: varchar("otp", { length: 6 }).notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    isUsed: boolean("is_used").default(false),
+    createdAt: timestamp("created_at").defaultNow(),
+});

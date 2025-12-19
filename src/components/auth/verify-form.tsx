@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { verifyOtp } from "@/actions/verify-otp";
+import { resendOtp } from "@/actions/resend-otp";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
@@ -26,8 +27,10 @@ import { useToast } from "@/hooks/use-toast";
 
 export const VerifyForm = () => {
     const [isPending, startTransition] = useTransition();
+    const [isResending, setIsResending] = useState(false);
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+    const [resendCooldown, setResendCooldown] = useState(0);
     const router = useRouter();
     const { toast } = useToast();
 
@@ -45,6 +48,14 @@ export const VerifyForm = () => {
         }, 1000);
         return () => clearInterval(interval);
     }, [timeLeft]);
+
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+        const interval = setInterval(() => {
+            setResendCooldown((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [resendCooldown]);
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -72,6 +83,31 @@ export const VerifyForm = () => {
                     }, 1000);
                 }
             });
+        });
+    };
+
+    const handleResend = () => {
+        setIsResending(true);
+        resendOtp().then((data) => {
+            setIsResending(false);
+            if (data.error) {
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: data.error,
+                });
+                if (data.secondsLeft) {
+                    setResendCooldown(data.secondsLeft);
+                }
+            } else {
+                toast({
+                    title: "Success",
+                    description: "New OTP sent to your email!",
+                });
+                setTimeLeft(300); // Reset timer to 5 minutes
+                setResendCooldown(30); // Set cooldown to 30 seconds
+                form.reset(); // Clear the input field
+            }
         });
     };
 
@@ -154,11 +190,24 @@ export const VerifyForm = () => {
                         <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             Didn&apos;t receive the code?{" "}
                             <button
-                                disabled={timeLeft > 60}
-                                className="text-primary font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={() => router.push("/login")}
+                                type="button"
+                                disabled={isResending || resendCooldown > 0}
+                                className="text-primary font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+                                onClick={handleResend}
                             >
-                                Resend
+                                {isResending ? (
+                                    <>
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                        Sending...
+                                    </>
+                                ) : resendCooldown > 0 ? (
+                                    `Resend (${resendCooldown}s)`
+                                ) : (
+                                    <>
+                                        <RefreshCw className="h-3 w-3" />
+                                        Resend
+                                    </>
+                                )}
                             </button>
                         </p>
                     </div>

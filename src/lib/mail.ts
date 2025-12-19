@@ -81,7 +81,7 @@ function renderOtpEmail(otp: string, brand: any) {
       <div style="background:linear-gradient(135deg,rgba(5,69,160,0.05) 0%,rgba(5,69,160,0.02) 100%);border-radius:12px;padding:32px;margin:32px 0;text-align:center;border:2px dashed ${brand.primary}">
         <div style="font-size:11px;font-weight:600;color:${brand.primary};text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Your Verification Code</div>
         <div style="font-size:42px;font-weight:700;letter-spacing:12px;color:${brand.primary};font-family:'Inter',monospace;margin:8px 0">${otp}</div>
-        <div style="font-size:13px;color:${brand.muted};margin-top:16px">Valid for <strong style="color:${brand.text}">2 minutes</strong></div>
+        <div style="font-size:13px;color:${brand.muted};margin-top:16px">Valid for <strong style="color:${brand.text}">5 minutes</strong></div>
       </div>
       
       <div style="background-color:rgba(250,204,21,0.1);border-left:4px solid #facc15;padding:16px 20px;border-radius:8px;margin:32px 0">
