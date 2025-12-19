@@ -1,6 +1,6 @@
 
 import { notFound } from "next/navigation";
-import { getProduct, getProductPreviews } from "@/app/actions/products";
+import { getProduct, getProductPreviews, getProducts } from "@/app/actions/products";
 import { ProductDetailClient } from "@/components/products/product-detail-client";
 import {
   Breadcrumb,
@@ -15,6 +15,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { Home, ShoppingBag } from "lucide-react";
+import type { Product } from "@/lib/types";
 
 function parseJsonOrString(data: any): string[] {
     if (Array.isArray(data)) return data;
@@ -45,11 +46,26 @@ export default async function ProductDetailPage({
   if (!product) {
     notFound();
   }
+  
+  // Fetch related products
+  const allProducts = await getProducts();
+  const relatedProducts = allProducts
+    .filter(p => p.category === product.category && p.id !== product.id)
+    .slice(0, 4) // Get up to 4 related products
+    .map(p => ({
+        ...p,
+        price: Number(p.price),
+        originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
+        sizes: parseJsonOrString(p.sizes),
+        colors: parseJsonOrString(p.colors),
+        images: parseJsonOrString(p.images),
+    }));
+
 
   const previews = await getProductPreviews(product.id as number);
 
   // Convert basic product to the type expected by client
-  const formattedProduct = {
+  const formattedProduct: Product = {
     ...product,
     price: Number(product.price),
     originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
@@ -92,7 +108,8 @@ export default async function ProductDetailPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <ProductDetailClient product={formattedProduct} user={user} />
+      <ProductDetailClient product={formattedProduct} relatedProducts={relatedProducts} user={user} />
     </div>
   );
 }
+
