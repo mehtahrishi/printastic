@@ -216,7 +216,7 @@ export const sendOrderConfirmationEmail = async (order: any, user: any) => {
     const htmlContent = renderOrderConfirmationEmail(order, user, brand);
 
     await transporter.sendMail({
-        from: `"${brand.name}" <orders@honestyprinthouse.in>`,
+        from: `"${brand.name}" <noreply@honestyprinthouse.in>`,
         to: user.email,
         subject: `Order Confirmation #${order.id} from ${brand.name}`,
         html: htmlContent,

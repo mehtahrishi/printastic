@@ -168,6 +168,7 @@ export default function CheckoutPage() {
                 if (verificationResult.success) {
                     clearCartLocal();
                     toast({ title: "Order Placed!", description: "Thank you for your purchase." });
+                    toast({ title: "Invoice Sent", description: "An invoice has been sent to your email." });
                     router.push(`/orders`);
                 } else {
                     toast({ title: "Payment Failed", description: verificationResult.error, variant: "destructive" });
