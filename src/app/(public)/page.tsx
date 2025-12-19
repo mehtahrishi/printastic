@@ -37,17 +37,6 @@ export default async function HomePage() {
       isTrending: p.isTrending ?? undefined,
     }));
   
-  const allProducts = fetchedProducts
-  .map(p => ({
-    ...p,
-    originalPrice: p.originalPrice ?? undefined,
-    category: p.category ?? undefined,
-    sizes: parseJsonOrString(p.sizes),
-    colors: parseJsonOrString(p.colors),
-    images: parseJsonOrString(p.images),
-    isTrending: p.isTrending ?? undefined,
-  }));
-
   const cookieStore = await cookies();
   const userId = cookieStore.get("auth_session")?.value;
   const user = userId ? await db.select({ name: users.name }).from(users).where(eq(users.id, parseInt(userId))).then(res => res[0] || null) : null;
@@ -74,7 +63,7 @@ export default async function HomePage() {
 
       <section className="pb-12 md:pb-20">
         <div className="container">
-          <ProductGridClient initialProducts={allProducts} user={user} />
+          <ProductGridClient initialProducts={trendingProducts} user={user} />
         </div>
       </section>
     </div>
