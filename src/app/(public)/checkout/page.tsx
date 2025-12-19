@@ -1,3 +1,4 @@
+
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,6 +48,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { clearCart: clearCartLocal } = useCart();
@@ -161,6 +163,7 @@ export default function CheckoutPage() {
             handler: async function (response: any) {
                 const verificationResult = await verifyPayment(response, orderDataForDb);
                 if (verificationResult.success) {
+                    setIsPaymentSuccessful(true);
                     clearCartLocal();
                     toast({ title: "Order Placed!", description: "Thank you for your purchase." });
                     router.push(`/`);
@@ -203,34 +206,34 @@ export default function CheckoutPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <FormField control={form.control} name="email" render={({ field }) => (
-                      <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="you@example.com" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="you@example.com" {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid md:grid-cols-2 gap-4">
                       <FormField control={form.control} name="firstName" render={({ field }) => (
-                        <FormItem><FormLabel>First Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>First Name</FormLabel><FormControl><Input {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={form.control} name="lastName" render={({ field }) => (
-                        <FormItem><FormLabel>Last Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Last Name</FormLabel><FormControl><Input {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                     <FormField control={form.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel>Phone</FormLabel><FormControl><Input placeholder="+91 98765 43210" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Phone</FormLabel><FormControl><Input placeholder="+91 98765 43210" {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="address" render={({ field }) => (
-                      <FormItem><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St" {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="apartment" render={({ field }) => (
-                      <FormItem><FormLabel>Apartment, Suite, etc. (Optional)</FormLabel><FormControl><Input placeholder="Apt 4B" {...field} /></FormControl><FormMessage /></FormItem>
+                      <FormItem><FormLabel>Apartment, Suite, etc. (Optional)</FormLabel><FormControl><Input placeholder="Apt 4B" {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <div className="grid md:grid-cols-3 gap-4">
                       <FormField control={form.control} name="city" render={({ field }) => (
-                        <FormItem><FormLabel>City</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>City</FormLabel><FormControl><Input {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={form.control} name="country" render={({ field }) => (
-                        <FormItem><FormLabel>Country</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Country</FormLabel><FormControl><Input {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                       )} />
                       <FormField control={form.control} name="zipCode" render={({ field }) => (
-                        <FormItem><FormLabel>PIN Code</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>PIN Code</FormLabel><FormControl><Input {...field} disabled={isPaymentSuccessful} /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
                   </CardContent>
@@ -251,11 +254,12 @@ export default function CheckoutPage() {
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                               className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                              disabled={isPaymentSuccessful}
                             >
                               <FormItem>
                                 <FormControl>
-                                    <Label className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 transition-all hover:bg-accent/50 ${field.value === 'online' ? 'border-primary bg-primary/5' : ''}`}>
-                                        <RadioGroupItem value="online" id="online" className="sr-only" />
+                                    <Label className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 transition-all hover:bg-accent/50 ${field.value === 'online' ? 'border-primary bg-primary/5' : ''} ${isPaymentSuccessful ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                        <RadioGroupItem value="online" id="online" className="sr-only" disabled={isPaymentSuccessful} />
                                         <CreditCard className="mb-3 h-6 w-6" />
                                         Pay Online
                                         <span className="font-normal text-muted-foreground text-sm mt-1">Cards, UPI, Netbanking & more</span>
@@ -264,8 +268,8 @@ export default function CheckoutPage() {
                               </FormItem>
                               <FormItem>
                                 <FormControl>
-                                    <Label className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 transition-all hover:bg-accent/50 ${field.value === 'cod' ? 'border-primary bg-primary/5' : ''}`}>
-                                        <RadioGroupItem value="cod" id="cod" className="sr-only" />
+                                    <Label className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 transition-all hover:bg-accent/50 ${field.value === 'cod' ? 'border-primary bg-primary/5' : ''} ${isPaymentSuccessful ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                        <RadioGroupItem value="cod" id="cod" className="sr-only" disabled={isPaymentSuccessful} />
                                         <Truck className="mb-3 h-6 w-6" />
                                         Cash on Delivery
                                         <span className="font-normal text-muted-foreground text-sm mt-1">Pay ₹50 now, rest on delivery</span>
@@ -281,8 +285,8 @@ export default function CheckoutPage() {
                   </CardContent>
                 </Card>
                 
-                <Button type="submit" size="lg" className="w-full" disabled={isProcessing}>
-                  {isProcessing ? "Processing..." : `Pay ₹${amountToPay.toFixed(2)}`}
+                <Button type="submit" size="lg" className="w-full" disabled={isProcessing || isPaymentSuccessful}>
+                  {isPaymentSuccessful ? "Payment Successful" : isProcessing ? "Processing..." : `Pay ₹${amountToPay.toFixed(2)}`}
                 </Button>
               </form>
             </Form>
