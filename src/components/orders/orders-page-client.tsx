@@ -39,23 +39,15 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
 
     useEffect(() => {
         if (fromCheckout) {
-            // Use sessionStorage to prevent showing toast on page refresh
-            if (!sessionStorage.getItem('checkout_toast_shown')) {
-                toast({
-                    title: "Invoice Sent",
-                    description: "An invoice has been sent to your email.",
-                });
-                sessionStorage.setItem('checkout_toast_shown', 'true');
-            }
+            toast({
+                title: "Invoice Sent",
+                description: "An invoice has been sent to your email.",
+            });
+            // Clean the URL to prevent toast on refresh
+            window.history.replaceState(null, '', '/orders');
         }
     }, [fromCheckout, toast]);
     
-    // Clear the session storage when the user navigates away from the page
-    useEffect(() => {
-        return () => {
-            sessionStorage.removeItem('checkout_toast_shown');
-        };
-    }, []);
 
     return (
         <div className="container py-12 md:py-16">
@@ -155,4 +147,3 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
         </div>
     );
 }
-
