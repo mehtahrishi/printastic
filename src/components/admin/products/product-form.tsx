@@ -78,19 +78,26 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
     const [newImages, setNewImages] = useState<File[]>([]);
     const [existingImages, setExistingImages] = useState<string[]>(product ? parseImages(product.images) : []);
 
-    const formatJsonField = (value: any) => {
+    const formatJsonField = (value: any): string => {
         if (!value) return "";
-        if (Array.isArray(value)) return value.join(", ");
+        if (Array.isArray(value)) {
+            // If it's already an array, join it.
+            return value.join(", ");
+        }
         if (typeof value === 'string') {
             try {
+                // Try parsing it as JSON. It might be a string like '["S", "M"]'.
                 const parsed = JSON.parse(value);
-                if (Array.isArray(parsed)) return parsed.join(", ");
-            } catch {
-                // It's not a JSON string, so just return it as is.
+                if (Array.isArray(parsed)) {
+                    return parsed.join(", ");
+                }
+            } catch (e) {
+                // If parsing fails, it's probably already a comma-separated string.
                 return value;
             }
         }
-        return "";
+        // Fallback for other types, though it should usually be one of the above.
+        return String(value);
     };
 
     const form = useForm<FormValues>({
@@ -426,3 +433,5 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
         </Form>
     );
 }
+
+    
