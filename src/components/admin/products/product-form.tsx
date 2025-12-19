@@ -79,8 +79,17 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
     const [existingImages, setExistingImages] = useState<string[]>(product ? parseImages(product.images) : []);
 
     const formatJsonField = (value: any) => {
+        if (!value) return "";
         if (Array.isArray(value)) return value.join(", ");
-        if (typeof value === "string") return value;
+        if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value);
+                if (Array.isArray(parsed)) return parsed.join(", ");
+            } catch {
+                // It's not a JSON string, so just return it as is.
+                return value;
+            }
+        }
         return "";
     };
 
@@ -417,4 +426,3 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
         </Form>
     );
 }
-
