@@ -149,7 +149,7 @@ function ProductRow({ product }: { product: Product }) {
                 {product.name}
             </TableCell>
             <TableCell>{product.category || "-"}</TableCell>
-            <TableCell>${Number(product.price).toFixed(2)}</TableCell>
+            <TableCell>₹{Number(product.price).toFixed(2)}</TableCell>
             <TableCell className="text-center">
                 <Checkbox checked={product.isTrending} disabled aria-label="Trending" />
             </TableCell>
