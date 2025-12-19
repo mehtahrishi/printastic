@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     template: "%s | Honesty Print House",
   },
   description: "Discover high-quality, professional printing services for all your needs. From custom apparel to unique art prints, we bring your ideas to life.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
   openGraph: {
     title: "Honesty Print House",
     description: "High-quality professional printing services for all your needs.",
