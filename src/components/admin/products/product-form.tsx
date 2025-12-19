@@ -1,8 +1,10 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -27,6 +29,7 @@ import { createProduct, updateProduct } from "@/app/actions/products";
 import { useState, useTransition, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/lib/types";
+import { Loader2, Trash2, UploadCloud, X } from "lucide-react";
 
 const CATEGORIES = ["Oversize T-Shirts", "Regular T-Shirts", "Kids T-Shirts", "Hoodie",];
 
@@ -41,8 +44,6 @@ const formSchema = z.object({
     category: z.string().optional(),
     sizes: z.string().optional(),
     colors: z.string().optional(),
-    productImages: z.any().optional(),
-    images: z.string().optional(),
     isTrending: z.boolean().default(false),
     isVisible: z.boolean().default(true),
 });
@@ -51,28 +52,35 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
     onSuccess?: () => void;
-    product?: Product; // Added product prop for editing
+    product?: Product;
 }
+
+const parseImages = (images: any): string[] => {
+    if (!images) return [];
+    if (Array.isArray(images)) return images;
+    if (typeof images === 'string') {
+        try {
+            const parsed = JSON.parse(images);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return images.split(',').map(s => s.trim()).filter(Boolean);
+        }
+    }
+    return [];
+};
+
 
 export function ProductForm({ onSuccess, product }: ProductFormProps) {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
+    
+    // State for managing images for preview
+    const [newImages, setNewImages] = useState<File[]>([]);
+    const [existingImages, setExistingImages] = useState<string[]>(product ? parseImages(product.images) : []);
 
     const formatJsonField = (value: any) => {
-        if (Array.isArray(value)) {
-            return value.join(", ");
-        }
-        if (typeof value === "string") {
-            try {
-                const parsed = JSON.parse(value);
-                if (Array.isArray(parsed)) {
-                    return parsed.join(", ");
-                }
-            } catch (e) {
-                // Not a JSON array, return as is
-            }
-            return value;
-        }
+        if (Array.isArray(value)) return value.join(", ");
+        if (typeof value === "string") return value;
         return "";
     };
 
@@ -87,23 +95,45 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
             category: product?.category || "",
             sizes: formatJsonField(product?.sizes),
             colors: formatJsonField(product?.colors),
-            images: formatJsonField(product?.images),
             isTrending: product?.isTrending || false,
             isVisible: product?.isVisible !== undefined ? product.isVisible : true,
         },
     });
 
-    // Watch name to auto-generate slug
     const nameValue = form.watch("name");
     useEffect(() => {
-        if (nameValue) {
+        if (nameValue && !product) { // Only auto-slug on create
             const slug = nameValue
                 .toLowerCase()
                 .replace(/\s+/g, '-')
                 .replace(/[^\w-]+/g, '');
             form.setValue("slug", slug);
         }
-    }, [nameValue, form]);
+    }, [nameValue, form, product]);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const newFileArray = Array.from(files);
+            if (newImages.length + existingImages.length + newFileArray.length > 5) {
+                toast({
+                    variant: "destructive",
+                    title: "Image limit reached",
+                    description: "You can upload a maximum of 5 images in total.",
+                });
+                return;
+            }
+            setNewImages(prev => [...prev, ...newFileArray]);
+        }
+    };
+    
+    const removeNewImage = (index: number) => {
+        setNewImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const removeExistingImage = (index: number) => {
+        setExistingImages(prev => prev.filter((_, i) => i !== index));
+    };
 
     function onSubmit(data: FormValues) {
         console.log("[ProductForm] Form submitted with data:", data);
@@ -111,31 +141,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
         startTransition(async () => {
             const formData = new FormData();
             
-            // Handle file uploads separately to ensure proper FormData encoding
-            let hasFiles = false;
-            if (data.productImages && data.productImages.length > 0) {
-                console.log(`[ProductForm] Adding ${data.productImages.length} files to FormData`);
-                for (let i = 0; i < data.productImages.length; i++) {
-                    const file = data.productImages[i];
-                    console.log(`[ProductForm] File ${i}:`, {
-                        name: file.name,
-                        size: file.size,
-                        type: file.type
-                    });
-                    formData.append("productImages", file, file.name);
-                    hasFiles = true;
-                }
-            } else {
-                console.log("[ProductForm] No files to upload");
-            }
-            
-            // Add other fields
             Object.entries(data).forEach(([key, value]) => {
-                if (key === "productImages") {
-                    // Already handled above
-                    return;
-                }
-                
                 if (value !== undefined && value !== null && value !== "") {
                     if (typeof value === "boolean") {
                         if (value) formData.append(key, "on");
@@ -145,16 +151,13 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                 }
             });
 
-            // For updates, add existing images if no new files uploaded
-            if (product && !hasFiles) {
-                console.log("[ProductForm] Update mode with no new files, preserving existing images");
-                if (product.images) {
-                    const imagesStr = Array.isArray(product.images) 
-                        ? JSON.stringify(product.images)
-                        : product.images;
-                    formData.append("images", imagesStr);
-                }
-            }
+            // Append new image files
+            newImages.forEach(file => {
+                formData.append("productImages", file);
+            });
+
+            // Append remaining existing images
+            formData.append("existingImages", existingImages.join(','));
 
             console.log("[ProductForm] Submitting FormData to server action...");
             
@@ -172,7 +175,9 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                     title: "Success",
                     description: `Product ${product ? "updated" : "created"} successfully`,
                 });
-                if (!product) form.reset(); // Don't reset on edit
+                form.reset();
+                setNewImages([]);
+                setExistingImages([]);
                 onSuccess?.();
             } else {
                 toast({
@@ -185,11 +190,13 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
         });
     }
 
+    const allImages = [...existingImages.map(url => ({ type: 'url', value: url })), ...newImages.map(file => ({ type: 'file', value: file }))];
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto px-1">
-
-                <div className="grid grid-cols-2 gap-4">
+                {/* ... other fields ... */}
+                 <div className="grid grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
                         name="name"
@@ -261,7 +268,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                     />
                 </div>
 
-                <FormField
+                 <FormField
                     control={form.control}
                     name="category"
                     render={({ field }) => (
@@ -316,76 +323,48 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                 </div>
 
                 <div className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="productImages"
-                        render={({ field: { value, onChange, ...fieldProps } }) => (
-                            <FormItem>
-                                <FormLabel>Product Images (Upload up to 5)</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...fieldProps}
-                                        placeholder="Upload images"
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={(event) => {
-                                            const files = event.target.files;
-                                            console.log("[FileInput] Files selected:", files?.length);
-                                            
-                                            if (files && files.length > 5) {
-                                                toast({
-                                                    variant: "destructive",
-                                                    title: "Too many files",
-                                                    description: "You can only upload a maximum of 5 images.",
-                                                });
-                                                event.target.value = ""; // Clear input
-                                                return;
-                                            }
-                                            
-                                            if (files && files.length > 0) {
-                                                // Convert FileList to Array for better handling
-                                                const fileArray = Array.from(files);
-                                                console.log("[FileInput] File details:", fileArray.map(f => ({
-                                                    name: f.name,
-                                                    size: f.size,
-                                                    type: f.type
-                                                })));
-                                                onChange(fileArray);
-                                            } else {
-                                                onChange(null);
-                                            }
-                                        }}
-                                    />
-                                </FormControl>
-                                <FormDescription>
-                                    Upload 1-5 images. First image will be the main product image.
-                                </FormDescription>
-                                {/* Preview current images */}
-                                {product && product.images && (
-                                    <div className="mt-2">
-                                        <p className="text-sm text-muted-foreground mb-1">Current Images:</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {(Array.isArray(product.images)
-                                                ? product.images
-                                                : (typeof product.images === 'string'
-                                                    ? ((product.images as string).trim().startsWith('[')
-                                                        ? (() => { try { return JSON.parse(product.images as string); } catch { return []; } })()
-                                                        : (product.images as string).split(",").map((s: string) => s.trim()).filter((s: string) => s))
-                                                    : [])
-                                            ).map((img, idx) => (
-                                                <div key={idx} className="relative group">
-                                                    <img src={img} alt={`Product ${idx + 1}`} className="h-20 w-20 object-cover rounded-md border" />
-                                                    {idx === 0 && <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] text-center py-0.5">Main</span>}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    <FormLabel>Product Images (Upload up to 5)</FormLabel>
+                     {/* Image Preview Area */}
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                        {allImages.map((img, index) => (
+                            <div key={index} className="relative group aspect-square">
+                                <Image
+                                    src={img.type === 'url' ? img.value : URL.createObjectURL(img.value)}
+                                    alt={`Preview ${index + 1}`}
+                                    fill
+                                    className="object-cover rounded-md border"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    onClick={() => img.type === 'url' ? removeExistingImage(existingImages.indexOf(img.value)) : removeNewImage(newImages.indexOf(img.value))}
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                                {index === 0 && <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] text-center py-0.5 rounded-b-md">Main</span>}
+                            </div>
+                        ))}
+                    </div>
+
+                    <FormControl>
+                         <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                            <UploadCloud className="mx-auto h-10 w-10 text-muted-foreground mb-2"/>
+                            <p className="text-sm text-muted-foreground">Drag & drop or click to upload</p>
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleFileChange}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                        </div>
+                    </FormControl>
+                    <FormDescription>
+                        First image will be the main product image.
+                    </FormDescription>
+                    <FormMessage />
                 </div>
 
                 <div className="flex gap-6">
@@ -429,10 +408,13 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                     />
                 </div>
 
+
                 <Button type="submit" disabled={isPending} className="w-full">
+                    {isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                     {isPending ? (product ? "Updating..." : "Creating...") : (product ? "Update Product" : "Create Product")}
                 </Button>
             </form>
         </Form>
     );
 }
+

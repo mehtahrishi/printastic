@@ -1,4 +1,5 @@
-import { mysqlTable, int, varchar, text, timestamp, decimal, boolean, json } from "drizzle-orm/mysql-core";
+
+import { mysqlTable, int, varchar, text, timestamp, decimal, boolean, json, datetime } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
     id: int("id").autoincrement().primaryKey(),
@@ -29,7 +30,7 @@ export const products = mysqlTable("products", {
     isTrending: boolean("is_trending").default(false),
     isVisible: boolean("is_visible").default(true),
     createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+    updatedAt: datetime("updated_at"),
 });
 
 export const productPreviews = mysqlTable("product_previews", {

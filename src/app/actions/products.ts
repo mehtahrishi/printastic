@@ -1,3 +1,4 @@
+
 "use server";
 
 import { db } from "@/lib/db";
@@ -167,6 +168,7 @@ export async function createProduct(prevState: any, formData: FormData) {
 
         revalidatePath("/admin/products");
         revalidatePath(`/products/${insertData.slug}`);
+        revalidatePath("/");
         console.log("[CreateProduct] Product created successfully and cache revalidated");
         return { success: true, message: "Product created successfully" };
     } catch (error) {
@@ -182,39 +184,23 @@ export async function createProduct(prevState: any, formData: FormData) {
 export async function updateProduct(productId: number, prevState: any, formData: FormData) {
     console.log(`[UpdateProduct] Starting product update for ID: ${productId}`);
     
+    // Get existing images from form (these are the ones the user didn't remove)
+    const existingImagesString = formData.get("existingImages") as string;
+    const existingImages = existingImagesString ? existingImagesString.split(',') : [];
+    console.log(`[UpdateProduct] Preserving ${existingImages.length} existing images:`, existingImages);
+    
     // Handle New Images Upload
-    const productImages = formData.getAll("productImages") as File[];
-    console.log(`[UpdateProduct] Received ${productImages.length} files from form`);
+    const newProductImages = formData.getAll("productImages") as File[];
+    console.log(`[UpdateProduct] Received ${newProductImages.length} new files from form`);
     
-    const newImageUrls = await uploadMultipleToCloudinary(productImages);
+    const newImageUrls = await uploadMultipleToCloudinary(newProductImages);
     console.log(`[UpdateProduct] Successfully uploaded ${newImageUrls.length} new images`);
-
-    // Get existing images from form (if any)
-    let existingImagesString = formData.get("images")?.toString() || "";
     
-    // Parse existing images into array
-    let existingImagesArray: string[] = [];
-    if (existingImagesString) {
-        try {
-            // Try parsing as JSON first
-            existingImagesArray = JSON.parse(existingImagesString);
-        } catch {
-            // If not JSON, split by comma
-            existingImagesArray = existingImagesString.split(",").map(s => s.trim()).filter(s => s);
-        }
-    }
+    const finalImageUrls = [...existingImages, ...newImageUrls];
+    console.log("[UpdateProduct] Final combined images array:", finalImageUrls);
     
-    console.log("[UpdateProduct] Existing images:", existingImagesArray);
-
-    // Handle new image uploads - combine with existing
-    if (newImageUrls.length > 0) {
-        existingImagesArray = [...existingImagesArray, ...newImageUrls];
-    }
-    
-    console.log("[UpdateProduct] Final images array:", existingImagesArray);
-    
-    if (existingImagesArray.length === 0) {
-        console.error("[UpdateProduct] No images available");
+    if (finalImageUrls.length === 0) {
+        console.error("[UpdateProduct] No images available after combining existing and new");
         return { 
             error: "At least one image is required."
         };
@@ -227,10 +213,9 @@ export async function updateProduct(productId: number, prevState: any, formData:
         price: formData.get("price"),
         originalPrice: formData.get("originalPrice") ? formData.get("originalPrice") : undefined,
         category: formData.get("category")?.toString() || undefined,
-
         sizes: formData.get("sizes")?.toString() || undefined,
         colors: formData.get("colors")?.toString() || undefined,
-        images: existingImagesArray.join(", "),
+        images: finalImageUrls.join(", "),
         isTrending: formData.get("isTrending") === "on",
         isVisible: formData.get("isVisible") === "on",
     });
@@ -253,33 +238,32 @@ export async function updateProduct(productId: number, prevState: any, formData:
 
         sizes: validatedFields.data.sizes ? validatedFields.data.sizes.split(",").map(s => s.trim()) : null,
         colors: validatedFields.data.colors ? validatedFields.data.colors.split(",").map(c => c.trim()) : null,
-        images: existingImagesArray,
+        images: finalImageUrls,
         isTrending: validatedFields.data.isTrending || false,
         isVisible: validatedFields.data.isVisible !== false,
+        updatedAt: new Date(),
     };
 
     console.log("[UpdateProduct] Updating database with:", {
         ...updateData,
-        images: updateData.images,
+        images: updateData.images, // Log the array
     });
 
     try {
-        const result = await db.update(products).set(updateData).where(eq(products.id, productId));
-        console.log("[UpdateProduct] Database update successful:", result);
+        await db.update(products).set(updateData).where(eq(products.id, productId));
+        console.log("[UpdateProduct] Database update successful for ID:", productId);
 
         revalidatePath("/admin/products");
         revalidatePath(`/products/${updateData.slug}`);
+        revalidatePath("/");
         console.log("[UpdateProduct] Product updated successfully and cache revalidated");
         return { success: true, message: "Product updated successfully" };
     } catch (error) {
-        console.error("[UpdateProduct] Database update failed:", error);
-        if (error instanceof Error) {
-            console.error("[UpdateProduct] Error details:", error.message);
-            console.error("[UpdateProduct] Error stack:", error.stack);
-        }
+        console.error(`[UpdateProduct] Database update failed for ID ${productId}:`, error);
         return { error: `Failed to update product: ${error instanceof Error ? error.message : 'Unknown error'}` };
     }
 }
+
 
 export async function deleteProduct(productId: number) {
     try {
