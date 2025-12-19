@@ -1,3 +1,4 @@
+
 import { getProducts } from "@/app/actions/products";
 import { ProductCarousel } from "@/components/products/product-carousel";
 import { ProductGridClient } from "@/components/products/product-grid-client";
@@ -22,9 +23,9 @@ function parseJsonOrString(data: any): string[] {
 }
 
 export default async function HomePage() {
-  const fetchedProducts = await getProducts(false);
+  const fetchedProducts = await getProducts();
 
-  const products = fetchedProducts
+  const trendingProducts = fetchedProducts
     .filter(p => p.isTrending) // Filter for trending products
     .map(p => ({
       ...p,
@@ -34,8 +35,18 @@ export default async function HomePage() {
       colors: parseJsonOrString(p.colors),
       images: parseJsonOrString(p.images),
       isTrending: p.isTrending ?? undefined,
-      isVisible: p.isVisible ?? undefined,
     }));
+  
+  const allProducts = fetchedProducts
+  .map(p => ({
+    ...p,
+    originalPrice: p.originalPrice ?? undefined,
+    category: p.category ?? undefined,
+    sizes: parseJsonOrString(p.sizes),
+    colors: parseJsonOrString(p.colors),
+    images: parseJsonOrString(p.images),
+    isTrending: p.isTrending ?? undefined,
+  }));
 
   const cookieStore = await cookies();
   const userId = cookieStore.get("auth_session")?.value;
@@ -45,7 +56,7 @@ export default async function HomePage() {
     <div>
       <section>
         <div className="container">
-          <ProductCarousel trendingProducts={products} />
+          <ProductCarousel trendingProducts={trendingProducts} />
         </div>
       </section>
 
@@ -63,7 +74,7 @@ export default async function HomePage() {
 
       <section className="pb-12 md:pb-20">
         <div className="container">
-          <ProductGridClient initialProducts={products} user={user} />
+          <ProductGridClient initialProducts={allProducts} user={user} />
         </div>
       </section>
     </div>

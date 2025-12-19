@@ -1,3 +1,4 @@
+
 import { Suspense } from "react";
 import { getProducts } from "@/app/actions/products";
 import { ProductsTable } from "@/components/admin/products/products-table";
@@ -10,7 +11,7 @@ export default async function ProductsPage({
 }: {
     searchParams?: { query?: string };
 }) {
-    const allProducts = await getProducts(true);
+    const allProducts = await getProducts();
     const query = searchParams?.query?.toLowerCase() || '';
 
     const filteredProducts = allProducts.filter(product => 

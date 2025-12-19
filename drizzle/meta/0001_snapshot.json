@@ -1,3 +1,4 @@
+
 {
   "version": "5",
   "dialect": "mysql",
@@ -446,14 +447,6 @@
           "autoincrement": false,
           "default": false
         },
-        "is_visible": {
-          "name": "is_visible",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -464,12 +457,10 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "datetime",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
+          "autoincrement": false
         }
       },
       "indexes": {},

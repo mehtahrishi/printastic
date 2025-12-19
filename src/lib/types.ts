@@ -1,3 +1,4 @@
+
 export type Product = {
   id: number | string;
   name: string;
@@ -10,7 +11,6 @@ export type Product = {
   colors?: string[];
   images: string[];
   isTrending?: boolean;
-  isVisible?: boolean;
   previews?: {
     id: string;
     imageUrl: string;

@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -45,14 +46,13 @@ export function ProductsTable({ products }: { products: Product[] }) {
                                 <TableHead>Category</TableHead>
                                 <TableHead>Price</TableHead>
                                 <TableHead className="text-center">Trending</TableHead>
-                                <TableHead className="text-center">Visible</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {products.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                                         No products found.
                                     </TableCell>
                                 </TableRow>
@@ -152,9 +152,6 @@ function ProductRow({ product }: { product: Product }) {
             <TableCell>${Number(product.price).toFixed(2)}</TableCell>
             <TableCell className="text-center">
                 <Checkbox checked={product.isTrending} disabled aria-label="Trending" />
-            </TableCell>
-            <TableCell className="text-center">
-                <Checkbox checked={product.isVisible} disabled aria-label="Visible" />
             </TableCell>
             <TableCell className="text-right flex items-center justify-end gap-2">
                 <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>

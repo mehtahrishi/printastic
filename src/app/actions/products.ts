@@ -20,7 +20,6 @@ const productSchema = z.object({
     colors: z.string().optional(), // "Red, Blue"
     images: z.string().optional(), // Array of image URLs
     isTrending: z.coerce.boolean().optional(),
-    isVisible: z.coerce.boolean().optional(),
 });
 
 async function uploadToCloudinary(file: File) {
@@ -131,7 +130,6 @@ export async function createProduct(prevState: any, formData: FormData) {
         colors: formData.get("colors")?.toString() || undefined,
         images: uploadedImageUrls.join(", "),
         isTrending: formData.get("isTrending") === "on",
-        isVisible: formData.get("isVisible") === "on",
     });
 
     if (!validatedFields.success) {
@@ -154,7 +152,6 @@ export async function createProduct(prevState: any, formData: FormData) {
         colors: validatedFields.data.colors ? validatedFields.data.colors.split(",").map(c => c.trim()) : null,
         images: uploadedImageUrls,
         isTrending: validatedFields.data.isTrending || false,
-        isVisible: validatedFields.data.isVisible !== false,
     };
 
     console.log("[CreateProduct] Inserting data into database:", {
@@ -217,7 +214,6 @@ export async function updateProduct(productId: number, prevState: any, formData:
         colors: formData.get("colors")?.toString() || undefined,
         images: finalImageUrls.join(", "),
         isTrending: formData.get("isTrending") === "on",
-        isVisible: formData.get("isVisible") === "on",
     });
 
     if (!validatedFields.success) {
@@ -240,7 +236,6 @@ export async function updateProduct(productId: number, prevState: any, formData:
         colors: validatedFields.data.colors ? validatedFields.data.colors.split(",").map(c => c.trim()) : null,
         images: finalImageUrls,
         isTrending: validatedFields.data.isTrending || false,
-        isVisible: validatedFields.data.isVisible !== false,
         updatedAt: new Date(),
     };
 
@@ -285,15 +280,9 @@ export async function deleteProduct(productId: number) {
     }
 }
 
-export async function getProducts(includeHidden = false) {
+export async function getProducts() {
     try {
-        let fetchedProducts;
-        if (includeHidden) {
-            fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
-        } else {
-            fetchedProducts = await db.select().from(products).where(eq(products.isVisible, true)).orderBy(desc(products.createdAt));
-        }
-        
+        const fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
         return fetchedProducts;
     } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -301,12 +290,8 @@ export async function getProducts(includeHidden = false) {
     }
 }
 
-export async function getProductsCount(onlyActive = false) {
+export async function getProductsCount() {
     try {
-        if (onlyActive) {
-            const result = await db.select({ count: products.id }).from(products).where(eq(products.isVisible, true));
-            return result.length;
-        }
         const result = await db.select({ count: products.id }).from(products);
         return result.length;
     } catch (error) {

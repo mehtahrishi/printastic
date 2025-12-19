@@ -28,7 +28,6 @@ export const products = mysqlTable("products", {
     colors: json("colors").$type<string[]>(),
     images: json("images").$type<string[]>().notNull(),
     isTrending: boolean("is_trending").default(false),
-    isVisible: boolean("is_visible").default(true),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: datetime("updated_at"),
 });
