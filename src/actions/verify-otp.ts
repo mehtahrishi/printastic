@@ -1,3 +1,4 @@
+
 "use server";
 
 import * as z from "zod";
@@ -27,7 +28,8 @@ export const verifyOtp = async (values: z.infer<typeof VerifySchema>) => {
     const expiresAt = parseInt(expiresAtStr);
 
     if (Date.now() > expiresAt) {
-        return { error: "Code expired!" };
+        cookieStore.delete("temp_otp_session");
+        return { error: "Code expired! Please login again." };
     }
 
     if (otp !== correctOtp) {
@@ -46,9 +48,7 @@ export const verifyOtp = async (values: z.infer<typeof VerifySchema>) => {
             return { error: "User not found!" };
         }
 
-        // Create a minimal session cookie
-        // In a real app, use a session library or JWT
-        // Here we'll store the User ID
+        // Create the main session cookie
         cookieStore.set("auth_session", existingUser.id.toString(), {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

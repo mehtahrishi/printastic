@@ -13,8 +13,9 @@ import { cookies } from "next/headers";
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const cookieStore = await cookies();
     
-    // Explicitly delete any old temporary OTP session to prevent reuse
+    // Explicitly delete any old sessions to prevent reuse or conflicts
     cookieStore.delete("temp_otp_session");
+    cookieStore.delete("auth_session");
 
     const validatedFields = LoginSchema.safeParse(values);
 
@@ -41,7 +42,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
                 await db.insert(users).values({
                     name: "Admin",
                     email: adminEmail,
-                    password: "$2b$10$dummyhashforadminuserauthviaenvvariablesonly",
+                    password: "$2b$10$dummyhashforadminuserauthviaenvvariablesonly", // Dummy hash
                     role: "ADMIN",
                 });
                 existingUser = await db.select().from(users).where(eq(users.email, email)).then(res => res[0]);
