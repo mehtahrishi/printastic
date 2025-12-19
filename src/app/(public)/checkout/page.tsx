@@ -161,14 +161,18 @@ export default function CheckoutPage() {
             description: "Test Transaction",
             order_id: orderResponse.order.id,
             handler: async function (response: any) {
+                // Immediately freeze the UI
+                setIsPaymentSuccessful(true);
+                
                 const verificationResult = await verifyPayment(response, orderDataForDb);
                 if (verificationResult.success) {
-                    setIsPaymentSuccessful(true);
                     clearCartLocal();
                     toast({ title: "Order Placed!", description: "Thank you for your purchase." });
                     router.push(`/`);
                 } else {
                     toast({ title: "Payment Failed", description: verificationResult.error, variant: "destructive" });
+                    // Unfreeze UI if verification fails, allowing user to retry
+                    setIsPaymentSuccessful(false); 
                 }
             },
             prefill: {
@@ -182,12 +186,24 @@ export default function CheckoutPage() {
         };
 
         const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (response: any) {
+            toast({
+                title: "Payment Failed",
+                description: response.error.description || "Something went wrong.",
+                variant: "destructive"
+            });
+            setIsProcessing(false); // Re-enable button on failure
+        });
+
         rzp.open();
     } catch (error: any) {
         console.error("Checkout error:", error);
         toast({ title: "Error", description: error.message || "An error occurred during checkout.", variant: "destructive" });
     } finally {
-        setIsProcessing(false);
+        // We don't set isProcessing to false here, because the Razorpay modal is now open.
+        // It will be handled in the handler or on dismiss.
+        // We set isProcessing to false on modal dismiss if it's not successful
+        // For now this is handled in payment.failed.
     }
   }
 
