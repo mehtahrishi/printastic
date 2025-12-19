@@ -1,3 +1,4 @@
+
 import nodemailer from "nodemailer";
 
 function escapeHtml(str: string) {
@@ -124,6 +125,32 @@ function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
     </tr>
   `).join('');
 
+  const isCod = order.paymentMethod === 'cod';
+  const total = Number(order.total);
+  const amountPaid = isCod ? 50.00 : total;
+  const amountDue = isCod ? total - 50.00 : 0;
+
+  const paymentDetailsHtml = `
+    <tr style="border-top:2px solid ${brand.border};">
+      <td style="padding:16px 0 4px;color:${brand.muted};font-size:14px">Total</td>
+      <td style="padding:16px 0 4px;color:${brand.muted};font-size:14px;text-align:right">₹${total.toFixed(2)}</td>
+    </tr>
+    ${isCod ? `
+    <tr>
+      <td style="padding:4px 0;color:${brand.muted};font-size:14px">Advance Paid</td>
+      <td style="padding:4px 0;color:${brand.muted};font-size:14px;text-align:right">₹${amountPaid.toFixed(2)}</td>
+    </tr>
+    <tr style="border-bottom:2px solid ${brand.border};">
+      <td style="padding:4px 0 16px;color:${brand.muted};font-size:14px">Amount Due on Delivery</td>
+      <td style="padding:4px 0 16px;color:${brand.muted};font-size:14px;text-align:right">₹${amountDue.toFixed(2)}</td>
+    </tr>
+    ` : ''}
+    <tr style="border-top:2px solid ${brand.border};">
+      <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px">Amount Paid</td>
+      <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px;text-align:right">₹${amountPaid.toFixed(2)}</td>
+    </tr>
+  `;
+
   const body = `
     <h2 style="margin:0 0 12px;font-size:26px;font-weight:700;color:${brand.text};letter-spacing:-0.02em">Your Order is Confirmed!</h2>
     <p style="margin:0 0 24px;color:${brand.muted};font-size:15px;line-height:1.6">Hi ${escapeHtml(user.name)}, thanks for your purchase. We're getting your order ready.</p>
@@ -134,10 +161,7 @@ function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
         ${itemsHtml}
       </table>
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-top:16px;">
-        <tr style="border-top:2px solid ${brand.border};">
-          <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px">Total</td>
-          <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px;text-align:right">₹${Number(order.total).toFixed(2)}</td>
-        </tr>
+        ${paymentDetailsHtml}
       </table>
     </div>
 

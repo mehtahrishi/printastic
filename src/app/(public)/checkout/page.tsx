@@ -199,11 +199,7 @@ export default function CheckoutPage() {
     } catch (error: any) {
         console.error("Checkout error:", error);
         toast({ title: "Error", description: error.message || "An error occurred during checkout.", variant: "destructive" });
-    } finally {
-        // We don't set isProcessing to false here, because the Razorpay modal is now open.
-        // It will be handled in the handler or on dismiss.
-        // We set isProcessing to false on modal dismiss if it's not successful
-        // For now this is handled in payment.failed.
+        setIsProcessing(false);
     }
   }
 

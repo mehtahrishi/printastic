@@ -4,7 +4,7 @@
 import Razorpay from "razorpay";
 import { db } from "@/lib/db";
 import { orders, orderItems, products, users } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { clearCart } from "./cart";
