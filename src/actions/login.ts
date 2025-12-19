@@ -1,3 +1,4 @@
+
 "use server";
 
 import * as z from "zod";
@@ -10,6 +11,11 @@ import { sendOtpEmail } from "@/lib/mail";
 import { cookies } from "next/headers";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
+    const cookieStore = await cookies();
+    
+    // Explicitly delete any old temporary OTP session to prevent reuse
+    cookieStore.delete("temp_otp_session");
+
     const validatedFields = LoginSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -70,11 +76,10 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         return { error: "Failed to send verification email. Please check server configuration." };
     }
 
-    // Store OTP and Email in a temporary HttpOnly cookie
+    // Store OTP and Email in a new temporary HttpOnly cookie
     const expiresAt = Date.now() + 2 * 60 * 1000; // 2 minutes
     const tempPayload = `${email}|${otp}|${expiresAt}`;
-
-    const cookieStore = await cookies();
+    
     cookieStore.set("temp_otp_session", tempPayload, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
