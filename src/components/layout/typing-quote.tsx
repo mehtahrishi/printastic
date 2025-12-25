@@ -40,7 +40,7 @@ export function TypingQuote() {
   }, [text, isDeleting]);
 
   return (
-    <div className="py-12 text-center">
+    <div className="pb-12 text-center">
         <p
             className="text-4xl md:text-5xl inline-block"
             style={{

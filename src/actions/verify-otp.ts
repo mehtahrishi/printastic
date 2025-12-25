@@ -1,4 +1,8 @@
 
+// DEPRECATED: OTP verification has been removed from the authentication flow.
+// This file is kept for backward compatibility but is no longer used.
+// Users now log in directly without OTP verification.
+
 "use server";
 
 import * as z from "zod";

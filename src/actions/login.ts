@@ -5,16 +5,14 @@ import * as z from "zod";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { LoginSchema } from "@/schemas";
-import { users, otpAttempts } from "@/db/schema";
-import { eq, and, gt, desc } from "drizzle-orm";
-import { sendOtpEmail } from "@/lib/mail";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const cookieStore = await cookies();
     
     // Explicitly delete any old sessions to prevent reuse or conflicts
-    cookieStore.delete("temp_otp_session");
     cookieStore.delete("auth_session");
 
     const validatedFields = LoginSchema.safeParse(values);
@@ -63,69 +61,18 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         return { error: "Invalid credentials!" };
     }
 
-    // Check for recent OTP attempts (rate limiting - 30 seconds)
-    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
-    const recentAttempt = await db
-        .select()
-        .from(otpAttempts)
-        .where(
-            and(
-                eq(otpAttempts.email, email),
-                gt(otpAttempts.createdAt, thirtySecondsAgo)
-            )
-        )
-        .orderBy(desc(otpAttempts.createdAt))
-        .limit(1)
-        .then(res => res[0]);
-
-    if (recentAttempt) {
-        const createdAt = recentAttempt.createdAt ?? new Date();
-        const secondsLeft = Math.ceil((createdAt.getTime() + 30000 - Date.now()) / 1000);
-        return { 
-            error: `Please wait ${secondsLeft} seconds before requesting a new OTP.`,
-            rateLimited: true,
-            secondsLeft 
-        };
-    }
-
-    // Generate 6 digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-
-    // Send OTP
+    // Create the main session cookie
     try {
-        await sendOtpEmail(email, otp);
-        console.log("--------------------------------");
-        console.log(`Generated and sent OTP for ${email}: ${otp}`);
-        console.log("--------------------------------");
-    } catch (error) {
-        console.error("Failed to send OTP email:", error);
-        return { error: "Failed to send verification email. Please check server configuration." };
-    }
-
-    // Store OTP in database for tracking
-    try {
-        await db.insert(otpAttempts).values({
-            email,
-            otp,
-            expiresAt,
-            isUsed: false,
+        cookieStore.set("auth_session", existingUser.id.toString(), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: "/",
         });
+
+        return { success: "Logged in successfully!" };
     } catch (error) {
-        console.error("Failed to store OTP attempt:", error);
-        // Continue even if database insert fails
+        console.error("Failed to create session:", error);
+        return { error: "Failed to create session. Please try again." };
     }
-
-    // Store OTP and Email in a new temporary HttpOnly cookie
-    const expiresAtTimestamp = expiresAt.getTime();
-    const tempPayload = `${email}|${otp}|${expiresAtTimestamp}`;
-    
-    cookieStore.set("temp_otp_session", tempPayload, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 5 * 60, // 5 minutes in seconds
-        path: "/",
-    });
-
-    return { success: "OTP sent!", twoFactor: true };
 };

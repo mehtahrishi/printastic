@@ -27,44 +27,46 @@ export function PrintPreview({ product }: PrintPreviewProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card className="overflow-hidden">
-        <div className="relative aspect-square">
+      <div className="overflow-hidden">
+        <div className="relative w-full max-w-md mx-auto" style={{ aspectRatio: 'auto' }}>
             {activePreview && (
                 <Image
                 src={activePreview}
                 alt={`Preview of ${product.name}`}
-                fill
-                className="object-contain transition-opacity duration-300"
+                width={500}
+                height={600}
+                className="w-full h-auto object-contain transition-opacity duration-300"
                 sizes="(max-width: 768px) 100vw, 40vw"
                 data-ai-hint={allPreviews.find((p: any) => p.imageUrl === activePreview)?.imageHint}
                 />
             )}
         </div>
-      </Card>
+      </div>
         
       {allPreviews.length > 1 && (
-          <div className="grid grid-cols-5 gap-2">
-          {allPreviews.map((preview: any) => (
-              <button
-              key={preview.id}
-              onClick={() => setActivePreview(preview.imageUrl)}
-              className={cn(
-                  "relative aspect-square overflow-hidden rounded-md border-2 transition-all",
-                  activePreview === preview.imageUrl
-                  ? "border-primary ring-2 ring-primary ring-offset-2"
-                  : "border-transparent hover:border-primary/50"
-              )}
-              >
-              <Image
-                  src={preview.imageUrl}
-                  alt={preview.setting}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 20vw, 10vw"
-              />
-              {activePreview === preview.imageUrl && <div className="absolute inset-0 border-2 border-primary rounded-md"></div>}
-              </button>
-          ))}
+          <div className="max-w-md mx-auto w-full">
+            <div className="grid grid-cols-4 gap-3">
+              {allPreviews.map((preview: any) => (
+                  <button
+                  key={preview.id}
+                  onClick={() => setActivePreview(preview.imageUrl)}
+                  className={cn(
+                      "relative aspect-square overflow-hidden rounded-lg border-2 transition-all",
+                      activePreview === preview.imageUrl
+                      ? "border-primary ring-2 ring-primary ring-offset-1"
+                      : "border-border hover:border-primary/50"
+                  )}
+                  >
+                  <Image
+                      src={preview.imageUrl}
+                      alt={preview.setting}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 20vw, 10vw"
+                  />
+                  </button>
+              ))}
+            </div>
           </div>
       )}
     </div>

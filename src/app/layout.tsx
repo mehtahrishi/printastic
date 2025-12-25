@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import { CookieConsent } from "@/components/cookie-consent";
 import { SplashScreen } from "@/components/ui/splash-screen";
-import { ChatWidget } from "@/components/chat-widget";
 import { CartProvider } from "@/hooks/use-cart";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 import { WishlistProvider } from "@/hooks/use-wishlist";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
@@ -79,7 +79,7 @@ export default async function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-body antialiased bg-grid",
+          "min-h-screen bg-background font-body antialiased",
           tanBuster.variable,
           moonTime.variable
         )}
@@ -88,9 +88,9 @@ export default async function RootLayout({
           <WishlistProvider user={user}>
             {children}
             <Toaster />
-            <ChatWidget />
             <CookieConsent />
             <SplashScreen />
+            <WhatsAppButton phoneNumber="9920214202" variant="fixed" />
           </WishlistProvider>
         </CartProvider>
       </body>

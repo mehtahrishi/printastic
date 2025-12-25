@@ -47,7 +47,9 @@ const OversizeTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
     width="24"
     height="24"
     viewBox="0 0 24 24"
-    fill="currentColor"
+    fill="white"
+    stroke="currentColor"
+    strokeWidth="1.5"
   >
     <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
   </svg>
@@ -60,7 +62,9 @@ const KidsTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"
-    fill="currentColor"
+    fill="white"
+    stroke="currentColor"
+    strokeWidth="1.5"
     viewBox="0 0 24 24"
   >
     <path
@@ -72,7 +76,9 @@ const KidsTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
 const RegularTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg 
     {...props}
-    fill="currentColor" 
+    fill="white"
+    stroke="currentColor"
+    strokeWidth="1.5"
     width="24" 
     height="24" 
     version="1.1" 
@@ -95,7 +101,9 @@ const HoodieIcon = (props: SVGProps<SVGSVGElement>) => (
       width="24"
       height="24"
       viewBox="0 0 304.43 304.43"
-      fill="currentColor"
+      fill="white"
+      stroke="currentColor"
+      strokeWidth="8"
     >
       <path d="M176.2,218.497h-47.971c-0.603,9.548-3.716,20.083-8.962,29.98c-2.266,4.273-4.859,8.296-7.69,11.963h81.275
         c-2.831-3.667-5.425-7.69-7.691-11.963C179.916,238.581,176.804,228.046,176.2,218.497z"/>
@@ -168,10 +176,10 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
             <Link
               key={item.name}
               href={item.href}
-              className="flex flex-col items-center text-foreground/60 transition-colors hover:text-foreground/80"
+              className="group flex items-center gap-0 text-foreground/60 transition-all duration-300 hover:text-primary relative overflow-hidden"
             >
-              <item.icon className="h-6 w-6" />
-              <span className="text-xs font-medium">{item.name}</span>
+              <item.icon className="h-5 w-5 absolute -left-7 opacity-0 transition-all duration-300 group-hover:left-0 group-hover:opacity-100 group-hover:mr-2" />
+              <span className="text-sm font-medium transition-all duration-300 group-hover:ml-7">{item.name}</span>
             </Link>
           ))}
         </nav>

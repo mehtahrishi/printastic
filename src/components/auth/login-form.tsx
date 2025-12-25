@@ -44,15 +44,6 @@ export const LoginForm = () => {
                         title: "Error",
                         description: data.error,
                     });
-                } else if (data.twoFactor) {
-                    setIsRedirecting(true);
-                    toast({
-                        title: "OTP Sent",
-                        description: "Please check your email for the verification code.",
-                    });
-                    setTimeout(() => {
-                        window.location.href = "/auth/verify-otp";
-                    }, 500);
                 } else {
                     setIsRedirecting(true);
                     toast({
