@@ -89,21 +89,28 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
                                     <div className="space-y-2">
                                          {order.items?.map((item: any, index: number) => {
                                             const details = [
-                                                item.quantity && `${item.quantity}x`,
+                                                item.quantity && `Qty: ${item.quantity}`,
                                                 item.size,
                                                 item.color,
                                             ].filter(Boolean).join(' / ');
 
                                             return (
-                                                <div key={index} className="flex justify-between items-start text-sm">
-                                                    <span className="text-foreground truncate pr-4">{item.product.name} {details && `(${details})`}</span>
-                                                    <span className="font-medium text-right shrink-0">₹{Number(item.price).toFixed(2)}</span>
+                                                <div key={index} className="text-sm">
+                                                    <div className="flex justify-between items-start">
+                                                        <span className="font-medium text-foreground pr-4">{item.product.name}</span>
+                                                        <span className="font-medium text-right shrink-0">₹{Number(item.price).toFixed(2)}</span>
+                                                    </div>
+                                                    {details && <div className="text-xs text-muted-foreground mt-0.5">{details}</div>}
                                                 </div>
                                             )
                                         })}
                                     </div>
                                 </CardContent>
-                                <CardFooter className="p-4 bg-muted/30 border-t">
+                                <CardFooter className="p-4 bg-muted/30 border-t flex-col items-start gap-3">
+                                    <div className="w-full flex justify-between text-sm">
+                                        <span className="text-muted-foreground">Payment Method:</span>
+                                        <span className="font-medium text-foreground capitalize">{order.paymentMethod}</span>
+                                    </div>
                                      {order.paymentMethod === 'cod' && order.status !== 'Delivered' ? (
                                         <div className="w-full space-y-2 text-sm">
                                             <div className="flex justify-between">
