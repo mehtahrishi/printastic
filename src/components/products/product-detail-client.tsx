@@ -41,7 +41,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
 
     const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.length === 1 ? product.sizes[0] : null);
     const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.length === 1 ? product.colors[0] : null);
-    const [isAdded, setIsAdded] = useState(false);
+    const [animationState, setAnimationState] = useState<'idle' | 'animating' | 'added'>('idle');
     const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
 
     const cartProduct = { ...product, id: product.id.toString() };
@@ -65,15 +65,15 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
             showAuthToast();
             return;
         }
-        if (isCartPending || isAdded) return;
+        if (isCartPending || animationState !== 'idle') return;
         
-        setIsAdded(true); // Trigger animation immediately
+        setAnimationState('animating');
         await addToCart(product.id, 1, {
             size: selectedSize || undefined,
             color: selectedColor || undefined,
         });
 
-        setTimeout(() => setIsAdded(false), 2000);
+        // The animation sequence is handled by the `onAnimationComplete` prop on the motion component
     };
 
     const handleWishlistToggle = () => {
@@ -256,43 +256,50 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                             size="default"
                             className={cn(
                                 "w-full h-11 text-base font-semibold overflow-hidden relative",
-                                (isCartPending || isAdded) && "cursor-default"
+                                (isCartPending || animationState !== 'idle') && "cursor-default"
                             )}
                             onClick={handleAddToCart}
-                            disabled={isAddToCartDisabled}
+                            disabled={isAddToCartDisabled || animationState !== 'idle'}
                         >
-                            <AnimatePresence mode="wait" initial={false}>
-                                {isCartPending ? (
-                                    <motion.div
-                                        key="loading"
-                                        initial={{ y: 10, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        exit={{ y: -10, opacity: 0 }}
-                                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                                    >
-                                        <Loader2 className="h-5 w-5 animate-spin"/>
-                                    </motion.div>
-                                ) : isAdded ? (
-                                    <motion.div
-                                        key="added"
-                                        initial={{ scale: 0.5, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        className="flex items-center"
-                                    >
-                                        <ThumbsUp className="mr-2 h-5 w-5" />
-                                        Added to Cart
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
+                            <AnimatePresence mode="popLayout" initial={false}>
+                                {animationState === 'idle' && (
+                                    <motion.span
                                         key="idle"
-                                        initial={{ y: 10, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        exit={{ y: -10, opacity: 0, position: "absolute" }}
+                                        initial={{ x: -20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
                                         className="flex items-center"
                                     >
                                         <ShoppingCart className="mr-2 h-4 w-4" />
                                         Add to Cart
-                                    </motion.div>
+                                    </motion.span>
+                                )}
+                                {animationState === 'animating' && (
+                                    <motion.span
+                                        key="animating"
+                                        initial={false}
+                                        animate={{ x: [0, 80], opacity: [1, 0] }}
+                                        transition={{ duration: 0.4, ease: "easeIn" }}
+                                        className="flex items-center absolute"
+                                        onAnimationComplete={() => {
+                                            setAnimationState('added');
+                                            setTimeout(() => setAnimationState('idle'), 2000);
+                                        }}
+                                    >
+                                        <ShoppingCart className="mr-2 h-4 w-4" />
+                                    </motion.span>
+                                )}
+                                {animationState === 'added' && (
+                                    <motion.span
+                                        key="added"
+                                        initial={{ x: -20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
+                                        className="flex items-center absolute"
+                                    >
+                                        <ThumbsUp className="mr-2 h-5 w-5" />
+                                        Added to Cart
+                                    </motion.span>
                                 )}
                             </AnimatePresence>
                         </Button>
