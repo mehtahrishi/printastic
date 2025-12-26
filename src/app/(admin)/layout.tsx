@@ -24,7 +24,7 @@ export default async function AdminLayout({
     // If not logged in, we are on the /admin/login page, so we don't show the sidebar.
     if (!isAdminLoggedIn) {
         return (
-            <div className="flex min-h-screen flex-col bg-background font-body antialiased bg-grid">
+            <div className="flex min-h-screen flex-col bg-background font-body antialiased">
                 <AdminHeader isLoggedIn={false} />
                 <main className="flex-1 w-full">
                     {children}
@@ -36,7 +36,7 @@ export default async function AdminLayout({
 
     // If logged in, show the full admin layout with sidebar.
     return (
-        <div className="flex min-h-screen flex-col bg-background font-body antialiased bg-grid">
+        <div className="flex min-h-screen flex-col bg-background font-body antialiased">
             <AdminHeader isLoggedIn={true} />
             <div className="flex flex-1">
                 <AdminSidebar />

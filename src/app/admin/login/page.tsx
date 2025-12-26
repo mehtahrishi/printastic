@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
+import { Footer } from "@/components/layout/footer";
 
 export default function AdminLoginPage() {
     const [isPending, startTransition] = useTransition();
@@ -59,7 +60,15 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto p-4 sm:p-8 py-20">
+        <>
+            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="container flex h-18 items-center justify-center md:justify-start">
+                    <Link href="/" className="flex items-center gap-2 text-xl md:text-2xl pt-3">
+                        <Logo className="w-auto h-auto" />
+                    </Link>
+                </div>
+            </header>
+            <div className="w-full max-w-md mx-auto p-4 sm:p-8 py-20">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -143,5 +152,7 @@ export default function AdminLoginPage() {
                 </div>
             </motion.div>
         </div>
+        <Footer />
+        </>
     );
 }

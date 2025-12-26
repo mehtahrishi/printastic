@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { AnnouncementBar } from "@/components/layout/announcement-bar";
 
 export default async function PublicLayout({
   children,
@@ -22,7 +21,6 @@ export default async function PublicLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AnnouncementBar />
       <Header user={user} />
       <main className="flex-1">{children}</main>
       <Footer />
