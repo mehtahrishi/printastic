@@ -18,18 +18,18 @@ import { Home, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/types";
 
 function parseJsonOrString(data: any): string[] {
-    if (Array.isArray(data)) return data;
-    if (typeof data === 'string') {
-        try {
-            // First, try to parse it as JSON
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed)) return parsed;
-        } catch (e) {
-            // If it's not a valid JSON string, treat it as a comma-separated string
-            return data.split(',').map(s => s.trim()).filter(Boolean);
-        }
+  if (Array.isArray(data)) return data;
+  if (typeof data === 'string') {
+    try {
+      // First, try to parse it as JSON
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {
+      // If it's not a valid JSON string, treat it as a comma-separated string
+      return data.split(',').map(s => s.trim()).filter(Boolean);
     }
-    return [];
+  }
+  return [];
 }
 
 
@@ -40,25 +40,27 @@ export default async function ProductDetailPage({
 }) {
   // The slug is passed as 'id', so we decode it
   const slug = decodeURIComponent(params.id);
-  
+
   const product = await getProduct(slug);
 
   if (!product) {
     notFound();
   }
-  
+
   // Fetch related products
   const allProducts = await getProducts();
   const relatedProducts = allProducts
     .filter(p => p.category === product.category && p.id !== product.id)
     .slice(0, 4) // Get up to 4 related products
     .map(p => ({
-        ...p,
-        price: Number(p.price),
-        originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
-        sizes: parseJsonOrString(p.sizes),
-        colors: parseJsonOrString(p.colors),
-        images: parseJsonOrString(p.images),
+      ...p,
+      category: p.category ?? undefined,
+      isTrending: p.isTrending ?? undefined,
+      price: Number(p.price),
+      originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
+      sizes: parseJsonOrString(p.sizes),
+      colors: parseJsonOrString(p.colors),
+      images: parseJsonOrString(p.images),
     }));
 
 
@@ -67,6 +69,8 @@ export default async function ProductDetailPage({
   // Convert basic product to the type expected by client
   const formattedProduct: Product = {
     ...product,
+    category: product.category ?? undefined,
+    isTrending: product.isTrending ?? undefined,
     price: Number(product.price),
     originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
     sizes: parseJsonOrString(product.sizes),

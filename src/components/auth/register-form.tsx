@@ -67,7 +67,7 @@ export const RegisterForm = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="backdrop-blur-xl bg-white/70 dark:bg-zinc-900/70 border border-white/20 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden"
+                className="backdrop-blur-xl bg-white/70 dark:bg-zinc-900/70 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden"
             >
                 <div className="p-8">
                     <div className="flex flex-col items-center mb-8 text-center space-y-2">

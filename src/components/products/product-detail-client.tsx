@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Heart, ShoppingCart, Loader2, ArrowRight, Check, Star, Shield, Truck, Package } from "lucide-react";
+import { Heart, ShoppingCart, Loader2, ArrowRight, Check, Star, Shield, Truck, Package, ThumbsUp, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
@@ -17,6 +17,14 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { RelatedProducts } from "./related-products";
 import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { SizeChart } from "@/components/products/size-chart";
+import { ProductInfoCards } from "@/components/products/product-info-cards";
 
 interface ProductDetailClientProps {
     product: any;
@@ -35,6 +43,8 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
 
     const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.length === 1 ? product.sizes[0] : null);
     const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.length === 1 ? product.colors[0] : null);
+    const [isAdded, setIsAdded] = useState(false);
+    const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
 
     const cartProduct = { ...product, id: product.id.toString() };
     const isWishlisted = isInWishlist(cartProduct.id);
@@ -58,11 +68,18 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
             return;
         }
 
+        // Prevent double clicks or interaction during animation
+        if (isCartPending || isAdded) return;
+
         startCartTransition(async () => {
-            const result = await addToCartAction(product.id, 1, {
-                size: selectedSize || undefined,
-                color: selectedColor || undefined,
-            });
+            // Run action and minimum timer in parallel to ensure animation is seen
+            const [result] = await Promise.all([
+                addToCartAction(product.id, 1, {
+                    size: selectedSize || undefined,
+                    color: selectedColor || undefined,
+                }),
+                new Promise(resolve => setTimeout(resolve, 800)) // Minimum 800ms animation time
+            ]);
 
             if (result.error) {
                 toast({
@@ -76,6 +93,8 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                     description: `${product.name} has been added to your cart.`,
                 });
                 addToCartLocal(cartProduct);
+                setIsAdded(true);
+                setTimeout(() => setIsAdded(false), 2000);
             }
         });
     };
@@ -97,7 +116,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
     const isAddToCartDisabled =
         (product.sizes && product.sizes.length > 0 && !selectedSize) ||
         (product.colors && product.colors.length > 0 && !selectedColor);
-    
+
     const onSale = product.originalPrice && product.originalPrice > product.price;
 
     return (
@@ -107,7 +126,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                 <div className="lg:sticky lg:top-24 lg:self-start">
                     <PrintPreview product={cartProduct} />
                 </div>
-                
+
                 {/* Product Info */}
                 <div className="flex flex-col space-y-4">
                     {/* Category & Badge */}
@@ -129,7 +148,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                         <h1 className="text-2xl md:text-3xl font-bold tracking-tight leading-tight">
                             {product.name}
                         </h1>
-                        
+
                         {/* Rating placeholder */}
                         <div className="flex items-center gap-2 mt-2">
                             <div className="flex items-center">
@@ -158,25 +177,39 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                         )}
                     </div>
 
-                    <Separator />
-
-                    {/* Description */}
-                    <div>
-                        <h3 className="font-semibold text-sm mb-2">Description</h3>
-                        <p className="text-sm text-foreground/70 leading-relaxed">
-                            {product.description}
-                        </p>
-                    </div>
+                    {/* Size Chart Section */}
+                    {product.sizes && product.sizes.length > 0 && (
+                        <div className="space-y-2">
+                            <Collapsible
+                                open={isSizeChartOpen}
+                                onOpenChange={setIsSizeChartOpen}
+                                className="w-full"
+                            >
+                                <CollapsibleTrigger asChild>
+                                    <div className="flex items-center justify-between w-full py-2 cursor-pointer transition-colors group">
+                                        <span className="font-semibold text-sm group-hover:text-primary">Size Chart</span>
+                                        {isSizeChartOpen ? (
+                                            <ChevronUp className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                                        ) : (
+                                            <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                                        )}
+                                    </div>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                                    <div className="px-2 pb-2 pt-1 border rounded-md mt-1 mb-2 bg-muted/10">
+                                        <SizeChart category={product.category} />
+                                    </div>
+                                </CollapsibleContent>
+                            </Collapsible>
+                        </div>
+                    )}
 
                     {/* Size Selection */}
                     {product.sizes && product.sizes.length > 0 && (
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <h3 className="font-semibold text-sm">
-                                    Size: {selectedSize && <span className="text-primary ml-1">{selectedSize}</span>}
-                                </h3>
-                                <button className="text-xs text-primary hover:underline">Size Guide</button>
-                            </div>
+                        <div className="space-y-3">
+                            <h3 className="font-semibold text-sm">
+                                Size: {selectedSize && <span className="text-primary ml-1">{selectedSize}</span>}
+                            </h3>
                             <div className="flex flex-wrap gap-2">
                                 {product.sizes.map((size: string) => (
                                     <Button
@@ -185,7 +218,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                                         size="sm"
                                         onClick={() => setSelectedSize(size)}
                                         className={cn(
-                                            "min-w-[50px] h-9 text-sm font-medium transition-all",
+                                            "min-w-[50px] h-9 text-sm font-medium transition-all hover:border-primary",
                                             selectedSize === size && "ring-2 ring-primary ring-offset-1"
                                         )}
                                     >
@@ -198,7 +231,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
 
                     {/* Color Selection */}
                     {product.colors && product.colors.length > 0 && (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <h3 className="font-semibold text-sm">
                                 Color: {selectedColor && <span className="text-primary ml-1">{selectedColor}</span>}
                             </h3>
@@ -210,7 +243,7 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                                         size="sm"
                                         onClick={() => setSelectedColor(color)}
                                         className={cn(
-                                            "h-9 text-sm font-medium transition-all",
+                                            "h-9 text-sm font-medium transition-all hover:border-primary",
                                             selectedColor === color && "ring-2 ring-primary ring-offset-1"
                                         )}
                                     >
@@ -221,27 +254,78 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                         </div>
                     )}
 
+                    <Separator />
+
+                    {/* Description */}
+                    <div>
+                        <h3 className="font-semibold text-sm mb-2">Description</h3>
+                        <ul className="text-sm text-foreground/70 space-y-1 list-disc pl-4">
+                            {product.description?.split(/,|\n/).map((descPart: string, index: number) => {
+                                const trimmed = descPart.trim();
+                                if (!trimmed) return null;
+                                return (
+                                    <li key={index} className="leading-relaxed">
+                                        {trimmed}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+
                     {/* Action Buttons */}
                     <div className="space-y-2 pt-3">
-                        <Button 
-                            size="default" 
-                            className="w-full h-11 text-base font-semibold"
-                            onClick={handleAddToCart} 
-                            disabled={isCartPending || isAddToCartDisabled}
-                        >
-                            {isCartPending ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Adding to Cart...
-                                </>
-                            ) : (
-                                <>
-                                    <ShoppingCart className="mr-2 h-4 w-4" />
-                                    Add to Cart
-                                </>
+                        <Button
+                            size="default"
+                            className={cn(
+                                "w-full h-11 text-base font-semibold overflow-hidden relative",
+                                (isCartPending || isAdded) && "cursor-default"
                             )}
+                            onClick={handleAddToCart}
+                            disabled={isAddToCartDisabled}
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                {isCartPending ? (
+                                    <motion.div
+                                        key="moving-cart"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                                    >
+                                        <motion.div
+                                            initial={{ x: 0 }}
+                                            animate={{ x: 150, opacity: [1, 1, 0] }}
+                                            transition={{ duration: 0.8, ease: "easeInOut" }}
+                                        >
+                                            <ShoppingCart className="h-5 w-5" />
+                                        </motion.div>
+                                    </motion.div>
+                                ) : isAdded ? (
+                                    <motion.div
+                                        key="added"
+                                        initial={{ scale: 0.5, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="flex items-center"
+                                    >
+                                        <ThumbsUp className="mr-2 h-5 w-5" />
+                                        Added to Cart
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="idle"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        className="flex items-center"
+                                    >
+                                        <ShoppingCart className="mr-2 h-4 w-4" />
+                                        Add to Cart
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </Button>
-                        
+
                         <div className="grid grid-cols-2 gap-2">
                             <Button size="default" variant="outline" className="h-10" asChild>
                                 <Link href="/cart">
@@ -249,11 +333,11 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                                     <ArrowRight className="ml-2 h-3.5 w-3.5" />
                                 </Link>
                             </Button>
-                            <Button 
-                                size="default" 
-                                variant="outline" 
+                            <Button
+                                size="default"
+                                variant="outline"
                                 className="h-10"
-                                onClick={handleWishlistToggle} 
+                                onClick={handleWishlistToggle}
                                 disabled={isWishlistPending}
                             >
                                 {isWishlistPending ? (
@@ -275,41 +359,13 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
 
                     <Separator />
 
-                    {/* Features */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                        <div className="flex items-start gap-2">
-                            <div className="p-1.5 rounded-lg bg-primary/10">
-                                <Truck className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                                <p className="font-semibold text-xs">Free Shipping</p>
-                                <p className="text-xs text-muted-foreground">On orders over ₹500</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="p-1.5 rounded-lg bg-primary/10">
-                                <Shield className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                                <p className="font-semibold text-xs">Quality Guarantee</p>
-                                <p className="text-xs text-muted-foreground">Premium materials</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <div className="p-1.5 rounded-lg bg-primary/10">
-                                <Package className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                                <p className="font-semibold text-xs">Easy Returns</p>
-                                <p className="text-xs text-muted-foreground">30-day return policy</p>
-                            </div>
-                        </div>
-                    </div>
+                    {/* Features Cards */}
+                    <ProductInfoCards />
                 </div>
             </div>
 
             {relatedProducts.length > 0 && (
-                 <div className="mt-12 md:mt-16">
+                <div className="mt-12 md:mt-16">
                     <Separator className="mb-8" />
                     <RelatedProducts products={relatedProducts} user={user} />
                 </div>

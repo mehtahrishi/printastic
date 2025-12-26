@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { TypingQuote } from "@/components/layout/typing-quote";
+
 
 const AuthLayout = async ({
     children
@@ -24,7 +24,6 @@ const AuthLayout = async ({
         <div className="flex min-h-screen flex-col">
             <Header user={user} />
             <main className="flex-1">{children}</main>
-            <TypingQuote />
             <Footer />
         </div>
     );
