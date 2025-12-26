@@ -107,7 +107,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
                 alt={product.name}
                 width={600}
                 height={800}
-                className="w-full h-auto object-cover aspect-[3/4] transition-transform duration-300 group-hover:scale-105"
+                className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
               <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted text-muted-foreground text-sm">

@@ -5,6 +5,7 @@ import { Facebook, Instagram } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
 import { SVGProps } from "react";
+import { TypingQuote } from "@/components/layout/typing-quote";
 
 const VisaIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg className="fill-black dark:fill-white" width="38" height="24" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -46,6 +47,7 @@ export function Footer() {
 
     return (
         <footer className="bg-muted text-muted-foreground pt-12">
+            <TypingQuote />
             <div className="container">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Logo & Socials */}
