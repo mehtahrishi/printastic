@@ -12,7 +12,6 @@ import type { Product } from "@/lib/types";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "../ui/toast";
-import { addToCart as addToCartAction } from "@/actions/cart";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { RelatedProducts } from "./related-products";
@@ -33,10 +32,9 @@ interface ProductDetailClientProps {
 }
 
 export function ProductDetailClient({ product, relatedProducts, user }: ProductDetailClientProps) {
-    const [isCartPending, startCartTransition] = useTransition();
     const [isWishlistPending, startWishlistTransition] = useTransition();
 
-    const { addToCart: addToCartLocal } = useCart();
+    const { addToCart, isUpdating: isCartPending } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { toast } = useToast();
     const router = useRouter();
@@ -62,41 +60,20 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
         });
     };
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!user) {
             showAuthToast();
             return;
         }
-
-        // Prevent double clicks or interaction during animation
         if (isCartPending || isAdded) return;
-
-        startCartTransition(async () => {
-            // Run action and minimum timer in parallel to ensure animation is seen
-            const [result] = await Promise.all([
-                addToCartAction(product.id, 1, {
-                    size: selectedSize || undefined,
-                    color: selectedColor || undefined,
-                }),
-                new Promise(resolve => setTimeout(resolve, 800)) // Minimum 800ms animation time
-            ]);
-
-            if (result.error) {
-                toast({
-                    title: "Error",
-                    description: result.error,
-                    variant: "destructive",
-                });
-            } else {
-                toast({
-                    title: "Added to Cart",
-                    description: `${product.name} has been added to your cart.`,
-                });
-                addToCartLocal(cartProduct);
-                setIsAdded(true);
-                setTimeout(() => setIsAdded(false), 2000);
-            }
+        
+        setIsAdded(true); // Trigger animation immediately
+        await addToCart(product.id, 1, {
+            size: selectedSize || undefined,
+            color: selectedColor || undefined,
         });
+
+        setTimeout(() => setIsAdded(false), 2000);
     };
 
     const handleWishlistToggle = () => {
@@ -115,7 +92,8 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
 
     const isAddToCartDisabled =
         (product.sizes && product.sizes.length > 0 && !selectedSize) ||
-        (product.colors && product.colors.length > 0 && !selectedColor);
+        (product.colors && product.colors.length > 0 && !selectedColor) ||
+        isCartPending;
 
     const onSale = product.originalPrice && product.originalPrice > product.price;
 
@@ -286,26 +264,19 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                             <AnimatePresence mode="wait" initial={false}>
                                 {isCartPending ? (
                                     <motion.div
-                                        key="moving-cart"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
+                                        key="loading"
+                                        initial={{ y: 10, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        exit={{ y: -10, opacity: 0 }}
                                         className="absolute inset-0 flex items-center justify-center pointer-events-none"
                                     >
-                                        <motion.div
-                                            initial={{ x: 0 }}
-                                            animate={{ x: 150, opacity: [1, 1, 0] }}
-                                            transition={{ duration: 0.8, ease: "easeInOut" }}
-                                        >
-                                            <ShoppingCart className="h-5 w-5" />
-                                        </motion.div>
+                                        <Loader2 className="h-5 w-5 animate-spin"/>
                                     </motion.div>
                                 ) : isAdded ? (
                                     <motion.div
                                         key="added"
                                         initial={{ scale: 0.5, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
-                                        exit={{ opacity: 0, y: -20 }}
                                         className="flex items-center"
                                     >
                                         <ThumbsUp className="mr-2 h-5 w-5" />
@@ -314,9 +285,9 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                                 ) : (
                                     <motion.div
                                         key="idle"
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        initial={{ y: 10, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        exit={{ y: -10, opacity: 0, position: "absolute" }}
                                         className="flex items-center"
                                     >
                                         <ShoppingCart className="mr-2 h-4 w-4" />

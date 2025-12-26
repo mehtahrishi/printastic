@@ -6,12 +6,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Minus, Plus } from "lucide-react";
-import { removeCartItem, updateCartItemQuantity } from "@/actions/cart";
-import { useState, useTransition } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 interface CartItemRowProps {
   item: {
@@ -33,10 +30,7 @@ interface CartItemRowProps {
 }
 
 export default function CartItemRow({ item }: CartItemRowProps) {
-  const [isPending, startTransition] = useTransition();
-  const [quantity, setQuantity] = useState(item.quantity);
-  const { toast } = useToast();
-  const { removeFromCart, updateQuantity: updateCartHook } = useCart();
+  const { removeFromCart, updateQuantity, isUpdating } = useCart();
 
   const getFirstImage = (images: any): string => {
     if (!images) return '/placeholder.jpg';
@@ -58,40 +52,11 @@ export default function CartItemRow({ item }: CartItemRowProps) {
 
   const handleUpdateQuantity = (newQuantity: number) => {
     if (newQuantity < 1) return;
-    setQuantity(newQuantity);
-    
-    startTransition(async () => {
-      const result = await updateCartItemQuantity(item.id, newQuantity);
-      if (result.error) {
-        toast({
-          title: "Error updating cart",
-          description: result.error,
-          variant: "destructive",
-        });
-        setQuantity(item.quantity); // Revert on error
-      } else {
-        updateCartHook(String(item.product.id), newQuantity);
-      }
-    });
+    updateQuantity(item.id, newQuantity);
   };
 
   const handleRemove = () => {
-    startTransition(async () => {
-      const result = await removeCartItem(item.id);
-      if (result.error) {
-        toast({
-          title: "Error removing item",
-          description: result.error,
-          variant: "destructive",
-        });
-      } else {
-        removeFromCart(String(item.product.id));
-        toast({
-          title: "Item Removed",
-          description: `${item.product.name} has been removed from your cart.`,
-        });
-      }
-    });
+    removeFromCart(item.id);
   };
 
   return (
@@ -125,7 +90,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
                   </span>
                 )}
               </div>
-              <p className="sm:hidden text-base font-semibold text-primary mt-2">₹{(price * quantity).toFixed(2)}</p>
+              <p className="sm:hidden text-base font-semibold text-primary mt-2">₹{(price * item.quantity).toFixed(2)}</p>
             </div>
             
             {/* --- Quantity Controls --- */}
@@ -134,15 +99,15 @@ export default function CartItemRow({ item }: CartItemRowProps) {
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => handleUpdateQuantity(quantity - 1)}
-                disabled={isPending || quantity <= 1}
+                onClick={() => handleUpdateQuantity(item.quantity - 1)}
+                disabled={isUpdating || item.quantity <= 1}
               >
                 <Minus className="h-3 w-3" />
               </Button>
               <Input
                 type="number"
                 min="1"
-                value={quantity}
+                value={item.quantity}
                 onChange={(e) => {
                   const val = parseInt(e.target.value);
                   if (!isNaN(val) && val > 0) {
@@ -150,14 +115,14 @@ export default function CartItemRow({ item }: CartItemRowProps) {
                   }
                 }}
                 className="w-14 h-8 text-center"
-                disabled={isPending}
+                disabled={isUpdating}
               />
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => handleUpdateQuantity(quantity + 1)}
-                disabled={isPending}
+                onClick={() => handleUpdateQuantity(item.quantity + 1)}
+                disabled={isUpdating}
               >
                 <Plus className="h-3 w-3" />
               </Button>
@@ -165,12 +130,12 @@ export default function CartItemRow({ item }: CartItemRowProps) {
 
             {/* --- Total & Remove --- */}
             <div className="hidden sm:flex items-center gap-4">
-              <p className="font-semibold w-24 text-right">₹{(price * quantity).toFixed(2)}</p>
+              <p className="font-semibold w-24 text-right">₹{(price * item.quantity).toFixed(2)}</p>
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={handleRemove}
-                disabled={isPending}
+                disabled={isUpdating}
                 className="text-muted-foreground hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
@@ -186,7 +151,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
                 variant="ghost" 
                 size="sm"
                 onClick={handleRemove}
-                disabled={isPending}
+                disabled={isUpdating}
                 className="w-full justify-center text-muted-foreground"
             >
                 <Trash2 className="h-4 w-4 mr-2"/>
