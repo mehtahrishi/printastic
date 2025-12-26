@@ -71,28 +71,28 @@ function renderShell(content: string, brand: { name: string; url: string; primar
   </html>`;
 }
 
-function renderOtpEmail(otp: string, brand: any) {
+function renderPasswordResetEmail(resetLink: string, brand: any) {
   const body = `
       <div style="text-align:center">
-        <h2 style="margin:0 0 12px;font-size:26px;font-weight:700;color:${brand.text};letter-spacing:-0.02em">Verify Your Account</h2>
-        <p style="margin:0 0 32px;color:${brand.muted};font-size:15px;line-height:1.6">Please enter the verification code below to complete your login</p>
+        <h2 style="margin:0 0 12px;font-size:26px;font-weight:700;color:${brand.text};letter-spacing:-0.02em">Password Reset Request</h2>
+        <p style="margin:0 0 32px;color:${brand.muted};font-size:15px;line-height:1.6">You recently requested to reset your password for your ${brand.name} account. Click the button below to reset it.</p>
       </div>
       
-      <div style="background:linear-gradient(135deg,rgba(5,69,160,0.05) 0%,rgba(5,69,160,0.02) 100%);border-radius:12px;padding:32px;margin:32px 0;text-align:center;border:2px dashed ${brand.primary}">
-        <div style="font-size:11px;font-weight:600;color:${brand.primary};text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Your Verification Code</div>
-        <div style="font-size:42px;font-weight:700;letter-spacing:12px;color:${brand.primary};font-family:'Inter',monospace;margin:8px 0">${otp}</div>
-        <div style="font-size:13px;color:${brand.muted};margin-top:16px">Valid for <strong style="color:${brand.text}">5 minutes</strong></div>
+      <div style="text-align:center;margin:32px 0;">
+        <a href="${resetLink}" style="display:inline-block;background:${brand.primary};color:#ffffff;text-decoration:none;padding:16px 32px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 2px 8px rgba(48,88,107,0.2)">Reset Your Password</a>
       </div>
       
       <div style="background-color:rgba(250,204,21,0.1);border-left:4px solid #facc15;padding:16px 20px;border-radius:8px;margin:32px 0">
         <p style="margin:0;font-size:14px;color:${brand.text};line-height:1.6">
-          <strong>Security Tip:</strong> Never share this code with anyone. We'll never ask you for your verification code.
+          <strong>This link is valid for 1 hour.</strong> If you did not request a password reset, please ignore this email.
         </p>
       </div>
       
       <div style="margin-top:40px;padding-top:24px;border-top:1px solid ${brand.border};text-align:center">
         <p style="margin:0;font-size:13px;color:${brand.muted};line-height:1.6">
-          If you didn't request this code, please ignore this email or <a href="${brand.url}" style="color:${brand.primary};text-decoration:none;font-weight:600">contact support</a>.
+          If you're having trouble with the button, copy and paste this URL into your browser:
+          <br>
+          <a href="${resetLink}" style="color:${brand.primary};text-decoration:none;font-weight:400;word-break:break-all;">${resetLink}</a>
         </p>
       </div>
     `;
@@ -189,66 +189,49 @@ function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
   return renderShell(body, brand);
 }
 
-export const sendOtpEmail = async (email: string, otp: string) => {
+const getTransporter = () => {
     const host = process.env.SMTP_HOST;
     const port = Number(process.env.SMTP_PORT || 587);
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
 
     if (!host || !user || !pass) {
-        console.error("SMTP not configured in environment variables. Cannot send OTP email.");
+        console.error("SMTP not configured in environment variables.");
         throw new Error("SMTP server is not configured.");
     }
-
-    const transporter = nodemailer.createTransport({
+    
+    return nodemailer.createTransport({
         host,
         port,
         secure: port === 465,
         auth: { user, pass },
         tls: {
-            // Do not fail on invalid certs
             rejectUnauthorized: false
         }
     });
+}
 
+export const sendPasswordResetEmail = async (email: string, token: string) => {
+    const transporter = getTransporter();
     const brand = getBrandConfig();
-    const htmlContent = renderOtpEmail(otp, brand);
+    const resetLink = `${brand.url}/reset-password?token=${token}`;
+    const htmlContent = renderPasswordResetEmail(resetLink, brand);
 
     try {
         await transporter.sendMail({
-            from: `"${brand.name} Security" <noreply@honestyprinthouse.in>`,
+            from: `"${brand.name} Support" <noreply@honestyprinthouse.in>`,
             to: email,
-            subject: `Your ${brand.name} Verification Code`,
+            subject: `Reset Your ${brand.name} Password`,
             html: htmlContent,
         });
     } catch (error) {
-        console.error("Error sending OTP email:", error);
-        throw new Error("Could not send verification email.");
+        console.error("Error sending password reset email:", error);
+        throw new Error("Could not send password reset email.");
     }
 };
 
-
 export const sendOrderConfirmationEmail = async (order: any, user: any) => {
-    const host = process.env.SMTP_HOST;
-    const port = Number(process.env.SMTP_PORT || 587);
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
-
-    if (!host || !smtpUser || !smtpPass) {
-        console.error("SMTP not configured for order confirmation email");
-        throw new Error("SMTP server is not configured for order emails.");
-    }
-
-    const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user: smtpUser, pass: smtpPass },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
-    
+    const transporter = getTransporter();
     const brand = getBrandConfig();
     const htmlContent = renderOrderConfirmationEmail(order, user, brand);
 

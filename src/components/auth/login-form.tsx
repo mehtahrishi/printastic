@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTransition, useState } from "react";
@@ -115,7 +116,7 @@ export const LoginForm = () => {
                                                     asChild
                                                     className="px-0 font-normal text-primary hover:no-underline"
                                                 >
-                                                    <Link href="/auth/reset">Forgot password?</Link>
+                                                    <Link href="/forgot-password">Forgot password?</Link>
                                                 </Button>
                                             </div>
                                             <FormControl>

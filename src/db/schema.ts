@@ -88,3 +88,10 @@ export const otpAttempts = mysqlTable("otp_attempts", {
     isUsed: boolean("is_used").default(false),
     createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+    id: int("id").autoincrement().primaryKey(),
+    email: varchar("email", { length: 255 }).notNull(),
+    token: varchar("token", { length: 255 }).notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+});
