@@ -7,7 +7,7 @@ export function TypingQuote() {
   const [text, setText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [charIndex, setCharIndex] = useState(0);
-  const fullText = '"Crystal clear prints, from our House to yours."';
+  const fullText = '"House Full of Prints."';
   const typingSpeed = 120;
   const deletingSpeed = 60;
   const pauseDuration = 2500;
