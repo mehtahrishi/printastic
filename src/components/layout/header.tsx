@@ -185,7 +185,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                   <Collapsible open={accountOpen} onOpenChange={setAccountOpen}>
                     <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent">
                       <div className="flex items-center gap-2">
-                        <UserRound className="h-5 w-5" />
+                        
                         <span className="text-sm font-medium">My Account</span>
                       </div>
                       <ChevronDown
