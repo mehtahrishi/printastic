@@ -144,14 +144,26 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Button variant="ghost" asChild size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href="/register">Sign up</Link>
-              </Button>
-            </div>
+            <>
+              {/* Desktop Auth Buttons */}
+              <div className="hidden md:flex items-center gap-2">
+                <Button variant="ghost" asChild size="sm">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/register">Sign up</Link>
+                </Button>
+              </div>
+              {/* Mobile Auth Buttons */}
+              <div className="flex md:hidden items-center gap-1">
+                <Button variant="ghost" asChild size="sm">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/register">Sign up</Link>
+                </Button>
+              </div>
+            </>
           )}
 
           {/* Mobile sidebar menu (opens from right, positioned after cart) */}
@@ -185,7 +197,6 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                   <Collapsible open={accountOpen} onOpenChange={setAccountOpen}>
                     <CollapsibleTrigger className="flex items-center justify-between w-full p-2 rounded-md hover:bg-accent">
                       <div className="flex items-center gap-2">
-                        
                         <span className="text-sm font-medium">My Account</span>
                       </div>
                       <ChevronDown
@@ -239,22 +250,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         >
                           Sign out
                         </Link>
-                      ) : (
-                        <>
-                        <Link
-                          href="/login"
-                          className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                        >
-                          Login
-                        </Link>
-                         <Link
-                          href="/register"
-                          className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent"
-                        >
-                          Sign Up
-                        </Link>
-                        </>
-                      )}
+                      ) : null }
 
                     </CollapsibleContent>
                   </Collapsible>
