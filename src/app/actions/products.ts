@@ -280,12 +280,83 @@ export async function deleteProduct(productId: number) {
     }
 }
 
+// Helper to detect if slug has a color word
+function isColorVariant(slug: string): boolean {
+    const commonColors = ['black', 'white', 'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'grey', 'gray', 'brown', 'navy', 'maroon', 'olive', 'cyan', 'magenta', 'lime', 'teal', 'violet', 'indigo', 'beige', 'cream', 'tan', 'ivory', 'gold', 'silver', 'bronze', 'copper', 'khaki', 'mint', 'peach', 'coral', 'salmon', 'burgundy', 'crimson', 'scarlet', 'turquoise', 'aqua', 'lavender', 'lilac', 'rose', 'ruby', 'emerald', 'jade', 'amber', 'charcoal', 'slate'];
+    const slugLower = slug.toLowerCase();
+    // Check if slug contains any color word (as a separate word with hyphens)
+    return commonColors.some(color => {
+        const regex = new RegExp(`(^|-)${color}(-|$)`);
+        return regex.test(slugLower);
+    });
+}
+
+// Extract base slug by removing color word
+function getBaseSlug(slug: string): string {
+    const commonColors = ['black', 'white', 'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'grey', 'gray', 'brown', 'navy', 'maroon', 'olive', 'cyan', 'magenta', 'lime', 'teal', 'violet', 'indigo', 'beige', 'cream', 'tan', 'ivory', 'gold', 'silver', 'bronze', 'copper', 'khaki', 'mint', 'peach', 'coral', 'salmon', 'burgundy', 'crimson', 'scarlet', 'turquoise', 'aqua', 'lavender', 'lilac', 'rose', 'ruby', 'emerald', 'jade', 'amber', 'charcoal', 'slate'];
+    const slugLower = slug.toLowerCase();
+    
+    for (const color of commonColors) {
+        // Match color as a separate word (with hyphens around it)
+        const regex = new RegExp(`-${color}(?=-|$)`, 'i');
+        if (regex.test(slugLower)) {
+            console.log('[getBaseSlug] Found color:', color, 'in slug:', slug);
+            // Remove the color word and clean up
+            const result = slug.replace(regex, '').replace(/--+/g, '-');
+            console.log('[getBaseSlug] Result after removal:', result);
+            return result;
+        }
+    }
+    console.log('[getBaseSlug] No color found in slug:', slug);
+    return slug;
+}
+
 export async function getProducts() {
+    try {
+        const fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
+        // Filter out color variants - only show primary products without color suffix
+        return fetchedProducts.filter(p => !isColorVariant(p.slug));
+    } catch (error) {
+        console.error("Failed to fetch products:", error);
+        return [];
+    }
+}
+
+// Get ALL products including color variants (for admin)
+export async function getAllProducts() {
     try {
         const fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
         return fetchedProducts;
     } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("Failed to fetch all products:", error);
+        return [];
+    }
+}
+
+// Get all color variants for a base product slug
+export async function getColorVariants(baseSlug: string) {
+    try {
+        console.log('[Color Variants] Looking for variants of:', baseSlug);
+        const allProducts = await db.select().from(products).orderBy(desc(products.createdAt));
+        console.log('[Color Variants] Total products in DB:', allProducts.length);
+        
+        const base = getBaseSlug(baseSlug);
+        console.log('[Color Variants] Base slug extracted:', base);
+        
+        // Find all products that start with the base slug (including the base itself if it exists)
+        const variants = allProducts.filter(p => {
+            const pBase = getBaseSlug(p.slug);
+            const matches = pBase === base && p.slug !== baseSlug;
+            if (matches) {
+                console.log('[Color Variants] Found variant:', p.slug, '(base:', pBase, ')');
+            }
+            return matches;
+        });
+        
+        console.log('[Color Variants] Total variants found:', variants.length);
+        return variants;
+    } catch (error) {
+        console.error("Failed to fetch color variants:", error);
         return [];
     }
 }

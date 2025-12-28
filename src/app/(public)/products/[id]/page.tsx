@@ -1,7 +1,8 @@
 
 import { notFound } from "next/navigation";
-import { getProduct, getProductPreviews, getProducts } from "@/app/actions/products";
+import { getProduct, getProductPreviews, getProducts, getColorVariants } from "@/app/actions/products";
 import { ProductDetailClient } from "@/components/products/product-detail-client";
+import { ColorVariantsSection } from "@/components/products/color-variants";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -36,16 +37,20 @@ function parseJsonOrString(data: any): string[] {
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   // The slug is passed as 'id', so we decode it
-  const slug = decodeURIComponent(params.id);
+  const { id } = await params;
+  const slug = decodeURIComponent(id);
 
   const product = await getProduct(slug);
 
   if (!product) {
     notFound();
   }
+
+  // Fetch color variants
+  const colorVariants = await getColorVariants(slug);
 
   // Fetch related products
   const allProducts = await getProducts();
@@ -113,6 +118,8 @@ export default async function ProductDetailPage({
       </Breadcrumb>
 
       <ProductDetailClient product={formattedProduct} relatedProducts={relatedProducts} user={user} />
+      
+      <ColorVariantsSection variants={colorVariants} />
     </div>
   );
 }
