@@ -14,7 +14,7 @@
       /* Table Styles */
       .table-line { stroke: #000000; stroke-width: 1; fill: none; }
       .table-text { font-size: 13px; fill: #000000; text-anchor: middle; alignment-baseline: middle; }
-      .table-header { font-weight: bold; font-size: 11px; } /* Slightly smaller for multi-line headers */
+      .table-header { font-weight: bold; font-size: 11px; }
       .table-sub { font-size: 9px; font-weight: normal; }
       .table-footnote { font-size: 11px; font-weight: bold; fill: #000000; text-anchor: start;}
     </style>
@@ -34,11 +34,15 @@
       c0.3,0,0.6-0.1,0.8-0.3L9,15.4V27c0,0.6,0.4,1,1,1h12c0.6,0,1-0.4,1-1V15.4l1.3,1.3c0.2,0.2,0.5,0.3,0.8,0.3c0.3,0,0.5-0.2,0.7-0.4
       l4-5C30.1,11.2,30.1,10.7,29.7,10.3z"/>
 
+      <line x1="6" y1="8.5" x2="26" y2="8.5" class="arrow-line" marker-start="url(#arrowhead-start)" marker-end="url(#arrowhead-end)" />
+      <text x="16" y="8" text-anchor="middle" class="arrow-text">SHOULDER</text>
+
+
       <line x1="10" y1="16" x2="22" y2="16" class="arrow-line" marker-start="url(#arrowhead-start)" marker-end="url(#arrowhead-end)" />
       <text x="16" y="15" text-anchor="middle" class="arrow-text">CHEST</text>
 
-      <line x1="26" y1="5" x2="26" y2="27" class="arrow-line" marker-start="url(#arrowhead-start)" marker-end="url(#arrowhead-end)" />
-      <text x="25" y="16" text-anchor="middle" transform="rotate(-90, 25, 16)" class="arrow-text">LENGTH</text>
+      <line x1="28" y1="5" x2="28" y2="27" class="arrow-line" marker-start="url(#arrowhead-start)" marker-end="url(#arrowhead-end)" />
+      <text x="27" y="16" text-anchor="middle" transform="rotate(-90, 27, 16)" class="arrow-text">LENGTH</text>
   </g>
 
 
