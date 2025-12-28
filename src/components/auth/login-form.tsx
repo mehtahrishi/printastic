@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTransition, useState } from "react";
@@ -21,11 +22,14 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/ui/logo";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { ToastAction } from "../ui/toast";
 
 export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
     const [isRedirecting, setIsRedirecting] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -38,21 +42,39 @@ export const LoginForm = () => {
     const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         startTransition(() => {
             login(values).then((data) => {
-                if (data.error) {
+                if (data.error || !data.user) {
                     toast({
                         variant: "destructive",
                         title: "Error",
-                        description: data.error,
+                        description: data.error || "An unknown error occurred.",
                     });
                 } else {
                     setIsRedirecting(true);
+                    
+                    // Show initial success toast
                     toast({
                         title: "Success",
                         description: data.success,
                     });
+
+                    // Redirect to homepage
+                    router.push("/");
+                    
+                    // After a delay, check for address and show the second toast if needed
                     setTimeout(() => {
-                        window.location.href = "/account";
-                    }, 500);
+                        if (!data.user?.address) {
+                            toast({
+                                title: "Complete Your Profile",
+                                description: "Add your address to enjoy a faster checkout experience.",
+                                duration: 8000, // Make it last a bit longer
+                                action: (
+                                  <ToastAction altText="Update Profile" onClick={() => router.push("/account")}>
+                                    Update Profile
+                                  </ToastAction>
+                                ),
+                            });
+                        }
+                    }, 2500); // 2.5 second delay
                 }
             });
         });
@@ -115,7 +137,7 @@ export const LoginForm = () => {
                                                     asChild
                                                     className="px-0 font-normal text-primary hover:no-underline"
                                                 >
-                                                    <Link href="/auth/reset">Forgot password?</Link>
+                                                    <Link href="/forgot-password">Forgot password?</Link>
                                                 </Button>
                                             </div>
                                             <FormControl>
@@ -159,7 +181,7 @@ export const LoginForm = () => {
                     </Form>
 
                     <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800 text-center">
-                        <p className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             Don&apos;t have an account?{" "}
                             <Link
                                 href="/register"

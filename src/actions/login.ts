@@ -70,7 +70,13 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             path: "/",
         });
 
-        return { success: "Logged in successfully!" };
+        // Return user object on success
+        const { password: _, ...userWithoutPassword } = existingUser;
+        return { 
+            success: "Logged in successfully!",
+            user: userWithoutPassword 
+        };
+
     } catch (error) {
         console.error("Failed to create session:", error);
         return { error: "Failed to create session. Please try again." };

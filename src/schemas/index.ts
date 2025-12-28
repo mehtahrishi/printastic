@@ -1,3 +1,4 @@
+
 import * as z from "zod";
 
 export const RegisterSchema = z.object({
@@ -24,12 +25,6 @@ export const LoginSchema = z.object({
     }),
 });
 
-export const VerifySchema = z.object({
-    otp: z.string().min(6, {
-        message: "OTP is required",
-    }),
-});
-
 export const ProfileSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
     phone: z.string().optional(),
@@ -37,4 +32,17 @@ export const ProfileSchema = z.object({
     apartment: z.string().optional(),
     city: z.string().optional(),
     postalCode: z.string().optional(),
+});
+
+export const ForgotPasswordSchema = z.object({
+    email: z.string().email({
+        message: "Email is required",
+    }),
+});
+
+export const ResetPasswordSchema = z.object({
+    password: z.string().min(6, {
+        message: "Password must be at least 6 characters.",
+    }),
+    token: z.string().min(1, "Token is required"),
 });

@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { ToastAction } from "@/components/ui/toast";
-import { addToCart as addToCartAction } from "@/actions/cart";
 import { useTransition } from "react";
 
 interface ProductCardProps {
@@ -38,7 +37,7 @@ function getFirstImage(images: string[] | string | undefined): string {
 
 export function ProductCard({ product, user }: ProductCardProps) {
   const [isPending, startTransition] = useTransition();
-  const { addToCart: addToCartLocal } = useCart();
+  const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { toast } = useToast();
   const router = useRouter();
@@ -63,18 +62,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
       showAuthToast();
       return;
     }
-    startTransition(async () => {
-      const result = await addToCartAction(Number(product.id));
-      if (result.error) {
-        toast({ title: "Error", description: result.error, variant: "destructive" });
-      } else {
-        addToCartLocal(product);
-        toast({
-          title: "Added to Cart",
-          description: `${product.name} has been added to your cart.`,
-        });
-      }
-    });
+    addToCart(Number(product.id));
   };
 
   const handleWishlistToggle = () => {

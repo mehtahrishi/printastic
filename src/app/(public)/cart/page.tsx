@@ -1,13 +1,14 @@
 
-import Image from "next/image";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart as ShoppingCartIcon, ArrowRight } from "lucide-react";
+import { ShoppingCart as ShoppingCartIcon } from "lucide-react";
 import { getCartItems } from "@/actions/cart";
 import CartItemRow from "@/components/cart/cart-item-row";
 import { ProceedToCheckoutButton } from "@/components/cart/proceed-to-checkout-button";
+import Link from "next/link";
+
+export const dynamic = 'force-dynamic';
 
 export default async function CartPage() {
   const cartItems = await getCartItems();
@@ -17,13 +18,14 @@ export default async function CartPage() {
   const FREE_SHIPPING_THRESHOLD = 500;
   const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const cartTotal = subtotal + shippingCost;
+  const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="container py-12 md:py-16">
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold">Shopping Cart</h1>
         <p className="text-muted-foreground mt-1">
-          You have {cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in your cart.
+          You have {itemCount} item{itemCount !== 1 ? 's' : ''} in your cart.
         </p>
       </div>
 

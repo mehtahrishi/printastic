@@ -1,6 +1,6 @@
 
 import { db } from "@/lib/db";
-import { users } from "@/db/schema";
+import { users, orders } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +15,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { eq, sql, sum, desc, like, or, and, gte, lte } from "drizzle-orm";
+
 
 // Helper to get initials
 function getInitials(name: string | null) {
@@ -35,16 +37,25 @@ export default async function CustomersPage({
     const resolvedSearchParams = await searchParams;
     const query = typeof resolvedSearchParams?.query === 'string' ? resolvedSearchParams.query.toLowerCase() : '';
 
-    // Fetch all users sorted by latest creation
-    const allUsers = await db.select().from(users);
+    // Fetch all users with their total spent on delivered orders
+    const usersWithTotals = await db
+        .select({
+            user: users,
+            totalSpent: sql<number>`SUM(CASE WHEN ${orders.status} = 'Delivered' THEN ${orders.total} ELSE 0 END)`.mapWith(Number)
+        })
+        .from(users)
+        .leftJoin(orders, eq(users.id, orders.userId))
+        .groupBy(users.id)
+        .orderBy(desc(users.createdAt));
 
-    const sortedUsers = allUsers.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA;
-    });
+    
+    const allUsers = usersWithTotals.map(result => ({
+        ...result.user,
+        totalSpent: result.totalSpent || 0
+    }));
 
-    const filteredUsers = sortedUsers.filter(user => {
+
+    const filteredUsers = allUsers.filter(user => {
         if (!query) return true;
         const name = user.name?.toLowerCase() || '';
         const email = user.email?.toLowerCase() || '';
@@ -142,7 +153,7 @@ export default async function CustomersPage({
                                         <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                                             <CreditCard className="h-3 w-3" /> Total Spent
                                         </span>
-                                        <span className="text-lg font-bold text-primary">₹0.00</span>
+                                        <span className="text-lg font-bold text-primary">₹{user.totalSpent.toFixed(2)}</span>
                                     </div>
                                 </div>
 
@@ -244,7 +255,7 @@ export default async function CustomersPage({
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                <span className="text-sm font-medium">₹0.00</span>
+                                                <span className="text-sm font-medium">₹{user.totalSpent.toFixed(2)}</span>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
@@ -268,3 +279,6 @@ export default async function CustomersPage({
         </div>
     );
 }
+
+
+    
