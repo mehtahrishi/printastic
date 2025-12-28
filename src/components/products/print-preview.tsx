@@ -158,21 +158,16 @@ export function PrintPreview({ product }: PrintPreviewProps) {
           onClick={() => setIsModalOpen(true)}
         >
           {activePreview && (
-            <>
-              <Image
-                src={activePreview}
-                alt={`Preview of ${product.name}`}
-                width={500}
-                height={600}
-                className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                sizes="(max-width: 768px) 100vw, 40vw"
-                data-ai-hint={allPreviews.find((p: any) => p.imageUrl === activePreview)?.imageHint}
-                priority
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                {/* Optional overlay hint if needed */}
-              </div>
-            </>
+            <Image
+              src={activePreview}
+              alt={`Preview of ${product.name}`}
+              width={500}
+              height={600}
+              className="w-full h-auto object-contain"
+              sizes="(max-width: 768px) 100vw, 40vw"
+              data-ai-hint={allPreviews.find((p: any) => p.imageUrl === activePreview)?.imageHint}
+              priority
+            />
           )}
         </div>
       </div>
