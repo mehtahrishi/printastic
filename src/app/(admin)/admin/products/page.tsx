@@ -5,6 +5,7 @@ import { ProductsTable } from "@/components/admin/products/products-table";
 import { CreateProductButton } from "@/components/admin/products/create-product-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SearchInput } from "@/components/admin/search-input";
+import { BulkAddProductsButton } from "@/components/admin/products/bulk-add-products-button";
 
 export default async function ProductsPage({
     searchParams
@@ -25,7 +26,10 @@ export default async function ProductsPage({
                     <h1 className="text-3xl font-bold tracking-tight">Products</h1>
                     <p className="text-muted-foreground">Manage your product inventory.</p>
                 </div>
-                <CreateProductButton />
+                <div className="flex items-center gap-2">
+                    <BulkAddProductsButton />
+                    <CreateProductButton />
+                </div>
             </div>
 
             <div className="flex justify-between items-center">
