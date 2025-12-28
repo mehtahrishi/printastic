@@ -23,7 +23,7 @@ const productSchema = z.object({
 });
 
 const bulkProductSchema = z.object({
-    products: z.array(productSchema.omit({ images: true }))
+    products: z.array(productSchema.omit({ images: true })).min(1, "At least one product is required").max(10, "Maximum 10 products allowed per bulk upload")
 });
 
 
@@ -82,6 +82,13 @@ export async function createBulkProducts(prevState: any, formData: FormData) {
 
     const productsToValidate = Object.values(productsData);
     
+    // Enforce 10 product limit
+    if (productsToValidate.length > 10) {
+        return {
+            error: "Maximum 10 products allowed per bulk upload. Please reduce the number of products.",
+        };
+    }
+    
     const validatedFields = bulkProductSchema.safeParse({ products: productsToValidate });
 
     if (!validatedFields.success) {
@@ -137,7 +144,7 @@ export async function createBulkProducts(prevState: any, formData: FormData) {
 
 
 export async function createProduct(prevState: any, formData: FormData) {
-    const productImages = formData.getAll("productImages[0]") as File[];
+    const productImages = formData.getAll("productImages") as File[];
     const uploadedImageUrls = await uploadMultipleToCloudinary(productImages);
 
     if (uploadedImageUrls.length === 0) {

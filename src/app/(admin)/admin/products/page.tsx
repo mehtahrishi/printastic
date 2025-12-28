@@ -10,10 +10,11 @@ import { BulkAddProductsButton } from "@/components/admin/products/bulk-add-prod
 export default async function ProductsPage({
     searchParams
 }: {
-    searchParams?: { query?: string };
+    searchParams?: Promise<{ query?: string }>;
 }) {
     const allProducts = await getProducts();
-    const query = searchParams?.query?.toLowerCase() || '';
+    const params = await searchParams;
+    const query = params?.query?.toLowerCase() || '';
 
     const filteredProducts = allProducts.filter(product => 
         product.name.toLowerCase().includes(query)

@@ -25,7 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { createProduct, updateProduct } from "@/app/actions/products";
+import { createProduct, updateProduct } from "@/actions/products";
 import { useState, useTransition, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/lib/types";

@@ -52,7 +52,7 @@ const productSchema = z.object({
 });
 
 const bulkFormSchema = z.object({
-    products: z.array(productSchema),
+    products: z.array(productSchema).min(1, "At least one product is required").max(10, "Maximum 10 products allowed per bulk upload"),
 });
 
 type FormValues = z.infer<typeof bulkFormSchema>;
@@ -159,6 +159,11 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {form.formState.errors.products?.root?.message && (
+                    <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md text-sm">
+                        {form.formState.errors.products.root.message}
+                    </div>
+                )}
                 <ScrollArea className="h-[60vh] pr-4">
                     <div className="space-y-4">
                         {fields.map((field, index) => (
@@ -255,9 +260,24 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                 </ScrollArea>
                 
                 <div className="flex justify-between items-center pt-4 border-t">
-                    <Button type="button" variant="outline" onClick={() => append({ name: "", slug: "", description: "", price: "", originalPrice: "", category: "", sizes: "", colors: "", isTrending: false })}>
+                    <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => {
+                            if (fields.length >= 10) {
+                                toast({
+                                    variant: "destructive",
+                                    title: "Limit Reached",
+                                    description: "Maximum 10 products allowed per bulk upload"
+                                });
+                                return;
+                            }
+                            append({ name: "", slug: "", description: "", price: "", originalPrice: "", category: "", sizes: "", colors: "", isTrending: false });
+                        }}
+                        disabled={fields.length >= 10}
+                    >
                         <Plus className="mr-2 h-4 w-4" />
-                        Add Another Product
+                        Add Another Product {fields.length >= 10 ? "(Max 10)" : `(${fields.length}/10)`}
                     </Button>
                     <Button type="submit" disabled={isPending}>
                         {isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
