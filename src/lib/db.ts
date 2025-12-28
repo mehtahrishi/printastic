@@ -14,9 +14,11 @@ const conn = globalForDb.conn ?? mysql.createPool({
     uri: connectionInfo,
     waitForConnections: true,
     connectionLimit: 10,
+    maxIdle: 10,
+    idleTimeout: 60000,
     queueLimit: 0,
     enableKeepAlive: true,
-    keepAliveInitialDelay: 0,
+    keepAliveInitialDelay: 10000,
 });
 
 if (process.env.NODE_ENV !== "production") globalForDb.conn = conn;

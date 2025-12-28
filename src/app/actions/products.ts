@@ -312,14 +312,27 @@ function getBaseSlug(slug: string): string {
 }
 
 export async function getProducts() {
-    try {
-        const fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
-        // Filter out color variants - only show primary products without color suffix
-        return fetchedProducts.filter(p => !isColorVariant(p.slug));
-    } catch (error) {
-        console.error("Failed to fetch products:", error);
-        return [];
+    const maxRetries = 3;
+    let lastError;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const fetchedProducts = await db.select().from(products).orderBy(desc(products.createdAt));
+            // Filter out color variants - only show primary products without color suffix
+            return fetchedProducts.filter(p => !isColorVariant(p.slug));
+        } catch (error) {
+            lastError = error;
+            console.error(`Failed to fetch products (attempt ${attempt}/${maxRetries}):`, error);
+            
+            // If not the last attempt, wait before retrying
+            if (attempt < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+            }
+        }
     }
+    
+    console.error("All retry attempts failed:", lastError);
+    return [];
 }
 
 // Get ALL products including color variants (for admin)

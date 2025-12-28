@@ -245,7 +245,8 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Our Address</h4>
                     <p className="text-sm text-muted-foreground">
-                      Shop No.9, Matoshree chs ltd, plot no. 387, Gyan VIkas Road, 19/C , Sector 19, Kopar Khairane, Navi mmumbai, maharashtra 400709, India
+                      Honesty Print House,<br />
+                      Shop No.9, Matoshree Chs Ltd, Plot no. 387, Gyan VIkas Road, 19/C , Sector 19, Kopar Khairane, Navi Mumbai, Maharashtra 400709, India
                     </p>
                   </div>
                 </div>
@@ -274,8 +275,8 @@ export default function ContactUsPage() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-1">Business Hours</h4>
                     <p className="text-sm text-muted-foreground">
-                      Mon-Fri: 9:00 AM - 6:00 PM<br />
-                      Sat-Sun: Closed
+                      Mon-Sat: 9:00 AM - 7:30 PM<br />
+                      Sun: Closed
                     </p>
                   </div>
                 </div>

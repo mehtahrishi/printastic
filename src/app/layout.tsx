@@ -24,6 +24,7 @@ const moonTime = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:9002'),
   title: {
     default: "Honesty Print House - High-Quality Printing Services",
     template: "%s | Honesty Print House",

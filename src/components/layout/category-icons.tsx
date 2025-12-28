@@ -98,29 +98,25 @@ interface CategoryIconsProps {
 
 export function CategoryIcons({ onCategorySelect, selectedCategory }: CategoryIconsProps) {
   return (
-    <section className="py-4 border-b border-border">
-      <div className="container">
+    <section className="border-b border-border">
+      <div className="container py-4">
         <div className="flex items-center justify-center gap-8 md:gap-12">
           {categories.map((category) => (
             <button
               key={category.name}
               onMouseEnter={() => onCategorySelect(category.value)}
-              className="group flex flex-col items-center relative cursor-pointer"
+              className={`group flex flex-col items-center relative cursor-pointer transition-all duration-300 ${
+                selectedCategory === category.value 
+                  ? 'scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]' 
+                  : 'scale-100'
+              }`}
             >
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2">
                 <category.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 <span className="text-xs font-medium text-foreground/80">
                   {category.name}
                 </span>
               </div>
-              {/* Slider indicator */}
-              <div 
-                className={`h-0.5 w-full transition-all duration-300 ${
-                  selectedCategory === category.value 
-                    ? 'bg-primary scale-x-100' 
-                    : 'bg-transparent scale-x-0'
-                }`}
-              />
             </button>
           ))}
         </div>
