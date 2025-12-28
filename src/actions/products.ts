@@ -128,13 +128,31 @@ export async function createBulkProducts(prevState: any, formData: FormData) {
             return { error: "No products to add." };
         }
 
-        await db.insert(products).values(productsToInsert);
+        // Insert products one by one to avoid connection issues
+        let insertedCount = 0;
+        for (const product of productsToInsert) {
+            try {
+                await db.insert(products).values(product);
+                insertedCount++;
+            } catch (insertError) {
+                console.error(`[CreateBulkProducts] Failed to insert product "${product.name}":`, insertError);
+                // Continue with next product instead of failing completely
+            }
+        }
+
+        if (insertedCount === 0) {
+            return { error: "Failed to insert any products. Please check the logs." };
+        }
         
         revalidatePath("/admin/products");
         revalidatePath("/");
         revalidatePath("/products");
         
-        return { success: true, message: `${productsToInsert.length} products created successfully.` };
+        const message = insertedCount === productsToInsert.length 
+            ? `${insertedCount} products created successfully.`
+            : `${insertedCount} of ${productsToInsert.length} products created successfully.`;
+        
+        return { success: true, message };
     } catch (error) {
         console.error("[CreateBulkProducts] Operation failed:", error);
         return { error: `Failed to create products: ${error instanceof Error ? error.message : 'Unknown error'}` };
