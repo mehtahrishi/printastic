@@ -12,8 +12,9 @@ export async function POST(req: Request) {
 
     const host = process.env.SMTP_HOST;
     const port = Number(process.env.SMTP_PORT || 587);
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
+    // Use contact-specific SMTP credentials
+    const user = process.env.CONTACT_SMTP_USER || process.env.SMTP_USER;
+    const pass = process.env.CONTACT_SMTP_PASS || process.env.SMTP_PASS;
     const to = process.env.CONTACT_TO || user;
 
     if (!host || !user || !pass) {
@@ -29,30 +30,31 @@ export async function POST(req: Request) {
     await transporter.verify();
 
     const brand = {
-      name: process.env.BRAND_NAME || "Printastic",
+      name: process.env.BRAND_NAME || "Honesty Print House",
       url: process.env.BRAND_URL || "https://honestyprinthouse.in/",
-      primary: process.env.BRAND_PRIMARY || "#30586b", // hsl(203 39% 29%) - site primary
-      accent: process.env.BRAND_ACCENT || "#c39961", // hsl(34 47% 64%) - site accent
-      background: "#f1f5f9", // hsl(206 33% 95%) - light background
-      text: "#1e293b", // hsl(215 28% 17%) - foreground
-      muted: "#64748b", // hsl(215 20% 45%) - muted text
-      border: "#cbd5e1", // hsl(215 20% 87%) - border
+      primary: "#0545A0",  // hsl(215, 100%, 34%) converted to hex
+      accent: "#FF6B35",   // hsl(19, 100%, 51%) converted to hex
+      background: "#F7F9FC", // hsl(215, 33%, 98%) converted to hex
+      text: "#1E3A5F",     // hsl(215, 40%, 15%) converted to hex
+      muted: "#64748B",    // hsl(215, 20%, 50%) converted to hex
+      border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
     };
 
     const adminHtml = renderAdminEmail({ name, email, subject, message }, brand);
-    const userHtml = renderUserEmail({ name, subject }, brand);
+    const userHtml = renderUserEmail({ name, subject, message }, brand);
 
     const adminInfo = await transporter.sendMail({
-      from: `${brand.name} Contact <${user}>`,
+      from: `${brand.name} <${user}>`,
       replyTo: email,
       to,
-      subject: `New Contact: ${subject}`,
+      subject: `New Contact from ${name}: ${subject}`,
       text: `New contact on ${brand.name}\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\n\n${message}`,
       html: adminHtml,
     });
 
     const userInfo = await transporter.sendMail({
-      from: `${brand.name} Support <${user}>`,
+      from: `${brand.name} <${user}>`,
+      replyTo: to,
       to: email,
       subject: `We received your message — ${brand.name}`,
       text: `Hi ${name},\n\nThanks for reaching out about "${subject}". Our team has received your message and will get back to you shortly.\n\nBest,\n${brand.name} Support\n${brand.url}`,
@@ -67,49 +69,54 @@ export async function POST(req: Request) {
 
 function renderShell(content: string, brand: { name: string; url: string; primary: string; accent: string; background: string; text: string; muted: string; border: string }) {
   return `
-  <div style="background:${brand.background};padding:32px 0;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="color:${brand.text}">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:16px;box-shadow:0 2px 12px rgba(30,41,59,0.08);overflow:hidden;border:1px solid ${brand.border}">
-            <tr>
-              <td style="background:linear-gradient(135deg, ${brand.primary} 0%, ${brand.primary}e6 100%);padding:32px 24px">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td>
-                      <div style="display:inline-flex;align-items:center;gap:8px">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08" />
-                          <path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z" />
-                        </svg>
-                        <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.02em">${brand.name}</span>
-                      </div>
-                      <div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px">${brand.url.replace(/^https?:\/\//, '')}</div>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr><td style="padding:32px 24px">${content}</td></tr>
-            <tr>
-              <td style="padding:20px 24px;border-top:1px solid ${brand.border};background:${brand.background}">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td style="color:${brand.muted};font-size:12px">
-                      © ${new Date().getFullYear()} ${brand.name}. All rights reserved.
-                    </td>
-                    <td align="right">
-                      <a href="${brand.url}" style="color:${brand.primary};text-decoration:none;font-size:12px;font-weight:500">Visit Store</a>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </div>`;
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body style="margin:0;padding:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background-color:${brand.background}">
+    <div style="background-color:${brand.background};background-image:linear-gradient(to right,rgba(5,69,160,0.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(5,69,160,0.08) 1px,transparent-1px);background-size:40px 40px;padding:40px 20px;min-height:100vh">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(5,69,160,0.1);border:1px solid ${brand.border}">
+              <!-- Header -->
+              <tr>
+                <td style="background:linear-gradient(135deg,${brand.primary} 0%,#003d82 100%);padding:40px 32px;text-align:center">
+                  <h1 style="margin:0;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.02em">${brand.name}</h1>
+                  <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.9)">${brand.url.replace(/^https?:\/\//, '')}</p>
+                </td>
+              </tr>
+              <!-- Content -->
+              <tr>
+                <td style="padding:40px 32px">
+                  ${content}
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td style="padding:24px 32px;border-top:1px solid ${brand.border};background-color:${brand.background}">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td style="color:${brand.muted};font-size:13px;line-height:1.6">
+                        © ${new Date().getFullYear()} ${brand.name}. All rights reserved.
+                      </td>
+                      <td align="right">
+                        <a href="${brand.url}" style="display:inline-block;color:${brand.primary};text-decoration:none;font-size:13px;font-weight:600;padding:8px 16px;border:1px solid ${brand.primary};border-radius:6px;transition:all 0.2s">Visit Store</a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+  </html>`;
 }
 
 function renderAdminEmail(data: { name: string; email: string; subject: string; message: string }, brand: any) {
@@ -141,14 +148,19 @@ function renderAdminEmail(data: { name: string; email: string; subject: string; 
   return renderShell(body, brand);
 }
 
-function renderUserEmail(data: { name: string; subject: string }, brand: any) {
+function renderUserEmail(data: { name: string; subject: string; message: string }, brand: any) {
   const body = `
     <h2 style="margin:0 0 8px;font-size:24px;font-weight:700;color:${brand.text}">We received your message!</h2>
     <p style="margin:0 0 24px;color:${brand.muted};font-size:15px">Hi ${escapeHtml(data.name)}, thanks for contacting ${brand.name}.</p>
-    
+
     <div style="padding:20px;border-left:3px solid ${brand.accent};background:${brand.background};border-radius:8px;margin-bottom:24px">
       <div style="font-size:13px;color:${brand.muted};font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Your Subject</div>
       <div style="font-size:16px;font-weight:600;color:${brand.text}">${escapeHtml(data.subject)}</div>
+    </div>
+
+    <div style="padding:20px;border:1px solid ${brand.border};border-radius:8px;margin-bottom:24px">
+      <div style="font-size:13px;color:${brand.muted};font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Your Message</div>
+      <div style="color:${brand.text};font-size:15px;line-height:1.6">${escapeHtml(data.message).replace(/\n/g, '<br/>')}</div>
     </div>
 
     <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:${brand.text}">
@@ -160,7 +172,7 @@ function renderUserEmail(data: { name: string; subject: string }, brand: any) {
     </p>
 
     <a href="${brand.url}" style="display:inline-block;background:${brand.primary};color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px;box-shadow:0 2px 8px rgba(48,88,107,0.2)">Visit ${brand.name}</a>
-    
+
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid ${brand.border}">
       <p style="margin:0;font-size:13px;color:${brand.muted};line-height:1.5">
         <strong style="color:${brand.text}">Need immediate help?</strong><br/>
