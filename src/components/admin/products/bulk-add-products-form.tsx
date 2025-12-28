@@ -201,25 +201,85 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
+                                     <FormField
                                         control={form.control}
-                                        name={`products.${index}.category`}
+                                        name={`products.${index}.originalPrice`}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Category</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                                                    </SelectContent>
-                                                </Select>
+                                                <FormLabel>Original Price (Optional)</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" step="0.01" {...field} />
+                                                </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                 </div>
+                                <FormField
+                                    control={form.control}
+                                    name={`products.${index}.category`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Category</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                 <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name={`products.${index}.sizes`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Sizes (comma separated)</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="S, M, L, XL" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name={`products.${index}.colors`}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Colors (comma separated)</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Red, Blue, Green" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <FormField
+                                    control={form.control}
+                                    name={`products.${index}.isTrending`}
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel>
+                                                    Trending
+                                                </FormLabel>
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                         ))}
                     </div>
@@ -229,7 +289,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() => append({ name: "", slug: "", description: "", price: "", category: "" })}
+                        onClick={() => append({ name: "", slug: "", description: "", price: "", originalPrice: "", category: "", sizes: "", colors: "", isTrending: false })}
                     >
                         <Plus className="mr-2 h-4 w-4" />
                         Add Another Product
