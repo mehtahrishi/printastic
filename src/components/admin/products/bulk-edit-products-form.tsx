@@ -293,12 +293,12 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                             ];
 
                             return (
-                                <Collapsible key={field.id} defaultOpen className="p-4 border rounded-lg space-y-4">
+                                <Collapsible key={field.id} defaultOpen={false} className="p-4 border rounded-lg space-y-4">
                                     <div className="flex justify-between items-center">
                                         <CollapsibleTrigger asChild>
-                                            <div className="flex items-center gap-2 cursor-pointer">
+                                            <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
+                                                <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
                                                 <h3 className="font-semibold text-lg">{form.watch(`products.${index}.name`)}</h3>
-                                                <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
                                             </div>
                                         </CollapsibleTrigger>
                                         <Button
