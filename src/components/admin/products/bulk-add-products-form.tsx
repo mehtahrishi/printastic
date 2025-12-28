@@ -23,7 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { createBulkProducts } from "@/app/actions/products";
+import { createBulkProducts } from "@/actions/products";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Trash2 } from "lucide-react";
@@ -243,4 +243,3 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
         </Form>
     );
 }
-
