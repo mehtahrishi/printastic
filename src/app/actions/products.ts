@@ -280,34 +280,34 @@ export async function deleteProduct(productId: number) {
     }
 }
 
-// Helper to detect if slug has a color word
+// Helper to detect if slug has a color word AT THE END
 function isColorVariant(slug: string): boolean {
     const commonColors = ['black', 'white', 'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'grey', 'gray', 'brown', 'navy', 'maroon', 'olive', 'cyan', 'magenta', 'lime', 'teal', 'violet', 'indigo', 'beige', 'cream', 'tan', 'ivory', 'gold', 'silver', 'bronze', 'copper', 'khaki', 'mint', 'peach', 'coral', 'salmon', 'burgundy', 'crimson', 'scarlet', 'turquoise', 'aqua', 'lavender', 'lilac', 'rose', 'ruby', 'emerald', 'jade', 'amber', 'charcoal', 'slate'];
     const slugLower = slug.toLowerCase();
-    // Check if slug contains any color word (as a separate word with hyphens)
+    // Check if slug ENDS with a color word (with hyphen before it)
     return commonColors.some(color => {
-        const regex = new RegExp(`(^|-)${color}(-|$)`);
+        const regex = new RegExp(`-${color}$`);
         return regex.test(slugLower);
     });
 }
 
-// Extract base slug by removing color word
+// Extract base slug by removing color word from the END
 function getBaseSlug(slug: string): string {
     const commonColors = ['black', 'white', 'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'grey', 'gray', 'brown', 'navy', 'maroon', 'olive', 'cyan', 'magenta', 'lime', 'teal', 'violet', 'indigo', 'beige', 'cream', 'tan', 'ivory', 'gold', 'silver', 'bronze', 'copper', 'khaki', 'mint', 'peach', 'coral', 'salmon', 'burgundy', 'crimson', 'scarlet', 'turquoise', 'aqua', 'lavender', 'lilac', 'rose', 'ruby', 'emerald', 'jade', 'amber', 'charcoal', 'slate'];
     const slugLower = slug.toLowerCase();
     
     for (const color of commonColors) {
-        // Match color as a separate word (with hyphens around it)
-        const regex = new RegExp(`-${color}(?=-|$)`, 'i');
+        // Match color only at the end of slug
+        const regex = new RegExp(`-${color}$`, 'i');
         if (regex.test(slugLower)) {
-            console.log('[getBaseSlug] Found color:', color, 'in slug:', slug);
-            // Remove the color word and clean up
-            const result = slug.replace(regex, '').replace(/--+/g, '-');
+            console.log('[getBaseSlug] Found color at end:', color, 'in slug:', slug);
+            // Remove the color word from the end
+            const result = slug.replace(regex, '');
             console.log('[getBaseSlug] Result after removal:', result);
             return result;
         }
     }
-    console.log('[getBaseSlug] No color found in slug:', slug);
+    console.log('[getBaseSlug] No color found at end of slug:', slug);
     return slug;
 }
 
