@@ -122,6 +122,48 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
     };
 
     function onSubmit(data: FormValues) {
+        // Validate all products before starting upload
+        const validationErrors: string[] = [];
+        
+        data.products.forEach((product, index) => {
+            const productNum = index + 1;
+            
+            // Check required fields
+            if (!product.name?.trim()) {
+                validationErrors.push(`Product ${productNum}: Name is required`);
+            }
+            if (!product.slug?.trim()) {
+                validationErrors.push(`Product ${productNum}: Slug is required`);
+            }
+            if (!product.description?.trim()) {
+                validationErrors.push(`Product ${productNum}: Description should not be blank`);
+            }
+            if (!product.price?.trim()) {
+                validationErrors.push(`Product ${productNum}: Price is required`);
+            }
+            if (!product.category?.trim()) {
+                validationErrors.push(`Product ${productNum}: Category is required`);
+            }
+            
+            // Check for images
+            if (!imagePreviews[index] || imagePreviews[index].length === 0) {
+                validationErrors.push(`Product ${productNum}: At least one image is required`);
+            }
+        });
+        
+        // If there are validation errors, show them and stop
+        if (validationErrors.length > 0) {
+            validationErrors.forEach(error => {
+                toast({
+                    variant: "destructive",
+                    title: "Validation Error",
+                    description: error,
+                    duration: 5000
+                });
+            });
+            return;
+        }
+        
         startTransition(async () => {
             const totalProducts = data.products.length;
             setUploadProgress({ current: 0, total: totalProducts });
