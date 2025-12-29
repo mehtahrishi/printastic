@@ -36,18 +36,18 @@ const KidsTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
 );
 
 const RegularTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
-  <svg 
+  <svg
     {...props}
     fill="white"
     stroke="currentColor"
     strokeWidth="1.5"
-    width="24" 
-    height="24" 
-    version="1.1" 
-    id="Icons" 
-    xmlns="http://www.w3.org/2000/svg" 
-    xmlnsXlink="http://www.w3.org/1999/xlink" 
-    viewBox="0 0 32 32" 
+    width="24"
+    height="24"
+    version="1.1"
+    id="Icons"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
+    viewBox="0 0 32 32"
     xmlSpace="preserve">
     <path d="M29.7,10.3l-3.7-3.7c-1.7-1.7-4-2.6-6.4-2.6h-0.2c-0.4,0-0.7,0.2-0.9,0.5C18,5.4,17.1,6,16,6s-2-0.6-2.6-1.5
       C13.2,4.2,12.9,4,12.6,4h-0.2C9.9,4,7.6,4.9,5.9,6.6l-3.7,3.7c-0.4,0.4-0.4,0.9-0.1,1.3l4,5C6.4,16.8,6.7,17,6.9,17
@@ -57,19 +57,19 @@ const RegularTShirtIcon = (props: SVGProps<SVGSVGElement>) => (
 );
 
 const HoodieIcon = (props: SVGProps<SVGSVGElement>) => (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 304.43 304.43"
-      fill="white"
-      stroke="currentColor"
-      strokeWidth="8"
-    >
-      <path d="M176.2,218.497h-47.971c-0.603,9.548-3.716,20.083-8.962,29.98c-2.266,4.273-4.859,8.296-7.69,11.963h81.275
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 304.43 304.43"
+    fill="white"
+    stroke="currentColor"
+    strokeWidth="8"
+  >
+    <path d="M176.2,218.497h-47.971c-0.603,9.548-3.716,20.083-8.962,29.98c-2.266,4.273-4.859,8.296-7.69,11.963h81.275
         c-2.831-3.667-5.425-7.69-7.691-11.963C179.916,238.581,176.804,228.046,176.2,218.497z"/>
-      <path d="M302.819,183.478l-84.082-85.638c-4.173-4.25-9.878-6.644-15.834-6.644h-14.341c7.845-15.915,12.623-33.403,12.623-43.027
+    <path d="M302.819,183.478l-84.082-85.638c-4.173-4.25-9.878-6.644-15.834-6.644h-14.341c7.845-15.915,12.623-33.403,12.623-43.027
         c0-20.619-21.925-42.333-48.971-42.333s-48.971,21.715-48.971,42.333c0,9.492,4.65,26.634,12.304,42.372v0.655h-14.022
         c-5.956,0-11.662,2.394-15.834,6.644L1.61,183.478c-2.045,2.083-2.155,5.385-0.254,7.6l17.576,20.47
         c1.96,2.282,5.369,2.617,7.735,0.76l53.12-41.687L63.928,286.117c-0.432,3.144,0.518,6.321,2.603,8.712
@@ -81,7 +81,7 @@ const HoodieIcon = (props: SVGProps<SVGSVGElement>) => (
         c-0.225-2.115,0.459-4.227,1.881-5.809c1.423-1.582,3.45-2.485,5.577-2.485h63.178c2.127,0,4.154,0.903,5.577,2.485
         c1.422,1.582,2.105,3.693,1.881,5.809c-0.898,8.431,1.776,19.518,7.153,29.661c0,0,0,0,0.001,0c4.553,8.589,10.59,15.824,17,20.371
         C218.079,263.713,219.214,267.108,218.222,270.218z"/>
-    </svg>
+  </svg>
 );
 
 const categories = [
@@ -104,16 +104,17 @@ export function CategoryIcons({ onCategorySelect, selectedCategory }: CategoryIc
           {categories.map((category) => (
             <button
               key={category.name}
+              onClick={() => onCategorySelect(category.value)}
               onMouseEnter={() => onCategorySelect(category.value)}
-              className={`group flex flex-col items-center relative cursor-pointer transition-all duration-300 ${
-                selectedCategory === category.value 
-                  ? 'scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]' 
-                  : 'scale-100'
-              }`}
+              aria-label={category.name}
+              className={`p-2 group flex flex-col items-center relative cursor-pointer transition-all duration-300 ${selectedCategory === category.value
+                ? 'scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]'
+                : 'scale-100'
+                }`}
             >
               <div className="flex items-center gap-2">
-                <category.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                <span className="text-xs font-medium text-foreground/80">
+                <category.icon className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                <span className="hidden md:block text-xs font-medium text-foreground/80">
                   {category.name}
                 </span>
               </div>

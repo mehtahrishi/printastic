@@ -9,6 +9,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
 
 interface Product {
@@ -41,12 +43,6 @@ export function ProductCarousel({ trendingProducts = [] }: ProductCarouselProps)
     Autoplay({ delay: 3000, stopOnInteraction: false })
   );
 
-  // Group products into slides of 3
-  const slides = [];
-  for (let i = 0; i < trendingProducts.length; i += 3) {
-    slides.push(trendingProducts.slice(i, i + 3));
-  }
-
   if (trendingProducts.length === 0) {
     return (
       <div className="text-center py-12">
@@ -58,45 +54,42 @@ export function ProductCarousel({ trendingProducts = [] }: ProductCarouselProps)
   return (
     <Carousel
       opts={{
-        align: "center",
+        align: "start",
         loop: true,
       }}
       plugins={[plugin.current]}
       className="w-full"
     >
       <CarouselContent>
-        {slides.map((slideProducts, slideIndex) => (
-          <CarouselItem key={slideIndex}>
-            <div className="grid grid-cols-3 gap-4">
-              {slideProducts.map((product, index) => {
-                const imageUrl = getFirstImage(product.images);
-                return (
-                  <Link 
-                    key={product.id} 
-                    href={`/products/${product.slug}`}
-                    className="relative w-full aspect-square group"
-                  >
-                    {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={product.name}
-                        fill
-                        priority={slideIndex === 0 && index === 0}
-                        className="object-contain transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground">
-                        No Image
-                      </div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </CarouselItem>
-        ))}
+        {trendingProducts.map((product, index) => {
+          const imageUrl = getFirstImage(product.images);
+          return (
+            <CarouselItem key={product.id} className="md:basis-1/3">
+              <Link
+                href={`/products/${product.slug}`}
+                className="relative block w-full aspect-square group"
+              >
+                {imageUrl ? (
+                  <Image
+                    src={imageUrl}
+                    alt={product.name}
+                    fill
+                    priority={index < 3} // Prioritize first visual set
+                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground">
+                    No Image
+                  </div>
+                )}
+              </Link>
+            </CarouselItem>
+          );
+        })}
       </CarouselContent>
+      <CarouselPrevious className="hidden md:flex" />
+      <CarouselNext className="hidden md:flex" />
     </Carousel>
   );
 }
