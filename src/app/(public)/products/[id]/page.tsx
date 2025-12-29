@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { getProduct, getProductPreviews, getProducts, getColorVariants } from "@/app/actions/products";
 import { ProductDetailClient } from "@/components/products/product-detail-client";
 import { ColorVariantsSection } from "@/components/products/color-variants";
+import { ProductReviews } from "@/components/products/product-reviews";
+import { RelatedProducts } from "@/components/products/related-products";
+import { getProductReviews, getProductRatingStats, getUserReviewForProduct } from "@/actions/reviews";
+import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -93,6 +97,11 @@ export default async function ProductDetailPage({
   const userId = cookieStore.get("auth_session")?.value;
   const user = userId ? await db.select({ name: users.name }).from(users).where(eq(users.id, parseInt(userId))).then(res => res[0] || null) : null;
 
+  // Fetch reviews
+  const reviews = await getProductReviews(product.id as number);
+  const ratingStats = await getProductRatingStats(product.id as number);
+  const userReview = userId ? await getUserReviewForProduct(product.id as number) : null;
+
   return (
     <div className="container py-8 md:py-12">
       <Breadcrumb className="mb-8">
@@ -117,7 +126,29 @@ export default async function ProductDetailPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <ProductDetailClient product={formattedProduct} relatedProducts={relatedProducts} user={user} />
+      <ProductDetailClient 
+        product={formattedProduct} 
+        relatedProducts={[]}
+        user={user}
+        averageRating={ratingStats.avgRating}
+        totalReviews={ratingStats.totalReviews}
+      />
+      
+      <ProductReviews
+        productId={product.id as number}
+        reviews={reviews}
+        user={user}
+        averageRating={ratingStats.avgRating}
+        totalReviews={ratingStats.totalReviews}
+        userReview={userReview}
+      />
+
+      {relatedProducts.length > 0 && (
+        <div className="mt-12 md:mt-16">
+          <Separator className="mb-8" />
+          <RelatedProducts products={relatedProducts} user={user} />
+        </div>
+      )}
       
       <ColorVariantsSection variants={colorVariants} />
     </div>

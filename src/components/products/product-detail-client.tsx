@@ -29,9 +29,11 @@ interface ProductDetailClientProps {
     product: any;
     relatedProducts: Product[];
     user?: { name: string | null } | null;
+    averageRating: number;
+    totalReviews: number;
 }
 
-export function ProductDetailClient({ product, relatedProducts, user }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, relatedProducts, user, averageRating, totalReviews }: ProductDetailClientProps) {
     const [isWishlistPending, startWishlistTransition] = useTransition();
 
     const { addToCart, isUpdating: isCartPending } = useCart();
@@ -127,15 +129,31 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                             {product.name}
                         </h1>
 
-                        {/* Rating placeholder */}
-                        <div className="flex items-center gap-2 mt-2">
-                            <div className="flex items-center">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
-                                ))}
+                        {/* Rating */}
+                        {totalReviews > 0 ? (
+                            <div className="flex items-center gap-2 mt-2">
+                                <div className="flex items-center">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star 
+                                            key={star} 
+                                            className={cn(
+                                                "w-3.5 h-3.5",
+                                                star <= Math.round(averageRating)
+                                                    ? "fill-yellow-400 text-yellow-400"
+                                                    : "fill-gray-300 text-gray-300"
+                                            )}
+                                        />
+                                    ))}
+                                </div>
+                                <span className="text-xs text-muted-foreground">
+                                    ({averageRating.toFixed(1)} · {totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
+                                </span>
                             </div>
-                            <span className="text-xs text-muted-foreground">(4.8 · 127 reviews)</span>
-                        </div>
+                        ) : (
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="text-xs text-muted-foreground">No reviews yet</span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Price */}
@@ -341,13 +359,6 @@ export function ProductDetailClient({ product, relatedProducts, user }: ProductD
                     <ProductInfoCards />
                 </div>
             </div>
-
-            {relatedProducts.length > 0 && (
-                <div className="mt-12 md:mt-16">
-                    <Separator className="mb-8" />
-                    <RelatedProducts products={relatedProducts} user={user} />
-                </div>
-            )}
         </>
     );
 }

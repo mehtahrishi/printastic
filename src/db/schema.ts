@@ -95,3 +95,13 @@ export const passwordResetTokens = mysqlTable("password_reset_tokens", {
     token: varchar("token", { length: 255 }).notNull().unique(),
     expiresAt: timestamp("expires_at").notNull(),
 });
+
+export const reviews = mysqlTable("reviews", {
+    id: int("id").autoincrement().primaryKey(),
+    productId: int("product_id").notNull().references(() => products.id, { onDelete: 'cascade' }),
+    userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+    rating: int("rating").notNull(), // 1-5 stars
+    review: text("review").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
