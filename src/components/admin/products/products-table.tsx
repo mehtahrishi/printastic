@@ -114,7 +114,7 @@ function ProductRow({ product }: { product: Product }) {
                 return Array.isArray(parsed) ? parsed[0] : null;
             } catch {
                 // If not JSON, might be comma-separated
-                const split = product.images.split(',').map(s => s.trim()).filter(s => s);
+                const split = (product.images as string).split(',').map((s: string) => s.trim()).filter((s: string) => s);
                 return split[0] || null;
             }
         }
@@ -160,7 +160,7 @@ function ProductRow({ product }: { product: Product }) {
                             <Pencil className="h-4 w-4" />
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
+                    <DialogContent className="sm:max-w-[500px]" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
                         <DialogHeader>
                             <DialogTitle>Edit Product</DialogTitle>
                             <DialogDescription>

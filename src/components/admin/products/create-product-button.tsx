@@ -24,7 +24,7 @@ export function CreateProductButton() {
                     Add Product
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px]" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Add New Product</DialogTitle>
                     <DialogDescription>

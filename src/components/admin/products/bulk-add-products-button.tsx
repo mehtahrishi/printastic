@@ -26,7 +26,7 @@ export function BulkAddProductsButton() {
                     Bulk Add
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+            <DialogContent className="sm:max-w-4xl max-h-[90vh]" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>Bulk Add Products</DialogTitle>
                     <DialogDescription>
