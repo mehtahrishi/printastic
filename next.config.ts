@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb', // Increased from default 1mb to 10mb for image uploads
+      bodySizeLimit: '50mb', // Increased to 50mb for bulk product uploads with multiple images
     },
   },
 };
