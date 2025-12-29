@@ -65,6 +65,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
     const [imagePreviews, setImagePreviews] = useState<Record<number, File[]>>({});
+    const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(bulkFormSchema),
@@ -122,15 +123,28 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
 
     function onSubmit(data: FormValues) {
         startTransition(async () => {
-            const formData = new FormData();
+            const totalProducts = data.products.length;
+            setUploadProgress({ current: 0, total: totalProducts });
             
-            data.products.forEach((product, index) => {
+            let successCount = 0;
+            let failCount = 0;
+            
+            // Upload products one at a time
+            for (let index = 0; index < data.products.length; index++) {
+                const product = data.products[index];
+                
+                // Update progress
+                setUploadProgress({ current: index + 1, total: totalProducts });
+                
+                // Create FormData for single product
+                const formData = new FormData();
+                
                 Object.entries(product).forEach(([key, value]) => {
                     if (value !== undefined && value !== null) {
-                         if (typeof value === "boolean") {
-                            if (value) formData.append(`products[${index}].${key}`, "on");
+                        if (typeof value === "boolean") {
+                            if (value) formData.append(`products[0].${key}`, "on");
                         } else {
-                            formData.append(`products[${index}].${key}`, value.toString());
+                            formData.append(`products[0].${key}`, value.toString());
                         }
                     }
                 });
@@ -138,20 +152,72 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                 // Append images for the current product
                 if (imagePreviews[index]) {
                     imagePreviews[index].forEach(file => {
-                        formData.append(`productImages[${index}]`, file);
+                        formData.append(`productImages[0]`, file);
                     });
                 }
-            });
 
-            const result = await createBulkProducts(null, formData);
-
-            if (result.success) {
-                toast({ title: "Success", description: result.message });
+                // Upload single product
+                try {
+                    const result = await createBulkProducts(null, formData);
+                    
+                    if (result.success) {
+                        successCount++;
+                        toast({ 
+                            title: "✓ Product Uploaded", 
+                            description: `${product.name} (${index + 1}/${totalProducts})`,
+                            duration: 2000
+                        });
+                    } else {
+                        failCount++;
+                        toast({ 
+                            variant: "destructive", 
+                            title: "Failed", 
+                            description: `${product.name}: ${result.error || "Upload failed"}`,
+                            duration: 3000
+                        });
+                    }
+                } catch (error) {
+                    failCount++;
+                    toast({ 
+                        variant: "destructive", 
+                        title: "Error", 
+                        description: `${product.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+                        duration: 3000
+                    });
+                }
+                
+                // Wait 2 seconds before next upload (except for last product)
+                if (index < data.products.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+            
+            // Show final summary
+            setUploadProgress(null);
+            
+            if (failCount === 0) {
+                toast({ 
+                    title: "All Products Uploaded Successfully!", 
+                    description: `${successCount} products added to your store.`,
+                    duration: 5000
+                });
                 form.reset();
                 setImagePreviews({});
                 onSuccess?.();
+            } else if (successCount > 0) {
+                toast({ 
+                    title: "Partial Upload Complete", 
+                    description: `${successCount} succeeded, ${failCount} failed. Please check and retry failed products.`,
+                    variant: "default",
+                    duration: 5000
+                });
             } else {
-                toast({ variant: "destructive", title: "Error", description: result.error || "Something went wrong" });
+                toast({ 
+                    variant: "destructive",
+                    title: "Upload Failed", 
+                    description: "All products failed to upload. Please check your connection and try again.",
+                    duration: 5000
+                });
             }
         });
     }
@@ -274,15 +340,22 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                             }
                             append({ name: "", slug: "", description: "", price: "", originalPrice: "", category: "", sizes: "", colors: "", isTrending: false });
                         }}
-                        disabled={fields.length >= 10}
+                        disabled={fields.length >= 10 || isPending}
                     >
                         <Plus className="mr-2 h-4 w-4" />
                         Add Another Product {fields.length >= 10 ? "(Max 10)" : `(${fields.length}/10)`}
                     </Button>
-                    <Button type="submit" disabled={isPending}>
-                        {isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                        {isPending ? "Saving..." : "Save All Products"}
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        {uploadProgress && (
+                            <div className="text-sm text-muted-foreground">
+                                Uploading {uploadProgress.current} of {uploadProgress.total}...
+                            </div>
+                        )}
+                        <Button type="submit" disabled={isPending}>
+                            {isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                            {isPending ? (uploadProgress ? `Uploading ${uploadProgress.current}/${uploadProgress.total}` : "Saving...") : "Save All Products"}
+                        </Button>
+                    </div>
                 </div>
             </form>
         </Form>
