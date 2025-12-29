@@ -135,7 +135,7 @@ export function ProductReviews({
                                     className={cn(
                                         "w-5 h-5",
                                         star <= Math.round(averageRating)
-                                            ? "fill-yellow-400 text-yellow-400"
+                                            ? "fill-primary text-primary"
                                             : "fill-gray-300 text-gray-300"
                                     )}
                                 />
@@ -164,8 +164,8 @@ export function ProductReviews({
                                         className={cn(
                                             "w-8 h-8 cursor-pointer transition-all hover:scale-110",
                                             star <= rating
-                                                ? "fill-yellow-400 text-yellow-400"
-                                                : "fill-gray-300 text-gray-300 hover:fill-yellow-200 hover:text-yellow-200"
+                                                ? "fill-primary text-primary"
+                                                : "fill-gray-300 text-gray-300 hover:fill-primary/50 hover:text-primary/50"
                                         )}
                                         onClick={() => setRating(star)}
                                     />
@@ -215,7 +215,7 @@ export function ProductReviews({
                                     className={cn(
                                         "w-5 h-5",
                                         star <= initialUserReview.rating
-                                            ? "fill-yellow-400 text-yellow-400"
+                                            ? "fill-primary text-primary"
                                             : "fill-gray-300 text-gray-300"
                                     )}
                                 />
@@ -266,7 +266,7 @@ export function ProductReviews({
                                                             className={cn(
                                                                 "h-3.5 w-3.5",
                                                                 i < review.rating
-                                                                    ? "fill-yellow-400 text-yellow-400"
+                                                                    ? "fill-primary text-primary"
                                                                     : "fill-gray-300 text-gray-300"
                                                             )}
                                                         />

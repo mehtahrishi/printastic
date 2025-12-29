@@ -139,7 +139,7 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                                             className={cn(
                                                 "w-3.5 h-3.5",
                                                 star <= Math.round(averageRating)
-                                                    ? "fill-yellow-400 text-yellow-400"
+                                                    ? "fill-primary text-primary"
                                                     : "fill-gray-300 text-gray-300"
                                             )}
                                         />
