@@ -30,7 +30,7 @@ import Image from "next/image";
 
 interface Review {
     id: number;
-    rating: number;
+    rating: number | null;
     review: string;
     status: string;
     createdAt: Date | null;
@@ -177,7 +177,7 @@ export function ReviewsClient({ initialReviews }: ReviewsClientProps) {
                                                                     key={i}
                                                                     className={cn(
                                                                         "h-3 w-3",
-                                                                        i < review.rating ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"
+                                                                        i < (review.rating || 0) ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"
                                                                     )}
                                                                 />
                                                             ))}

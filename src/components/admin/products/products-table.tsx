@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, ExternalLink } from "lucide-react";
+import Link from 'next/link';
 import { deleteProduct } from "@/app/actions/products";
 import { useState, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -101,12 +102,12 @@ function ProductRow({ product }: { product: Product }) {
     // Parse images if it's a string
     const getImageUrl = (product: Product) => {
         if (!product.images) return null;
-        
+
         // If already an array, use first element
         if (Array.isArray(product.images)) {
             return product.images[0] || null;
         }
-        
+
         // If string, try to parse as JSON
         if (typeof product.images === 'string') {
             try {
@@ -118,7 +119,7 @@ function ProductRow({ product }: { product: Product }) {
                 return split[0] || null;
             }
         }
-        
+
         return null;
     };
 
@@ -154,6 +155,12 @@ function ProductRow({ product }: { product: Product }) {
                 <Checkbox checked={product.isTrending} disabled aria-label="Trending" />
             </TableCell>
             <TableCell className="text-right flex items-center justify-end gap-2">
+                <Button variant="ghost" size="icon" asChild title="View Product">
+                    <Link href={`/products/${product.slug}`} target="_blank">
+                        <ExternalLink className="h-4 w-4" />
+                    </Link>
+                </Button>
+
                 <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
                     <DialogTrigger asChild>
                         <Button variant="ghost" size="icon">

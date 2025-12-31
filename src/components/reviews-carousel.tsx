@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface Review {
   name: string;
-  rating: number;
+  rating: number | null;
   review: string;
   date: string;
 }
@@ -106,23 +106,28 @@ export function ReviewsCarousel({ initialReviews = [] }: ReviewsCarouselProps) {
                     <div className="flex-1">
                       <h3 className="font-semibold text-base text-foreground">{review.name}</h3>
                       <div className="flex items-center gap-1 mt-1">
-                        {Array.from({ length: 5 }).map((_, i) => (
+                        {review.rating ? Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
                             className={cn(
                               "h-3.5 w-3.5",
-                              i < review.rating
+                              i < (review.rating || 0)
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "fill-gray-300 text-gray-300"
                             )}
                           />
-                        ))}
+                        )) : (
+                          <span className="text-xs text-muted-foreground italic">No rating</span>
+                        )}
                         <span className="text-xs text-muted-foreground ml-2">{review.date}</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-foreground/80 leading-relaxed">
-                    "{review.review}"
+                  <p className={cn(
+                    "text-sm leading-relaxed",
+                    review.review ? "text-foreground/80" : "text-muted-foreground italic"
+                  )}>
+                    "{review.review || "No written review"}"
                   </p>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { Star, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Star, Loader2, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { addReview } from "@/actions/reviews";
@@ -16,7 +16,7 @@ import {
 
 interface Review {
     id: number;
-    rating: number;
+    rating: number | null;
     review: string;
     userName: string | null;
     createdAt: Date | null;
@@ -24,7 +24,7 @@ interface Review {
 
 interface UserReview {
     id: number;
-    rating: number;
+    rating: number | null;
     review: string;
 }
 
@@ -45,7 +45,8 @@ export function ProductReviews({
     totalReviews,
     userReview: initialUserReview
 }: ProductReviewsProps) {
-    const [rating, setRating] = useState(5);
+    const [rating, setRating] = useState<number | null>(null);
+    const [hoverRating, setHoverRating] = useState<number | null>(null);
     const [reviewText, setReviewText] = useState("");
     const [isPending, startTransition] = useTransition();
     const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
@@ -97,10 +98,11 @@ export function ProductReviews({
             return;
         }
 
-        if (reviewText.trim().length < 10) {
+        // Modified validation: Allow if rating exists OR text exists (with basic length check if mostly text)
+        if (!rating && reviewText.trim().length < 5) {
             toast({
-                title: "Review too short",
-                description: "Please write at least 10 characters",
+                title: "Invalid review",
+                description: "Please provide a star rating or write a review (at least 5 chars).",
                 variant: "destructive"
             });
             return;
@@ -115,7 +117,7 @@ export function ProductReviews({
                     description: "Your review is pending approval."
                 });
                 setReviewText("");
-                setRating(5);
+                setRating(null);
                 router.refresh();
             } else {
                 toast({
@@ -171,26 +173,37 @@ export function ProductReviews({
                             </div>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
-                            <div className="px-6 pb-6 space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Rating</label>
-                                    <div className="flex gap-1">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                                key={star}
+                            <div className="px-6 pb-6 space-y-6">
+                                <div className="space-y-3">
+                                    <label className="text-sm font-medium">Rating (Optional)</label>
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        {[1, 2, 3, 4, 5].map((starCount) => (
+                                            <div
+                                                key={starCount}
                                                 className={cn(
-                                                    "w-8 h-8 cursor-pointer transition-all hover:scale-110",
-                                                    star <= rating
-                                                        ? "fill-primary text-primary"
-                                                        : "fill-gray-300 text-gray-300 hover:fill-primary/50 hover:text-primary/50"
+                                                    "flex items-center gap-0.5 px-3 py-2 rounded-md cursor-pointer transition-all border",
+                                                    rating === starCount
+                                                        ? "border-primary bg-primary/5 shadow-sm"
+                                                        : "border-transparent hover:bg-muted/50 bg-muted/20"
                                                 )}
-                                                onClick={() => setRating(star)}
-                                            />
+                                                onClick={() => setRating(rating === starCount ? null : starCount)}
+                                            >
+                                                {Array.from({ length: starCount }).map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        className="w-4 h-4 fill-primary text-primary"
+                                                    />
+                                                ))}
+                                            </div>
                                         ))}
                                     </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Select rating: 1 to 5 stars.
+                                    </p>
                                 </div>
+
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Your Review</label>
+                                    <label className="text-sm font-medium">Your Review (Optional if rated)</label>
                                     <Textarea
                                         placeholder="Share your experience with this product..."
                                         value={reviewText}
@@ -199,12 +212,12 @@ export function ProductReviews({
                                         className="resize-none"
                                     />
                                     <p className="text-xs text-muted-foreground">
-                                        Minimum 10 characters ({reviewText.length}/10)
+                                        Minimum 5 characters if submitting text.
                                     </p>
                                 </div>
                                 <Button
                                     onClick={handleSubmit}
-                                    disabled={isPending || reviewText.trim().length < 10}
+                                    disabled={isPending || (!rating && reviewText.trim().length < 5)}
                                     className="min-w-[120px]"
                                 >
                                     {isPending ? (
@@ -221,8 +234,6 @@ export function ProductReviews({
                     </Collapsible>
                 </div>
             )}
-
-
 
             {/* Reviews Carousel */}
             {reviews.length > 0 && (
@@ -243,7 +254,7 @@ export function ProductReviews({
                                     key={`${review.id}-${index}`}
                                     className="w-full md:w-1/3 flex-shrink-0 px-3 pb-4"
                                 >
-                                    <div className="bg-card rounded-lg shadow-lg p-6 border border-border h-full">
+                                    <div className="bg-card rounded-lg shadow-lg p-6 border border-border h-full flex flex-col">
                                         <div className="flex items-center gap-3 mb-4">
                                             <div
                                                 className="text-primary text-2xl flex-shrink-0"
@@ -256,17 +267,19 @@ export function ProductReviews({
                                                     {review.userName || "Anonymous"}
                                                 </h3>
                                                 <div className="flex items-center gap-1 mt-1">
-                                                    {Array.from({ length: 5 }).map((_, i) => (
+                                                    {review.rating ? Array.from({ length: 5 }).map((_, i) => (
                                                         <Star
                                                             key={i}
                                                             className={cn(
                                                                 "h-3.5 w-3.5",
-                                                                i < review.rating
+                                                                i < (review.rating || 0)
                                                                     ? "fill-primary text-primary"
                                                                     : "fill-gray-300 text-gray-300"
                                                             )}
                                                         />
-                                                    ))}
+                                                    )) : (
+                                                        <span className="text-xs text-muted-foreground italic">No rating</span>
+                                                    )}
                                                     <span className="text-xs text-muted-foreground ml-2">
                                                         {review.createdAt ? new Date(review.createdAt).toLocaleDateString('en-US', {
                                                             year: 'numeric',
@@ -277,8 +290,8 @@ export function ProductReviews({
                                                 </div>
                                             </div>
                                         </div>
-                                        <p className="text-sm text-foreground/80 leading-relaxed">
-                                            "{review.review}"
+                                        <p className="text-sm text-foreground/80 leading-relaxed italic">
+                                            "{review.review || "No written review"}"
                                         </p>
                                     </div>
                                 </div>

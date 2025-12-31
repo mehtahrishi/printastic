@@ -5,7 +5,7 @@ import { reviews, users, products } from "@/db/schema";
 import { eq, desc, and, avg, count, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 
-export async function addReview(productId: number, rating: number, reviewText: string) {
+export async function addReview(productId: number, rating: number | null, reviewText: string) {
     const cookieStore = await cookies();
     const userId = cookieStore.get("auth_session")?.value;
 
@@ -13,19 +13,24 @@ export async function addReview(productId: number, rating: number, reviewText: s
         return { success: false, error: "Not authenticated" };
     }
 
-    if (rating < 1 || rating > 5) {
+    if (!rating && !reviewText.trim()) {
+        return { success: false, error: "Please provide a rating or a review" };
+    }
+
+    if (rating !== null && (rating < 1 || rating > 5)) {
         return { success: false, error: "Rating must be between 1 and 5" };
     }
 
-    if (reviewText.trim().length < 10) {
-        return { success: false, error: "Review must be at least 10 characters" };
+    // Review text length check only if text is provided
+    if (reviewText.trim().length > 0 && reviewText.trim().length < 5) {
+        return { success: false, error: "Review must be at least 5 characters" };
     }
 
     try {
         await db.insert(reviews).values({
             productId,
             userId: parseInt(userId),
-            rating,
+            rating: rating,
             review: reviewText,
             status: "PENDING",
         });
@@ -72,7 +77,8 @@ export async function getProductRatingStats(productId: number) {
             .from(reviews)
             .where(and(
                 eq(reviews.productId, productId),
-                eq(reviews.status, "APPROVED")
+                eq(reviews.status, "APPROVED"),
+                sql`${reviews.rating} IS NOT NULL`
             ));
 
         return {
@@ -112,7 +118,7 @@ export async function getUserReviewForProduct(productId: number) {
     }
 }
 
-export async function updateReview(reviewId: number, rating: number, reviewText: string) {
+export async function updateReview(reviewId: number, rating: number | null, reviewText: string) {
     const cookieStore = await cookies();
     const userId = cookieStore.get("auth_session")?.value;
 
@@ -120,19 +126,23 @@ export async function updateReview(reviewId: number, rating: number, reviewText:
         return { success: false, error: "Not authenticated" };
     }
 
-    if (rating < 1 || rating > 5) {
+    if (!rating && !reviewText.trim()) {
+        return { success: false, error: "Please provide a rating or a review" };
+    }
+
+    if (rating !== null && (rating < 1 || rating > 5)) {
         return { success: false, error: "Rating must be between 1 and 5" };
     }
 
-    if (reviewText.trim().length < 10) {
-        return { success: false, error: "Review must be at least 10 characters" };
+    if (reviewText.trim().length > 0 && reviewText.trim().length < 5) {
+        return { success: false, error: "Review must be at least 5 characters" };
     }
 
     try {
         await db
             .update(reviews)
             .set({
-                rating,
+                rating: rating,
                 review: reviewText,
                 updatedAt: new Date(),
             })

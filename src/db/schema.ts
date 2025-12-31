@@ -101,7 +101,7 @@ export const reviews = mysqlTable("reviews", {
     id: int("id").autoincrement().primaryKey(),
     productId: int("product_id").notNull().references(() => products.id, { onDelete: 'cascade' }),
     userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
-    rating: int("rating").notNull(), // 1-5 stars
+    rating: int("rating"), // 1-5 stars, nullable
     review: text("review").notNull(),
     status: varchar("status", { length: 20 }).default("PENDING").notNull(),
     createdAt: timestamp("created_at").defaultNow(),
