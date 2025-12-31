@@ -100,14 +100,14 @@ function renderPasswordResetEmail(resetLink: string, brand: any) {
 }
 
 const getBrandConfig = () => ({
-    name: process.env.BRAND_NAME || "Honesty Print House",
-    url: process.env.BRAND_URL || "https://honestyprinthouse.in/",
-    primary: "#0545A0",  // hsl(215, 100%, 34%) converted to hex
-    accent: "#FF6B35",   // hsl(19, 100%, 51%) converted to hex
-    background: "#F7F9FC", // hsl(215, 33%, 98%) converted to hex
-    text: "#1E3A5F",     // hsl(215, 40%, 15%) converted to hex
-    muted: "#64748B",    // hsl(215, 20%, 50%) converted to hex
-    border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
+  name: process.env.BRAND_NAME || "Honesty Print House",
+  url: process.env.BRAND_URL || "https://honestyprinthouse.in/",
+  primary: "#0545A0",  // hsl(215, 100%, 34%) converted to hex
+  accent: "#FF6B35",   // hsl(19, 100%, 51%) converted to hex
+  background: "#F7F9FC", // hsl(215, 33%, 98%) converted to hex
+  text: "#1E3A5F",     // hsl(215, 40%, 15%) converted to hex
+  muted: "#64748B",    // hsl(215, 20%, 50%) converted to hex
+  border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
 });
 
 function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
@@ -116,7 +116,7 @@ function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
       <td style="padding:12px 0;font-size:14px;color:${brand.text}">
         ${escapeHtml(item.productName)}
         <div style="font-size:12px;color:${brand.muted}">
-          Qty: ${item.quantity}
+          ${item.sku ? `SKU: ${escapeHtml(item.sku)} | ` : ''}Qty: ${item.quantity}
           ${item.size ? ` | Size: ${item.size}` : ''}
           ${item.color ? ` | Color: ${item.color}` : ''}
         </div>
@@ -190,60 +190,60 @@ function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
 }
 
 const getTransporter = () => {
-    const host = process.env.SMTP_HOST;
-    const port = Number(process.env.SMTP_PORT || 587);
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
 
-    if (!host || !user || !pass) {
-        console.error("SMTP not configured in environment variables.");
-        throw new Error("SMTP server is not configured.");
+  if (!host || !user || !pass) {
+    console.error("SMTP not configured in environment variables.");
+    throw new Error("SMTP server is not configured.");
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false
     }
-    
-    return nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
+  });
 }
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-    const transporter = getTransporter();
-    const brand = getBrandConfig();
-    const resetLink = `${brand.url}/reset-password?token=${token}`;
-    const htmlContent = renderPasswordResetEmail(resetLink, brand);
+  const transporter = getTransporter();
+  const brand = getBrandConfig();
+  const resetLink = `${brand.url}/reset-password?token=${token}`;
+  const htmlContent = renderPasswordResetEmail(resetLink, brand);
 
-    try {
-        await transporter.sendMail({
-            from: `"${brand.name} Support" <noreply@honestyprinthouse.in>`,
-            to: email,
-            subject: `Reset Your ${brand.name} Password`,
-            html: htmlContent,
-        });
-    } catch (error) {
-        console.error("Error sending password reset email:", error);
-        throw new Error("Could not send password reset email.");
-    }
+  try {
+    await transporter.sendMail({
+      from: `"${brand.name} Support" <noreply@honestyprinthouse.in>`,
+      to: email,
+      subject: `Reset Your ${brand.name} Password`,
+      html: htmlContent,
+    });
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    throw new Error("Could not send password reset email.");
+  }
 };
 
 export const sendOrderConfirmationEmail = async (order: any, user: any) => {
-    const transporter = getTransporter();
-    const brand = getBrandConfig();
-    const htmlContent = renderOrderConfirmationEmail(order, user, brand);
+  const transporter = getTransporter();
+  const brand = getBrandConfig();
+  const htmlContent = renderOrderConfirmationEmail(order, user, brand);
 
-    try {
-        await transporter.sendMail({
-            from: `"${brand.name}" <noreply@honestyprinthouse.in>`,
-            to: user.email,
-            subject: `Order Confirmation #${order.id} from ${brand.name}`,
-            html: htmlContent,
-        });
-    } catch (error) {
-        console.error("Error sending order confirmation email:", error);
-        throw new Error("Could not send order confirmation email.");
-    }
+  try {
+    await transporter.sendMail({
+      from: `"${brand.name}" <noreply@honestyprinthouse.in>`,
+      to: user.email,
+      subject: `Order Confirmation #${order.id} from ${brand.name}`,
+      html: htmlContent,
+    });
+  } catch (error) {
+    console.error("Error sending order confirmation email:", error);
+    throw new Error("Could not send order confirmation email.");
+  }
 };

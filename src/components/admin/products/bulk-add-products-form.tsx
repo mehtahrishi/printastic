@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm, useFieldArray } from "react-hook-form";
@@ -29,9 +28,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Trash2, ChevronDown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import Image from "next/image";
 
@@ -40,6 +39,7 @@ const CATEGORIES = ["Oversize T-Shirts", "Regular T-Shirts", "Kids T-Shirts", "H
 const productSchema = z.object({
     name: z.string().min(1, "Name is required"),
     slug: z.string().min(1, "Slug is required"),
+    sku: z.string().optional(),
     description: z.string().min(1, "Description is required"),
     price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
         message: "Price must be a positive number",
@@ -70,16 +70,17 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
     const form = useForm<FormValues>({
         resolver: zodResolver(bulkFormSchema),
         defaultValues: {
-            products: [{ 
-                name: "", 
-                slug: "", 
-                description: "", 
-                price: "", 
-                originalPrice: "", 
+            products: [{
+                name: "",
+                slug: "",
+                sku: "",
+                description: "",
+                price: "",
+                originalPrice: "",
                 category: "",
                 sizes: "",
                 colors: "",
-                isTrending: false 
+                isTrending: false
             }],
         },
     });
@@ -124,10 +125,10 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
     function onSubmit(data: FormValues) {
         // Validate all products before starting upload
         const validationErrors: string[] = [];
-        
+
         data.products.forEach((product, index) => {
             const productNum = index + 1;
-            
+
             // Check required fields
             if (!product.name?.trim()) {
                 validationErrors.push(`Product ${productNum}: Name is required`);
@@ -144,13 +145,13 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
             if (!product.category?.trim()) {
                 validationErrors.push(`Product ${productNum}: Category is required`);
             }
-            
+
             // Check for images
             if (!imagePreviews[index] || imagePreviews[index].length === 0) {
                 validationErrors.push(`Product ${productNum}: At least one image is required`);
             }
         });
-        
+
         // If there are validation errors, show them and stop
         if (validationErrors.length > 0) {
             validationErrors.forEach(error => {
@@ -163,24 +164,24 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
             });
             return;
         }
-        
+
         startTransition(async () => {
             const totalProducts = data.products.length;
             setUploadProgress({ current: 0, total: totalProducts });
-            
+
             let successCount = 0;
             let failCount = 0;
-            
+
             // Upload products one at a time
             for (let index = 0; index < data.products.length; index++) {
                 const product = data.products[index];
-                
+
                 // Update progress
                 setUploadProgress({ current: index + 1, total: totalProducts });
-                
+
                 // Create FormData for single product
                 const formData = new FormData();
-                
+
                 Object.entries(product).forEach(([key, value]) => {
                     if (value !== undefined && value !== null) {
                         if (typeof value === "boolean") {
@@ -201,45 +202,45 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                 // Upload single product
                 try {
                     const result = await createBulkProducts(null, formData);
-                    
+
                     if (result.success) {
                         successCount++;
-                        toast({ 
-                            title: "✓ Product Uploaded", 
+                        toast({
+                            title: "✓ Product Uploaded",
                             description: `${product.name} (${index + 1}/${totalProducts})`,
                             duration: 2000
                         });
                     } else {
                         failCount++;
-                        toast({ 
-                            variant: "destructive", 
-                            title: "Failed", 
+                        toast({
+                            variant: "destructive",
+                            title: "Failed",
                             description: `${product.name}: ${result.error || "Upload failed"}`,
                             duration: 3000
                         });
                     }
                 } catch (error) {
                     failCount++;
-                    toast({ 
-                        variant: "destructive", 
-                        title: "Error", 
+                    toast({
+                        variant: "destructive",
+                        title: "Error",
                         description: `${product.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
                         duration: 3000
                     });
                 }
-                
+
                 // Wait 2 seconds before next upload (except for last product)
                 if (index < data.products.length - 1) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
             }
-            
+
             // Show final summary
             setUploadProgress(null);
-            
+
             if (failCount === 0) {
-                toast({ 
-                    title: "All Products Uploaded Successfully!", 
+                toast({
+                    title: "All Products Uploaded Successfully!",
                     description: `${successCount} products added to your store.`,
                     duration: 5000
                 });
@@ -247,16 +248,16 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                 setImagePreviews({});
                 onSuccess?.();
             } else if (successCount > 0) {
-                toast({ 
-                    title: "Partial Upload Complete", 
+                toast({
+                    title: "Partial Upload Complete",
                     description: `${successCount} succeeded, ${failCount} failed. Please check and retry failed products.`,
                     variant: "default",
                     duration: 5000
                 });
             } else {
-                toast({ 
+                toast({
                     variant: "destructive",
-                    title: "Upload Failed", 
+                    title: "Upload Failed",
                     description: "All products failed to upload. Please check your connection and try again.",
                     duration: 5000
                 });
@@ -283,7 +284,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                             <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
                                         </div>
                                     </CollapsibleTrigger>
-                                     <Button
+                                    <Button
                                         type="button"
                                         variant="ghost"
                                         size="icon"
@@ -296,7 +297,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                 </div>
                                 <CollapsibleContent className="space-y-4">
                                     {/* All form fields go here */}
-                                     <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         <FormField name={`products.${index}.name`} render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Name</FormLabel>
@@ -311,6 +312,9 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                         <FormField name={`products.${index}.slug`} render={({ field }) => (
                                             <FormItem><FormLabel>Slug</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
+                                        <FormField name={`products.${index}.sku`} render={({ field }) => (
+                                            <FormItem><FormLabel>SKU</FormLabel><FormControl><Input placeholder="PROD-001" {...field} /></FormControl><FormMessage /></FormItem>
+                                        )} />
                                     </div>
                                     <FormField name={`products.${index}.description`} render={({ field }) => (
                                         <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
@@ -319,7 +323,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                         <FormField name={`products.${index}.price`} render={({ field }) => (
                                             <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
-                                         <FormField name={`products.${index}.originalPrice`} render={({ field }) => (
+                                        <FormField name={`products.${index}.originalPrice`} render={({ field }) => (
                                             <FormItem><FormLabel>Original Price (Optional)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                     </div>
@@ -333,7 +337,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                             <FormMessage />
                                         </FormItem>
                                     )} />
-                                     <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-4">
                                         <FormField name={`products.${index}.sizes`} render={({ field }) => (
                                             <FormItem><FormLabel>Sizes (comma separated)</FormLabel><FormControl><Input placeholder="S, M, L, XL" {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
@@ -341,7 +345,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                             <FormItem><FormLabel>Colors (comma separated)</FormLabel><FormControl><Input placeholder="Red, Blue, Green" {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                     </div>
-                                     <div className="space-y-2">
+                                    <div className="space-y-2">
                                         <FormLabel>Images</FormLabel>
                                         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                                             {(imagePreviews[index] || []).map((file, imgIndex) => (
@@ -366,11 +370,11 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                         ))}
                     </div>
                 </ScrollArea>
-                
+
                 <div className="flex justify-between items-center pt-4 border-t">
-                    <Button 
-                        type="button" 
-                        variant="outline" 
+                    <Button
+                        type="button"
+                        variant="outline"
                         onClick={() => {
                             if (fields.length >= 10) {
                                 toast({
@@ -380,7 +384,7 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                 });
                                 return;
                             }
-                            append({ name: "", slug: "", description: "", price: "", originalPrice: "", category: "", sizes: "", colors: "", isTrending: false });
+                            append({ name: "", slug: "", sku: "", description: "", price: "", originalPrice: "", category: "", sizes: "", colors: "", isTrending: false });
                         }}
                         disabled={fields.length >= 10 || isPending}
                     >

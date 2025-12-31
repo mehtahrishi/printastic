@@ -28,9 +28,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trash2, ChevronDown, UploadCloud, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import Image from "next/image";
 import type { Product } from "@/lib/types";
@@ -41,6 +41,7 @@ const productSchema = z.object({
     id: z.number(),
     name: z.string().min(1, "Name is required"),
     slug: z.string().min(1, "Slug is required"),
+    sku: z.string().optional(),
     description: z.string().min(1, "Description is required"),
     price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
         message: "Price must be a positive number",
@@ -125,10 +126,10 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
 
     const handleCategoryChange = (category: string) => {
         if (!category) return;
-        
+
         setSelectedCategory(category);
         const categoryProducts = allProducts.filter(p => p.category === category);
-        
+
         if (categoryProducts.length === 0) {
             toast({
                 variant: "destructive",
@@ -142,6 +143,7 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
             id: Number(p.id),
             name: p.name,
             slug: p.slug,
+            sku: p.sku || "",
             description: p.description,
             price: p.price?.toString() || "",
             originalPrice: p.originalPrice?.toString() || "",
@@ -221,9 +223,9 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
             }
 
             if (errorCount === 0) {
-                toast({ 
-                    title: "Success", 
-                    description: `${successCount} product(s) updated successfully` 
+                toast({
+                    title: "Success",
+                    description: `${successCount} product(s) updated successfully`
                 });
                 form.reset();
                 setNewImages({});
@@ -231,10 +233,10 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                 setShowSelection(true);
                 onSuccess?.();
             } else {
-                toast({ 
-                    variant: "destructive", 
-                    title: "Partial Success", 
-                    description: `${successCount} product(s) updated, ${errorCount} failed` 
+                toast({
+                    variant: "destructive",
+                    title: "Partial Success",
+                    description: `${successCount} product(s) updated, ${errorCount} failed`
                 });
             }
         });
@@ -249,7 +251,7 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                         Choose a category to edit all products within that category
                     </p>
                 </div>
-                
+
                 <div className="max-w-md mx-auto space-y-3">
                     <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                         <SelectTrigger className="h-12 text-base border-2 hover:border-primary transition-colors">
@@ -257,8 +259,8 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                         </SelectTrigger>
                         <SelectContent>
                             {CATEGORIES.map((cat) => (
-                                <SelectItem 
-                                    key={cat} 
+                                <SelectItem
+                                    key={cat}
                                     value={cat}
                                     className="text-base py-3 cursor-pointer"
                                 >
@@ -270,7 +272,7 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                             ))}
                         </SelectContent>
                     </Select>
-                    
+
                     <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
                         <p className="text-sm text-center text-muted-foreground">
                             💡 All products from the selected category will be loaded for bulk editing
@@ -313,7 +315,7 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                                         </Button>
                                     </div>
                                     <CollapsibleContent className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                             <FormField name={`products.${index}.name`} render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Name</FormLabel>
@@ -328,6 +330,15 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                                                     <FormLabel>Slug</FormLabel>
                                                     <FormControl>
                                                         <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                            <FormField name={`products.${index}.sku`} render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>SKU</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="PROD-001" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -431,7 +442,7 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                                                 ))}
                                             </div>
                                             <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 text-center hover:border-primary transition-colors">
-                                                <UploadCloud className="mx-auto h-8 w-8 text-muted-foreground mb-1"/>
+                                                <UploadCloud className="mx-auto h-8 w-8 text-muted-foreground mb-1" />
                                                 <p className="text-xs text-muted-foreground">Add more images</p>
                                                 <Input
                                                     type="file"
@@ -458,7 +469,7 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                         })}
                     </div>
                 </ScrollArea>
-                
+
                 <div className="flex justify-between items-center pt-4 border-t">
                     <Button type="button" variant="outline" onClick={() => {
                         setShowSelection(true);

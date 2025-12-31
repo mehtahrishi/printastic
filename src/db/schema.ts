@@ -27,6 +27,7 @@ export const products = mysqlTable("products", {
     sizes: json("sizes").$type<string[]>(),
     colors: json("colors").$type<string[]>(),
     images: json("images").$type<string[]>().notNull(),
+    sku: varchar("sku", { length: 255 }),
     isTrending: boolean("is_trending").default(false),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: datetime("updated_at"),

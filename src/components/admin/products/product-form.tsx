@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -29,13 +28,14 @@ import { createProduct, updateProduct } from "@/actions/products";
 import { useState, useTransition, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Product } from "@/lib/types";
-import { Loader2, Trash2, UploadCloud, X } from "lucide-react";
+import { Loader2, UploadCloud, X } from "lucide-react";
 
-const CATEGORIES = ["Oversize T-Shirts", "Regular T-Shirts", "Kids T-Shirts", "Hoodie",];
+const CATEGORIES = ["Oversize T-Shirts", "Regular T-Shirts", "Kids T-Shirts", "Hoodie"];
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     slug: z.string().min(1, "Slug is required"),
+    sku: z.string().optional(),
     description: z.string().min(1, "Description is required"),
     price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
         message: "Price must be a positive number",
@@ -68,11 +68,10 @@ const parseImages = (images: any): string[] => {
     return [];
 };
 
-
 export function ProductForm({ onSuccess, product }: ProductFormProps) {
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
-    
+
     // State for managing images for preview
     const [newImages, setNewImages] = useState<File[]>([]);
     const [existingImages, setExistingImages] = useState<string[]>(product ? parseImages(product.images) : []);
@@ -80,22 +79,18 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
     const formatJsonField = (value: any): string => {
         if (!value) return "";
         if (Array.isArray(value)) {
-            // If it's already an array, join it.
             return value.join(", ");
         }
         if (typeof value === 'string') {
             try {
-                // Try parsing it as JSON. It might be a string like '["S", "M"]'.
                 const parsed = JSON.parse(value);
                 if (Array.isArray(parsed)) {
                     return parsed.join(", ");
                 }
             } catch (e) {
-                // If parsing fails, it's probably already a comma-separated string.
                 return value;
             }
         }
-        // Fallback for other types, though it should usually be one of the above.
         return String(value);
     };
 
@@ -104,6 +99,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
         defaultValues: {
             name: product?.name || "",
             slug: product?.slug || "",
+            sku: product?.sku || "",
             description: product?.description || "",
             price: product?.price?.toString() || "",
             originalPrice: product?.originalPrice?.toString() || "",
@@ -140,7 +136,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
             setNewImages(prev => [...prev, ...newFileArray]);
         }
     };
-    
+
     const removeNewImage = (index: number) => {
         setNewImages(prev => prev.filter((_, i) => i !== index));
     };
@@ -151,10 +147,10 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 
     function onSubmit(data: FormValues) {
         console.log("[ProductForm] Form submitted with data:", data);
-        
+
         startTransition(async () => {
             const formData = new FormData();
-            
+
             Object.entries(data).forEach(([key, value]) => {
                 if (value !== undefined && value !== null && value !== "") {
                     if (typeof value === "boolean") {
@@ -174,7 +170,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
             formData.append("existingImages", existingImages.join(','));
 
             console.log("[ProductForm] Submitting FormData to server action...");
-            
+
             let result;
             if (product) {
                 result = await updateProduct(Number(product.id), null, formData);
@@ -204,13 +200,15 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
         });
     }
 
-    const allImages = [...existingImages.map(url => ({ type: 'url', value: url })), ...newImages.map(file => ({ type: 'file', value: file }))];
+    const allImages = [
+        ...existingImages.map(url => ({ type: 'url' as const, value: url })),
+        ...newImages.map(file => ({ type: 'file' as const, value: file }))
+    ];
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto px-1">
-                {/* ... other fields ... */}
-                 <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <FormField
                         control={form.control}
                         name="name"
@@ -232,6 +230,19 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                                 <FormLabel>Slug</FormLabel>
                                 <FormControl>
                                     <Input placeholder="product-slug" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="sku"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>SKU (Product Code)</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="PROD-001" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -282,7 +293,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                     />
                 </div>
 
-                 <FormField
+                <FormField
                     control={form.control}
                     name="category"
                     render={({ field }) => (
@@ -338,12 +349,12 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
 
                 <div className="space-y-4">
                     <FormLabel>Product Images (Upload up to 5)</FormLabel>
-                     {/* Image Preview Area */}
+                    {/* Image Preview Area */}
                     <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                         {allImages.map((img, index) => (
                             <div key={index} className="relative group aspect-square">
                                 <Image
-                                    src={img.type === 'url' ? img.value : URL.createObjectURL(img.value)}
+                                    src={img.type === 'url' ? img.value : URL.createObjectURL(img.value as File)}
                                     alt={`Preview ${index + 1}`}
                                     fill
                                     className="object-cover rounded-md border"
@@ -353,7 +364,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                                     variant="destructive"
                                     size="icon"
                                     className="absolute -top-2 -right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={() => img.type === 'url' ? removeExistingImage(existingImages.indexOf(img.value)) : removeNewImage(newImages.indexOf(img.value))}
+                                    onClick={() => img.type === 'url' ? removeExistingImage(existingImages.indexOf(img.value as string)) : removeNewImage(newImages.indexOf(img.value as File))}
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
@@ -363,8 +374,8 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                     </div>
 
                     <FormControl>
-                         <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
-                            <UploadCloud className="mx-auto h-10 w-10 text-muted-foreground mb-2"/>
+                        <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                            <UploadCloud className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
                             <p className="text-sm text-muted-foreground">Drag & drop or click to upload</p>
                             <Input
                                 type="file"

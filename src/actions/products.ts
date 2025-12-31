@@ -12,6 +12,7 @@ import cloudinary from "@/lib/cloudinary";
 const productSchema = z.object({
     name: z.string().min(1, "Name is required"),
     slug: z.string().min(1, "Slug is required"),
+    sku: z.string().optional(),
     description: z.string().min(1, "Description is required"),
     price: z.coerce.number().min(0, "Price must be positive"),
     originalPrice: z.coerce.number().optional(),
@@ -31,10 +32,10 @@ async function uploadToCloudinary(file: File) {
     try {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        
+
         return new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream(
-                { 
+                {
                     folder: process.env.CLOUDINARY_FOLDER || "INHOUSE",
                     resource_type: 'auto'
                 },
@@ -81,14 +82,14 @@ export async function createBulkProducts(prevState: any, formData: FormData) {
     }
 
     const productsToValidate = Object.values(productsData);
-    
+
     // Enforce 10 product limit
     if (productsToValidate.length > 10) {
         return {
             error: "Maximum 10 products allowed per bulk upload. Please reduce the number of products.",
         };
     }
-    
+
     const validatedFields = bulkProductSchema.safeParse({ products: productsToValidate });
 
     if (!validatedFields.success) {
@@ -107,19 +108,20 @@ export async function createBulkProducts(prevState: any, formData: FormData) {
             const uploadedImageUrls = await uploadMultipleToCloudinary(pImages);
 
             if (uploadedImageUrls.length === 0) {
-                 return { error: `Product "${p.name}" requires at least one image.` };
+                return { error: `Product "${p.name}" requires at least one image.` };
             }
-            
+
             productsToInsert.push({
                 name: p.name,
                 slug: p.slug,
+                sku: p.sku || null,
                 description: p.description,
                 price: p.price.toString(),
                 originalPrice: p.originalPrice?.toString(),
                 category: p.category,
                 sizes: p.sizes ? p.sizes.split(",").map(s => s.trim()) : null,
                 colors: p.colors ? p.colors.split(",").map(c => c.trim()) : null,
-                images: uploadedImageUrls, 
+                images: uploadedImageUrls,
                 isTrending: p.isTrending || false,
             });
         }
@@ -143,15 +145,15 @@ export async function createBulkProducts(prevState: any, formData: FormData) {
         if (insertedCount === 0) {
             return { error: "Failed to insert any products. Please check the logs." };
         }
-        
+
         revalidatePath("/admin/products");
         revalidatePath("/");
         revalidatePath("/products");
-        
-        const message = insertedCount === productsToInsert.length 
+
+        const message = insertedCount === productsToInsert.length
             ? `${insertedCount} products created successfully.`
             : `${insertedCount} of ${productsToInsert.length} products created successfully.`;
-        
+
         return { success: true, message };
     } catch (error) {
         console.error("[CreateBulkProducts] Operation failed:", error);
@@ -166,7 +168,7 @@ export async function createProduct(prevState: any, formData: FormData) {
     const uploadedImageUrls = await uploadMultipleToCloudinary(productImages);
 
     if (uploadedImageUrls.length === 0) {
-        return { 
+        return {
             error: "At least one image is required. Please ensure you've selected valid image files.",
         };
     }
@@ -174,6 +176,7 @@ export async function createProduct(prevState: any, formData: FormData) {
     const validatedFields = productSchema.safeParse({
         name: formData.get("name"),
         slug: formData.get("slug") || formData.get("name")?.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
+        sku: formData.get("sku")?.toString() || undefined,
         description: formData.get("description"),
         price: formData.get("price"),
         originalPrice: formData.get("originalPrice") ? formData.get("originalPrice") : undefined,
@@ -192,6 +195,7 @@ export async function createProduct(prevState: any, formData: FormData) {
 
     const insertData = {
         ...validatedFields.data,
+        sku: validatedFields.data.sku || null,
         price: validatedFields.data.price.toString(),
         originalPrice: validatedFields.data.originalPrice?.toString(),
         sizes: validatedFields.data.sizes ? validatedFields.data.sizes.split(",").map(s => s.trim()) : null,
@@ -214,15 +218,15 @@ export async function createProduct(prevState: any, formData: FormData) {
 
 export async function updateProduct(productId: number, prevState: any, formData: FormData) {
     console.log(`[UpdateProduct] Starting product update for ID: ${productId}`);
-    
+
     const existingImagesString = formData.get("existingImages") as string;
     const existingImages = existingImagesString ? existingImagesString.split(',') : [];
-    
+
     const newProductImages = formData.getAll("productImages") as File[];
     const newImageUrls = await uploadMultipleToCloudinary(newProductImages);
-    
+
     const finalImageUrls = [...existingImages, ...newImageUrls];
-    
+
     if (finalImageUrls.length === 0) {
         return { error: "At least one image is required." };
     }
@@ -230,6 +234,7 @@ export async function updateProduct(productId: number, prevState: any, formData:
     const validatedFields = productSchema.safeParse({
         name: formData.get("name"),
         slug: formData.get("slug") || formData.get("name")?.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
+        sku: formData.get("sku")?.toString() || undefined,
         description: formData.get("description"),
         price: formData.get("price"),
         originalPrice: formData.get("originalPrice") ? formData.get("originalPrice") : undefined,
@@ -248,6 +253,7 @@ export async function updateProduct(productId: number, prevState: any, formData:
 
     const updateData = {
         ...validatedFields.data,
+        sku: validatedFields.data.sku || null,
         price: validatedFields.data.price.toString(),
         originalPrice: validatedFields.data.originalPrice?.toString(),
         sizes: validatedFields.data.sizes ? validatedFields.data.sizes.split(",").map(s => s.trim()) : null,
@@ -273,7 +279,7 @@ export async function deleteProduct(productId: number) {
     try {
         const productToDelete = await db.select({ slug: products.slug }).from(products).where(eq(products.id, productId)).then(res => res[0]);
         await db.delete(products).where(eq(products.id, productId));
-        
+
         revalidatePath("/admin/products");
         revalidatePath("/");
         revalidatePath("/products");
@@ -312,7 +318,7 @@ export async function getProduct(identifier: number | string) {
         const condition = typeof identifier === 'number'
             ? eq(products.id, identifier)
             : eq(products.slug, identifier);
-        
+
         const product = await db.select().from(products).where(condition).then(res => res[0]);
         return product || null;
     } catch (error) {

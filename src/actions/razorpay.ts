@@ -74,11 +74,11 @@ export async function verifyPayment(
         .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
         .update(body.toString())
         .digest("hex");
-    
+
     if (expectedSignature !== razorpay_signature) {
         return { success: false, error: "Invalid payment signature." };
     }
-    
+
     let createdOrderId: number | null = null;
 
     // Signature is valid, now save the order to the database
@@ -115,7 +115,7 @@ export async function verifyPayment(
 
         // Clear the cart after successful transaction
         await clearCart();
-        
+
         // Send email confirmation
         if (createdOrderId) {
             try {
@@ -126,12 +126,13 @@ export async function verifyPayment(
                     productName: products.name,
                     quantity: orderItems.quantity,
                     price: orderItems.price,
+                    sku: products.sku,
                     size: orderItems.size,
                     color: orderItems.color,
                 })
-                .from(orderItems)
-                .innerJoin(products, eq(orderItems.productId, products.id))
-                .where(eq(orderItems.orderId, createdOrderId));
+                    .from(orderItems)
+                    .innerJoin(products, eq(orderItems.productId, products.id))
+                    .where(eq(orderItems.orderId, createdOrderId));
 
                 if (user && orderDetails && items) {
                     await sendOrderConfirmationEmail({ ...orderDetails, items }, user);
@@ -141,7 +142,7 @@ export async function verifyPayment(
                 // Don't fail the whole request, just log it.
             }
         }
-        
+
         return { success: true };
     } catch (error) {
         console.error("Failed to save order to database:", error);
