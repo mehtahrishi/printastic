@@ -21,7 +21,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container py-12 md:py-16">
+    <div className="w-full px-4 md:px-12 py-12 md:py-16">
       <h1 className="text-3xl md:text-4xl font-bold mb-8">Your Wishlist</h1>
       {wishlistItems.length === 0 ? (
         <Card className="text-center py-20 bg-muted/20 border-dashed">

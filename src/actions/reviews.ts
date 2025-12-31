@@ -215,3 +215,30 @@ export async function updateReviewStatus(reviewId: number, status: "APPROVED" | 
         return { success: false, error: "Failed to update review status" };
     }
 }
+
+export async function getLatestReviews() {
+    try {
+        const latestReviews = await db
+            .select({
+                name: users.name,
+                rating: reviews.rating,
+                review: reviews.review,
+                date: reviews.createdAt,
+            })
+            .from(reviews)
+            .leftJoin(users, eq(reviews.userId, users.id))
+            .where(eq(reviews.status, "APPROVED"))
+            .orderBy(desc(reviews.createdAt))
+            .limit(10);
+
+        return latestReviews.map(review => ({
+            name: review.name || "Anonymous",
+            rating: review.rating,
+            review: review.review,
+            date: review.date ? new Date(review.date).toLocaleDateString() : "Recently"
+        }));
+    } catch (error) {
+        console.error("Failed to fetch latest reviews:", error);
+        return [];
+    }
+}

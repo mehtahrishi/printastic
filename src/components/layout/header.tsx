@@ -79,7 +79,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-18 items-center">
+      <div className="w-full px-4 md:px-12 flex h-18 items-center">
         <Link href="/" className="flex items-center gap-2 mr-6 md:mr-12 text-xl md:text-2xl pt-3 md:-ml-10 mx-auto md:mx-0">
           <Logo className="w-auto h-auto" />
         </Link>
@@ -218,11 +218,11 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         className="text-sm text-foreground/80 hover:text-foreground p-2 rounded-md hover:bg-accent flex justify-between"
                       >
                         <span>My Wishlist</span>
-                         {user && wishlistItemCount > 0 && (
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
-                                {wishlistItemCount}
-                            </span>
-                         )}
+                        {user && wishlistItemCount > 0 && (
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs">
+                            {wishlistItemCount}
+                          </span>
+                        )}
                       </Link>
                       <Link
                         href="/cart"
@@ -250,7 +250,7 @@ export function Header({ user }: { user?: { name: string | null } | null }) {
                         >
                           Sign out
                         </Link>
-                      ) : null }
+                      ) : null}
 
                     </CollapsibleContent>
                   </Collapsible>

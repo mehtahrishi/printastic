@@ -1,5 +1,6 @@
 import { getProducts } from "@/app/actions/products";
 import { getUserDetails } from "@/actions/user";
+import { getLatestReviews } from "@/actions/reviews";
 import { ProductCarousel } from "@/components/products/product-carousel";
 import { ProductGridClient } from "@/components/products/product-grid-client";
 import { CategoryIconsWrapper } from "@/components/layout/category-icons-wrapper";
@@ -7,21 +8,22 @@ import { ReviewsCarousel } from "@/components/reviews-carousel";
 import type { Product } from "@/lib/types";
 
 function parseJsonOrString(data: any): string[] {
-    if (Array.isArray(data)) return data;
-    if (typeof data === 'string') {
-        try {
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed)) return parsed;
-        } catch (e) {
-            return data.split(',').map(s => s.trim()).filter(Boolean);
-        }
+  if (Array.isArray(data)) return data;
+  if (typeof data === 'string') {
+    try {
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {
+      return data.split(',').map(s => s.trim()).filter(Boolean);
     }
-    return [];
+  }
+  return [];
 }
 
 export default async function HomePage() {
   const allProducts = await getProducts();
   const user = await getUserDetails();
+  const latestReviews = await getLatestReviews();
 
   const trendingProducts = allProducts
     .filter((p) => p.isTrending)
@@ -39,7 +41,7 @@ export default async function HomePage() {
   return (
     <div>
       <section>
-        <div className="container">
+        <div className="w-full px-4 md:px-12">
           <ProductCarousel trendingProducts={trendingProducts} />
         </div>
       </section>
@@ -48,7 +50,7 @@ export default async function HomePage() {
       <CategoryIconsWrapper />
 
       <section className="text-center py-12 md:py-16">
-        <div className="container">
+        <div className="w-full px-4 md:px-12">
           <h1 className="text-4xl md:text-6xl font-bold text-primary tracking-tight">
             Trending Now
           </h1>
@@ -59,11 +61,11 @@ export default async function HomePage() {
       </section>
 
       <section className="pb-12">
-        <div className="container">
+        <div className="w-full px-4 md:px-12">
           <ProductGridClient initialProducts={trendingProducts.slice(0, 8)} user={user} />
           <div className="text-center mt-8">
-            <a 
-              href="/products" 
+            <a
+              href="/products"
               className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 transition-colors"
             >
               View All Products
@@ -72,7 +74,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <ReviewsCarousel />
+      <ReviewsCarousel initialReviews={latestReviews} />
     </div>
   );
 }

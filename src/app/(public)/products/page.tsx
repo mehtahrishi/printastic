@@ -90,7 +90,7 @@ function ProductsPageComponent() {
     <div className="min-h-screen">
       {/* Header Section */}
       <div className="border-b">
-        <div className="container py-8">
+        <div className="w-full px-4 md:px-12 py-8">
           <h1 className="text-4xl md:text-5xl font-bold text-center text-primary">
             Our Products
           </h1>
@@ -99,7 +99,7 @@ function ProductsPageComponent() {
 
       {/* Filters and Grid Toggle */}
       <div className="border-b backdrop-blur-sm bg-background/80 sticky top-16 z-10">
-        <div className="container py-4">
+        <div className="w-full px-4 md:px-12 py-4">
           <div className="flex items-center justify-between gap-4">
 
             {/* Left Section: Category & Search */}
@@ -170,7 +170,7 @@ function ProductsPageComponent() {
       </div>
 
       {/* Products Grid */}
-      <div className="container py-8">
+      <div className="w-full px-4 md:px-12 py-8">
         {filteredProducts.length > 0 ? (
           <>
             <div className="mb-6">

@@ -4,82 +4,65 @@ import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const reviews = [
-  {
-    name: "Rajesh Kumar",
-    rating: 5,
-    review: "Outstanding quality and fast delivery! The print quality exceeded my expectations. Highly recommended for custom t-shirts.",
-    date: "2 weeks ago"
-  },
-  {
-    name: "Priya Sharma",
-    rating: 5,
-    review: "Absolutely love the prints! The colors are vibrant and the fabric quality is excellent. Will definitely order again.",
-    date: "1 month ago"
-  },
-  {
-    name: "Amit Patel",
-    rating: 4,
-    review: "Great service and good quality products. The team was very helpful with my custom design requirements.",
-    date: "3 weeks ago"
-  },
-  {
-    name: "Sneha Reddy",
-    rating: 5,
-    review: "Best printing house in the area! Professional work, timely delivery, and affordable prices. Very satisfied!",
-    date: "1 week ago"
-  },
-  {
-    name: "Vikram Singh",
-    rating: 5,
-    review: "Excellent work on my bulk order. The quality was consistent across all pieces. Highly professional team!",
-    date: "2 months ago"
-  },
-  {
-    name: "Anjali Desai",
-    rating: 4,
-    review: "Very impressed with the print quality. The colors match perfectly with what I expected. Great job!",
-    date: "3 weeks ago"
-  },
-];
+interface Review {
+  name: string;
+  rating: number;
+  review: string;
+  date: string;
+}
 
-// Duplicate reviews for infinite loop
-const infiniteReviews = [...reviews, ...reviews];
+interface ReviewsCarouselProps {
+  initialReviews?: Review[];
+}
 
-export function ReviewsCarousel() {
+export function ReviewsCarousel({ initialReviews = [] }: ReviewsCarouselProps) {
   const [offset, setOffset] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Use real reviews if available, otherwise show empty state or fallback
+  const displayReviews = initialReviews.length > 0 ? initialReviews : [];
+
+  // Duplicate for infinite loop only if we have enough reviews to scroll
+  const infiniteReviews = displayReviews.length > 2
+    ? [...displayReviews, ...displayReviews]
+    : displayReviews;
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   useEffect(() => {
+    if (displayReviews.length <= 2) return;
+
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setOffset((prev) => prev + 1);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [displayReviews.length]);
 
   useEffect(() => {
-    if (offset === reviews.length) {
+    if (offset === displayReviews.length) {
       setTimeout(() => {
         setIsTransitioning(false);
         setOffset(0);
       }, 500);
     }
-  }, [offset]);
+  }, [offset, displayReviews.length]);
 
   const slidePercentage = isMobile ? 100 : 100 / 3;
+
+  if (displayReviews.length === 0) {
+    return null; // Don't show section if no reviews
+  }
 
   return (
     <section className="py-16 bg-muted/30">
@@ -94,25 +77,31 @@ export function ReviewsCarousel() {
         </div>
 
         <div className="relative mx-auto overflow-hidden pb-8">
-          <div 
+          <div
             className={cn(
               "flex",
-              isTransitioning && "transition-transform duration-500 ease-in-out"
+              isTransitioning && displayReviews.length > 2 && "transition-transform duration-500 ease-in-out",
+              displayReviews.length <= 2 && "justify-center"
             )}
-            style={{ transform: `translateX(-${offset * slidePercentage}%)` }}
+            style={{
+              transform: displayReviews.length > 2 ? `translateX(-${offset * slidePercentage}%)` : 'none'
+            }}
           >
             {infiniteReviews.map((review, index) => (
               <div
-                key={index}
-                className="w-full md:w-1/3 flex-shrink-0 px-3"
+                key={`${review.name}-${index}`}
+                className={cn(
+                  "flex-shrink-0 px-3",
+                  displayReviews.length > 2 ? "w-full md:w-1/3" : "w-full md:w-1/2 max-w-md"
+                )}
               >
                 <div className="bg-card rounded-lg shadow-lg p-6 border border-border h-full">
                   <div className="flex items-center gap-3 mb-4">
-                    <div 
+                    <div
                       className="text-primary text-2xl flex-shrink-0"
                       style={{ fontFamily: "var(--font-tan-buster)" }}
                     >
-                      {review.name.charAt(0)}
+                      {review.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-base text-foreground">{review.name}</h3>

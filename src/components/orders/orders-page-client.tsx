@@ -51,10 +51,10 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
             window.history.replaceState(null, '', '/orders');
         }
     }, [fromCheckout, toast]);
-    
+
 
     return (
-        <div className="container py-12 md:py-16">
+        <div className="w-full px-4 md:px-12 py-12 md:py-16">
             <h1 className="text-3xl md:text-4xl font-bold mb-8">My Orders</h1>
 
             {orders.length === 0 ? (
@@ -73,7 +73,7 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
                     {/* Mobile View: Cards */}
                     <div className="space-y-6 md:hidden">
                         {orders.map((order) => (
-                             <Card key={order.id} className="overflow-hidden">
+                            <Card key={order.id} className="overflow-hidden">
                                 <CardHeader className="p-4 bg-muted/30 border-b">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
@@ -87,7 +87,7 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
                                 </CardHeader>
                                 <CardContent className="p-4 space-y-4">
                                     <div className="space-y-2">
-                                         {order.items?.map((item: any, index: number) => {
+                                        {order.items?.map((item: any, index: number) => {
                                             const details = [
                                                 item.quantity && `Qty: ${item.quantity}`,
                                                 item.size,
@@ -111,7 +111,7 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
                                         <span className="text-muted-foreground">Payment Method:</span>
                                         <span className="font-medium text-foreground capitalize">{order.paymentMethod}</span>
                                     </div>
-                                     {order.paymentMethod === 'cod' && order.status !== 'Delivered' ? (
+                                    {order.paymentMethod === 'cod' && order.status !== 'Delivered' ? (
                                         <div className="w-full space-y-2 text-sm">
                                             <div className="flex justify-between">
                                                 <span className="text-muted-foreground">Total:</span>
