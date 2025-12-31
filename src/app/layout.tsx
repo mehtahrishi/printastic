@@ -69,8 +69,20 @@ export default async function RootLayout({
   const userId = cookieStore.get("auth_session")?.value;
 
   let user = null;
-  if (userId && !isNaN(parseInt(userId))) {
-    user = await db.select({ id: users.id, name: users.name }).from(users).where(eq(users.id, parseInt(userId))).then(res => res[0] || null);
+  const parsedUserId = userId ? parseInt(userId) : NaN;
+
+  if (!isNaN(parsedUserId)) {
+    try {
+      const result = await db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(eq(users.id, parsedUserId))
+        .limit(1);
+      user = result[0] || null;
+    } catch (e) {
+      console.error("Failed to fetch user in RootLayout", e);
+      // swallow error to allow page load
+    }
   }
 
   return (

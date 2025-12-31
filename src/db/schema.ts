@@ -102,6 +102,7 @@ export const reviews = mysqlTable("reviews", {
     userId: int("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
     rating: int("rating").notNull(), // 1-5 stars
     review: text("review").notNull(),
+    status: varchar("status", { length: 20 }).default("PENDING").notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });

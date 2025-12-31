@@ -8,6 +8,7 @@ import {
     ShoppingBag,
     Users,
     Package,
+    Star,
 } from "lucide-react";
 
 export const sidebarItems = [
@@ -30,6 +31,11 @@ export const sidebarItems = [
         name: "Products",
         href: "/admin/products",
         icon: Package,
+    },
+    {
+        name: "Reviews",
+        href: "/admin/reviews",
+        icon: Star,
     },
 ];
 
