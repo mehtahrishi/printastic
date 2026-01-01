@@ -108,6 +108,7 @@ export async function verifyPayment(
                 price: item.price.toString(),
                 size: item.size,
                 color: item.color,
+                gsm: item.gsm,
             }));
 
             await tx.insert(orderItems).values(newOrderItems);

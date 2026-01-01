@@ -19,6 +19,7 @@ async function getUserId() {
 export async function addToCart(productId: number, quantity: number = 1, options?: {
     size?: string;
     color?: string;
+    gsm?: string;
 }) {
     try {
         const userId = await getUserId();
@@ -32,12 +33,13 @@ export async function addToCart(productId: number, quantity: number = 1, options
             return { error: "Product not found" };
         }
 
-        // Check if item already exists in cart with same size/color
+        // Check if item already exists in cart with same size/color/gsm
         const whereConditions = [
             eq(cartItems.userId, userId),
             eq(cartItems.productId, productId),
             options?.size ? eq(cartItems.size, options.size) : isNull(cartItems.size),
-            options?.color ? eq(cartItems.color, options.color) : isNull(cartItems.color)
+            options?.color ? eq(cartItems.color, options.color) : isNull(cartItems.color),
+            options?.gsm ? eq(cartItems.gsm, options.gsm) : isNull(cartItems.gsm)
         ];
         
         const existingItem = await db
@@ -63,6 +65,7 @@ export async function addToCart(productId: number, quantity: number = 1, options
                 quantity,
                 size: options?.size || null,
                 color: options?.color || null,
+                gsm: options?.gsm || null,
             });
         }
 
@@ -97,6 +100,7 @@ export async function getCartItems() {
             quantity: result.cartItem.quantity,
             size: result.cartItem.size,
             color: result.cartItem.color,
+            gsm: result.cartItem.gsm,
             product: result.product,
         }));
 

@@ -13,6 +13,9 @@ interface Product {
   slug: string;
   price: string;
   images: string | string[];
+  category?: string;
+  gsm180Price?: string;
+  gsm240Price?: string;
 }
 
 function parseImages(images: any): string[] {
@@ -151,7 +154,11 @@ export function CategoryProductCarousel({ category }: CategoryProductCarouselPro
                           {product.name}
                         </p>
                         <p className="text-sm font-semibold text-primary mt-1">
-                          ₹{product.price}
+                          {product.gsm180Price && product.gsm240Price ? (
+                            `₹${product.gsm180Price} - ₹${product.gsm240Price}`
+                          ) : (
+                            `₹${product.price}`
+                          )}
                         </p>
                       </div>
                     </Card>

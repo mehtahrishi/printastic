@@ -83,6 +83,11 @@ export function ProductCard({ product, user }: ProductCardProps) {
   const originalPrice = product.originalPrice ? Number(product.originalPrice) : null;
   const onSale = originalPrice && originalPrice > price;
 
+  // Check if product has GSM pricing (for Oversize T-Shirts)
+  const hasGsmPricing = product.gsm180Price && product.gsm240Price;
+  const gsm180 = hasGsmPricing ? Number(product.gsm180Price) : null;
+  const gsm240 = hasGsmPricing ? Number(product.gsm240Price) : null;
+
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg group">
       <CardHeader className="p-0 relative">
@@ -133,9 +138,17 @@ export function ProductCard({ product, user }: ProductCardProps) {
             </CardTitle>
             </Link>
             <div className="flex items-baseline gap-2 mt-2">
-                <p className="text-lg md:text-xl font-bold text-primary">₹{price.toFixed(2)}</p>
-                {onSale && (
-                    <p className="text-sm text-muted-foreground line-through">₹{originalPrice.toFixed(2)}</p>
+                {hasGsmPricing ? (
+                    <p className="text-lg md:text-xl font-bold text-primary">
+                        ₹{gsm180!.toFixed(2)} - ₹{gsm240!.toFixed(2)}
+                    </p>
+                ) : (
+                    <>
+                        <p className="text-lg md:text-xl font-bold text-primary">₹{price.toFixed(2)}</p>
+                        {onSale && (
+                            <p className="text-sm text-muted-foreground line-through">₹{originalPrice!.toFixed(2)}</p>
+                        )}
+                    </>
                 )}
             </div>
         </div>

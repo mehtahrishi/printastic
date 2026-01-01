@@ -40,6 +40,7 @@ export async function getOrders() {
             price: orderItems.price,
             size: orderItems.size,
             color: orderItems.color,
+            gsm: orderItems.gsm,
             product: {
                 id: products.id,
                 name: products.name,

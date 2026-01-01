@@ -91,6 +91,7 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
                                             const details = [
                                                 item.quantity && `Qty: ${item.quantity}`,
                                                 item.size,
+                                                item.gsm && `${item.gsm} GSM`,
                                                 item.color,
                                             ].filter(Boolean).join(' / ');
 
@@ -171,6 +172,7 @@ export function OrdersPageClient({ orders, fromCheckout }: { orders: any[], from
                                                                     const details = [
                                                                         item.quantity && `${item.quantity}x`,
                                                                         item.size,
+                                                                        item.gsm && `${item.gsm} GSM`,
                                                                         item.color,
                                                                     ].filter(Boolean).join(' / ');
 

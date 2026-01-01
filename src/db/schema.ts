@@ -23,6 +23,8 @@ export const products = mysqlTable("products", {
     description: text("description").notNull(),
     price: decimal("price", { precision: 10, scale: 2 }).notNull(),
     originalPrice: decimal("original_price", { precision: 10, scale: 2 }),
+    gsm180Price: decimal("gsm_180_price", { precision: 10, scale: 2 }),
+    gsm240Price: decimal("gsm_240_price", { precision: 10, scale: 2 }),
     category: varchar("category", { length: 100 }),
     sizes: json("sizes").$type<string[]>(),
     colors: json("colors").$type<string[]>(),
@@ -48,6 +50,7 @@ export const cartItems = mysqlTable("cart_items", {
     quantity: int("quantity").notNull().default(1),
     size: varchar("size", { length: 50 }),
     color: varchar("color", { length: 50 }),
+    gsm: varchar("gsm", { length: 10 }), // GSM value for fabric weight (180, 240, etc.)
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
@@ -79,6 +82,7 @@ export const orderItems = mysqlTable("order_items", {
     price: decimal("price", { precision: 10, scale: 2 }).notNull(), // Price at the time of purchase
     size: varchar("size", { length: 50 }),
     color: varchar("color", { length: 50 }),
+    gsm: varchar("gsm", { length: 10 }), // GSM value for fabric weight (180, 240, etc.)
 });
 
 export const otpAttempts = mysqlTable("otp_attempts", {

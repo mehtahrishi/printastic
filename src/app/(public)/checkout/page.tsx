@@ -70,8 +70,17 @@ export default function CheckoutPage() {
   });
 
   const subtotal = cartItems.reduce(
-    (total, item) =>
-      total + parseFloat(item.product.price as any) * item.quantity,
+    (total, item) => {
+      let itemPrice = parseFloat(item.product.price as any);
+
+      // Check if product has GSM pricing and item has GSM selected
+      if (item.gsm && item.product.gsm180Price && item.product.gsm240Price) {
+        if (item.gsm === "180") itemPrice = parseFloat(item.product.gsm180Price as any);
+        if (item.gsm === "240") itemPrice = parseFloat(item.product.gsm240Price as any);
+      }
+
+      return total + (itemPrice * item.quantity);
+    },
     0
   );
 
@@ -137,13 +146,24 @@ export default function CheckoutPage() {
         total,
         shippingAddress: `${values.address}, ${values.apartment || ''}, ${values.city}, ${values.zipCode}`,
         paymentMethod: values.paymentMethod,
-        items: cartItems.map(item => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-            price: parseFloat(item.product.price),
-            size: item.size,
-            color: item.color,
-        }))
+        items: cartItems.map(item => {
+            let itemPrice = parseFloat(item.product.price);
+
+            // Calculate correct price based on GSM
+            if (item.gsm && item.product.gsm180Price && item.product.gsm240Price) {
+              if (item.gsm === "180") itemPrice = parseFloat(item.product.gsm180Price);
+              if (item.gsm === "240") itemPrice = parseFloat(item.product.gsm240Price);
+            }
+
+            return {
+                productId: item.product.id,
+                quantity: item.quantity,
+                price: itemPrice,
+                size: item.size,
+                color: item.color,
+                gsm: item.gsm,
+            };
+        })
     };
 
     try {
@@ -310,19 +330,31 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex justify-between items-start">
-                      <div>
-                        <p className="font-semibold">{item.product.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Qty: {item.quantity}
+                  {cartItems.map((item) => {
+                    // Calculate correct price based on GSM
+                    let itemPrice = parseFloat(item.product.price);
+                    if (item.gsm && item.product.gsm180Price && item.product.gsm240Price) {
+                      if (item.gsm === "180") itemPrice = parseFloat(item.product.gsm180Price as any);
+                      if (item.gsm === "240") itemPrice = parseFloat(item.product.gsm240Price as any);
+                    }
+
+                    return (
+                      <div key={item.id} className="flex justify-between items-start">
+                        <div className="flex-1 pr-4">
+                          <p className="font-semibold">{item.product.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Qty: {item.quantity}
+                            {item.size && ` • ${item.size}`}
+                            {item.gsm && ` • ${item.gsm} GSM`}
+                            {item.color && ` • ${item.color}`}
+                          </p>
+                        </div>
+                        <p className="font-medium text-right whitespace-nowrap">
+                          ₹{(itemPrice * item.quantity).toFixed(2)}
                         </p>
                       </div>
-                      <p className="font-medium text-right">
-                        ₹{(parseFloat(item.product.price) * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <Separator />
                   <div className="space-y-2">
                     <div className="flex justify-between">

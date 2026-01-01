@@ -46,7 +46,7 @@ export function ProductsTable({ products }: { products: Product[] }) {
                                 <TableHead>Name</TableHead>
                                 <TableHead>SKU</TableHead>
                                 <TableHead>Category</TableHead>
-                                <TableHead>Price</TableHead>
+                                <TableHead>GSM/Price</TableHead>
                                 <TableHead className="text-center">Trending</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -154,7 +154,22 @@ function ProductRow({ product }: { product: Product }) {
                 {product.sku || "-"}
             </TableCell>
             <TableCell>{product.category || "-"}</TableCell>
-            <TableCell>₹{Number(product.price).toFixed(2)}</TableCell>
+            <TableCell>
+                {product.category === "Oversize T-Shirts" && product.gsm180Price && product.gsm240Price ? (
+                    <div className="text-xs border rounded overflow-hidden">
+                        <div className="grid grid-cols-2 bg-muted/50 p-1 font-medium border-b text-center">
+                            <div>180 GSM</div>
+                            <div>240 GSM</div>
+                        </div>
+                        <div className="grid grid-cols-2 p-1 text-center divide-x">
+                            <div>₹{Number(product.gsm180Price).toFixed(0)}</div>
+                            <div>₹{Number(product.gsm240Price).toFixed(0)}</div>
+                        </div>
+                    </div>
+                ) : (
+                    <span>₹{Number(product.price).toFixed(2)}</span>
+                )}
+            </TableCell>
             <TableCell className="text-center">
                 <Checkbox checked={product.isTrending} disabled aria-label="Trending" />
             </TableCell>

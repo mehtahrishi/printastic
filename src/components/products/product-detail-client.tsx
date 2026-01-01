@@ -41,10 +41,23 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
     const { toast } = useToast();
     const router = useRouter();
 
+    // Check if product has GSM pricing (oversize product)
+    const hasGsmPricing = product.gsm180Price && product.gsm240Price;
+    const gsmOptions = hasGsmPricing ? [
+        { value: "180", label: "180 GSM (Standard)", price: Number(product.gsm180Price) },
+        { value: "240", label: "240 GSM (Premium)", price: Number(product.gsm240Price) }
+    ] : null;
+
     const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.length === 1 ? product.sizes[0] : null);
+    const [selectedGsm, setSelectedGsm] = useState<string | null>(gsmOptions ? "180" : null);
     const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.length === 1 ? product.colors[0] : null);
     const [animationState, setAnimationState] = useState<'idle' | 'animating' | 'added'>('idle');
     const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
+
+    // Calculate current price based on GSM selection
+    const currentPrice = hasGsmPricing && selectedGsm
+        ? (gsmOptions?.find(g => g.value === selectedGsm)?.price || Number(product.price))
+        : Number(product.price);
 
     const cartProduct = { ...product, id: product.id.toString() };
     const isWishlisted = isInWishlist(cartProduct.id);
@@ -73,6 +86,7 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
         await addToCart(product.id, 1, {
             size: selectedSize || undefined,
             color: selectedColor || undefined,
+            gsm: selectedGsm || undefined,
         });
 
         // The animation sequence is handled by the `onAnimationComplete` prop on the motion component
@@ -94,10 +108,11 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
 
     const isAddToCartDisabled =
         (product.sizes && product.sizes.length > 0 && !selectedSize) ||
+        (hasGsmPricing && !selectedGsm) ||
         (product.colors && product.colors.length > 0 && !selectedColor) ||
         isCartPending;
 
-    const onSale = product.originalPrice && product.originalPrice > product.price;
+    const onSale = product.originalPrice && !hasGsmPricing && product.originalPrice > product.price;
 
     return (
         <>
@@ -159,15 +174,15 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                     {/* Price */}
                     <div className="flex items-baseline gap-2 py-1">
                         <span className="text-2xl md:text-3xl font-bold text-primary">
-                            ₹{product.price.toFixed(2)}
+                            ₹{currentPrice.toFixed(2)}
                         </span>
                         {onSale && (
                             <>
                                 <span className="text-lg text-muted-foreground line-through">
-                                    ₹{product.originalPrice.toFixed(2)}
+                                    ₹{Number(product.originalPrice).toFixed(2)}
                                 </span>
                                 <Badge variant="destructive" className="text-xs">
-                                    {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                                    {Math.round((1 - Number(product.price) / Number(product.originalPrice)) * 100)}% OFF
                                 </Badge>
                             </>
                         )}
@@ -197,6 +212,32 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                                     </div>
                                 </CollapsibleContent>
                             </Collapsible>
+                        </div>
+                    )}
+
+                    {/* GSM Selection for Oversize Products */}
+                    {hasGsmPricing && gsmOptions && (
+                        <div className="space-y-3">
+                            <h3 className="font-semibold text-sm">
+                                Material: {selectedGsm && <span className="text-primary ml-1">{gsmOptions.find(g => g.value === selectedGsm)?.label}</span>}
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {gsmOptions.map((gsm) => (
+                                    <Button
+                                        key={gsm.value}
+                                        variant={selectedGsm === gsm.value ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setSelectedGsm(gsm.value)}
+                                        className={cn(
+                                            "h-auto py-2 px-4 text-sm font-medium transition-all hover:border-primary flex flex-col items-start",
+                                            selectedGsm === gsm.value && "ring-2 ring-primary ring-offset-1"
+                                        )}
+                                    >
+                                        <span className="font-semibold">{gsm.label}</span>
+                                        <span className="text-xs opacity-80">₹{gsm.price}</span>
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
                     )}
 

@@ -41,6 +41,8 @@ const formSchema = z.object({
         message: "Price must be a positive number",
     }),
     originalPrice: z.string().optional(),
+    gsm180Price: z.string().optional(),
+    gsm240Price: z.string().optional(),
     category: z.string().optional(),
     sizes: z.string().optional(),
     colors: z.string().optional(),
@@ -107,6 +109,8 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
             sizes: formatJsonField(product?.sizes),
             colors: formatJsonField(product?.colors),
             isTrending: product?.isTrending || false,
+            gsm180Price: product?.gsm180Price?.toString() || "",
+            gsm240Price: product?.gsm240Price?.toString() || "",
         },
     });
 
@@ -270,9 +274,9 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                         name="price"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Price</FormLabel>
+                                <FormLabel>Price {form.watch("category") === "Oversize T-Shirts" && "(Use GSM Pricing Below)"}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="29.99" type="number" step="0.01" {...field} />
+                                    <Input placeholder="29.99" type="number" step="0.01" {...field} disabled={form.watch("category") === "Oversize T-Shirts"} className={form.watch("category") === "Oversize T-Shirts" ? "bg-muted" : ""} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -285,7 +289,7 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                             <FormItem>
                                 <FormLabel>Original Price (Optional)</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="39.99" type="number" step="0.01" {...field} />
+                                    <Input placeholder="39.99" type="number" step="0.01" {...field} disabled={form.watch("category") === "Oversize T-Shirts"} className={form.watch("category") === "Oversize T-Shirts" ? "bg-muted" : ""} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -346,6 +350,50 @@ export function ProductForm({ onSuccess, product }: ProductFormProps) {
                         )}
                     />
                 </div>
+
+                {/* GSM Configuration for Oversize Products */}
+                {form.watch("category") === "Oversize T-Shirts" && (
+                    <div className="border rounded-lg p-4 space-y-4 bg-muted/30">
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-sm">GSM Configuration</h3>
+                            <span className="text-xs text-muted-foreground">(For Oversize T-Shirts)</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="gsm180Price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>180 GSM Price (₹)</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="299" type="number" step="0.01" {...field} />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Standard GSM pricing
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="gsm240Price"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>240 GSM Price (₹)</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="349" type="number" step="0.01" {...field} />
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            Premium GSM pricing
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div className="space-y-4">
                     <FormLabel>Product Images (Upload up to 5)</FormLabel>

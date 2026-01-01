@@ -16,6 +16,7 @@ interface CartItemRowProps {
     quantity: number;
     size: string | null;
     color: string | null;
+    gsm: string | null;
     product: {
       id: number;
       name: string;
@@ -23,6 +24,8 @@ interface CartItemRowProps {
       description: string;
       price: string;
       originalPrice: string | null;
+      gsm180Price?: string | null;
+      gsm240Price?: string | null;
       images: string[];
       category: string | null;
     };
@@ -47,8 +50,19 @@ export default function CartItemRow({ item }: CartItemRowProps) {
     return '/placeholder.jpg';
   };
 
+  // Calculate the correct price based on GSM selection
+  const getItemPrice = () => {
+    // Check if product has GSM pricing and item has GSM selected
+    if (item.gsm && item.product.gsm180Price && item.product.gsm240Price) {
+      if (item.gsm === "180") return parseFloat(item.product.gsm180Price);
+      if (item.gsm === "240") return parseFloat(item.product.gsm240Price);
+    }
+    
+    return parseFloat(item.product.price);
+  };
+
   const imageUrl = getFirstImage(item.product.images);
-  const price = parseFloat(item.product.price);
+  const price = getItemPrice();
 
   const handleUpdateQuantity = (newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -82,10 +96,11 @@ export default function CartItemRow({ item }: CartItemRowProps) {
                 {item.product.name}
               </Link>
               <div className="text-sm text-muted-foreground mt-1">
-                {(item.size || item.color) && (
+                {(item.size || item.gsm || item.color) && (
                   <span>
                     {item.size}
-                    {item.size && item.color && ' / '}
+                    {item.gsm && <span className="ml-1">({item.gsm} GSM)</span>}
+                    {(item.size || item.gsm) && item.color && ' / '}
                     {item.color}
                   </span>
                 )}

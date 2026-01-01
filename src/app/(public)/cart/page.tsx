@@ -12,7 +12,19 @@ export const dynamic = 'force-dynamic';
 
 export default async function CartPage() {
   const cartItems = await getCartItems();
-  const subtotal = cartItems.reduce((total, item) => total + (parseFloat(item.product.price as any) * item.quantity), 0);
+  
+  // Calculate subtotal with GSM pricing support
+  const subtotal = cartItems.reduce((total, item) => {
+    let itemPrice = parseFloat(item.product.price as any);
+
+    // Check if product has GSM pricing and item has GSM selected
+    if (item.gsm && item.product.gsm180Price && item.product.gsm240Price) {
+      if (item.gsm === "180") itemPrice = parseFloat(item.product.gsm180Price as any);
+      if (item.gsm === "240") itemPrice = parseFloat(item.product.gsm240Price as any);
+    }
+
+    return total + (itemPrice * item.quantity);
+  }, 0);
 
   const SHIPPING_COST = 50;
   const FREE_SHIPPING_THRESHOLD = 500;

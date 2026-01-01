@@ -8,10 +8,11 @@ import { OrdersPageClient } from "@/components/orders/orders-page-client";
 export default async function OrdersPage({
     searchParams
 }: {
-    searchParams?: { [key: string]: string | string[] | undefined };
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
     const orders = await getOrders();
-    const fromCheckout = searchParams?.from === 'checkout';
+    const params = await searchParams;
+    const fromCheckout = params?.from === 'checkout';
 
     return (
         <Suspense fallback={<div>Loading...</div>}>

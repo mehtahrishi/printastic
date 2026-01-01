@@ -8,6 +8,8 @@ interface ColorVariant {
   slug: string;
   images: string | string[];
   price: string;
+  gsm180Price?: string;
+  gsm240Price?: string;
 }
 
 function parseJsonOrString(data: any): string[] {
@@ -55,7 +57,11 @@ export function ColorVariantsSection({ variants }: { variants: ColorVariant[] })
                     {variant.name}
                   </p>
                   <p className="text-sm text-center text-muted-foreground mt-1">
-                    ₹{variant.price}
+                    {variant.gsm180Price && variant.gsm240Price ? (
+                      `₹${variant.gsm180Price} - ₹${variant.gsm240Price}`
+                    ) : (
+                      `₹${variant.price}`
+                    )}
                   </p>
                 </CardContent>
               </Card>

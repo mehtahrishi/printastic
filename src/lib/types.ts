@@ -7,8 +7,10 @@ export type Product = {
   description: string;
   price: number | string;
   originalPrice?: number | string;
+  gsm180Price?: number | string;
+  gsm240Price?: number | string;
   category?: string;
-  sizes?: string[]; // Arrays from JSON
+  sizes?: string[];
   colors?: string[];
   images: string[];
   isTrending?: boolean;

@@ -47,6 +47,8 @@ const productSchema = z.object({
         message: "Price must be a positive number",
     }),
     originalPrice: z.string().optional(),
+    gsm180Price: z.string().optional(),
+    gsm240Price: z.string().optional(),
     category: z.string().optional(),
     sizes: z.string().optional(),
     colors: z.string().optional(),
@@ -147,6 +149,8 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
             description: p.description,
             price: p.price?.toString() || "",
             originalPrice: p.originalPrice?.toString() || "",
+            gsm180Price: p.gsm180Price?.toString() || "",
+            gsm240Price: p.gsm240Price?.toString() || "",
             category: p.category || "",
             sizes: formatJsonField(p.sizes),
             colors: formatJsonField(p.colors),
@@ -356,9 +360,9 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                                         <div className="grid grid-cols-2 gap-4">
                                             <FormField name={`products.${index}.price`} render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Price</FormLabel>
+                                                    <FormLabel>Price {form.watch(`products.${index}.category`) === "Oversize T-Shirts" && "(Use GSM Below)"}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" step="0.01" {...field} />
+                                                        <Input type="number" step="0.01" {...field} disabled={form.watch(`products.${index}.category`) === "Oversize T-Shirts"} className={form.watch(`products.${index}.category`) === "Oversize T-Shirts" ? "bg-muted" : ""} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -367,12 +371,34 @@ export function BulkEditProductsForm({ onSuccess }: BulkEditProductFormProps) {
                                                 <FormItem>
                                                     <FormLabel>Original Price (Optional)</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" step="0.01" {...field} />
+                                                        <Input type="number" step="0.01" {...field} disabled={form.watch(`products.${index}.category`) === "Oversize T-Shirts"} className={form.watch(`products.${index}.category`) === "Oversize T-Shirts" ? "bg-muted" : ""} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )} />
                                         </div>
+                                        {form.watch(`products.${index}.category`) === "Oversize T-Shirts" && (
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <FormField name={`products.${index}.gsm180Price`} render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>180 GSM Price</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" step="0.01" placeholder="Price for 180 GSM" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                                <FormField name={`products.${index}.gsm240Price`} render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>240 GSM Price</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" step="0.01" placeholder="Price for 240 GSM" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            </div>
+                                        )}
                                         <FormField name={`products.${index}.category`} render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Category</FormLabel>

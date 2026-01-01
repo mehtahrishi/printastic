@@ -45,6 +45,8 @@ const productSchema = z.object({
         message: "Price must be a positive number",
     }),
     originalPrice: z.string().optional(),
+    gsm180Price: z.string().optional(),
+    gsm240Price: z.string().optional(),
     category: z.string().optional(),
     sizes: z.string().optional(),
     colors: z.string().optional(),
@@ -77,6 +79,8 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                 description: "",
                 price: "",
                 originalPrice: "",
+                gsm180Price: "",
+                gsm240Price: "",
                 category: "",
                 sizes: "",
                 colors: "",
@@ -321,10 +325,10 @@ export function BulkAddProductsForm({ onSuccess }: BulkProductFormProps) {
                                     )} />
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField name={`products.${index}.price`} render={({ field }) => (
-                                            <FormItem><FormLabel>Price</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
+                                            <FormItem><FormLabel>Price {form.watch(`products.${index}.category`) === "Oversize T-Shirts" && "(Use GSM Below)"}</FormLabel><FormControl><Input type="number" step="0.01" {...field} disabled={form.watch(`products.${index}.category`) === "Oversize T-Shirts"} className={form.watch(`products.${index}.category`) === "Oversize T-Shirts" ? "bg-muted" : ""} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                         <FormField name={`products.${index}.originalPrice`} render={({ field }) => (
-                                            <FormItem><FormLabel>Original Price (Optional)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl><FormMessage /></FormItem>
+                                            <FormItem><FormLabel>Original Price (Optional)</FormLabel><FormControl><Input type="number" step="0.01" {...field} disabled={form.watch(`products.${index}.category`) === "Oversize T-Shirts"} className={form.watch(`products.${index}.category`) === "Oversize T-Shirts" ? "bg-muted" : ""} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                     </div>
                                     <FormField name={`products.${index}.category`} render={({ field }) => (
