@@ -44,6 +44,7 @@ export function ProductsTable({ products }: { products: Product[] }) {
                             <TableRow>
                                 <TableHead className="w-[80px]">Image</TableHead>
                                 <TableHead>Name</TableHead>
+                                <TableHead>SKU</TableHead>
                                 <TableHead>Category</TableHead>
                                 <TableHead>Price</TableHead>
                                 <TableHead className="text-center">Trending</TableHead>
@@ -53,7 +54,7 @@ export function ProductsTable({ products }: { products: Product[] }) {
                         <TableBody>
                             {products.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                                         No products found.
                                     </TableCell>
                                 </TableRow>
@@ -148,6 +149,9 @@ function ProductRow({ product }: { product: Product }) {
             </TableCell>
             <TableCell className="font-medium">
                 {product.name}
+            </TableCell>
+            <TableCell className="text-muted-foreground text-sm">
+                {product.sku || "-"}
             </TableCell>
             <TableCell>{product.category || "-"}</TableCell>
             <TableCell>₹{Number(product.price).toFixed(2)}</TableCell>
