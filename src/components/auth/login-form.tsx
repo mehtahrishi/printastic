@@ -22,7 +22,7 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/ui/logo";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ToastAction } from "../ui/toast";
 
 export const LoginForm = () => {
@@ -30,6 +30,8 @@ export const LoginForm = () => {
     const [isRedirecting, setIsRedirecting] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl");
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -50,16 +52,16 @@ export const LoginForm = () => {
                     });
                 } else {
                     setIsRedirecting(true);
-                    
+
                     // Show initial success toast
                     toast({
                         title: "Success",
                         description: data.success,
                     });
 
-                    // Redirect to homepage
-                    router.push("/");
-                    
+                    // Redirect to homepage or callback URL
+                    router.push(callbackUrl || "/");
+
                     // After a delay, check for address and show the second toast if needed
                     setTimeout(() => {
                         if (!data.user?.address) {
@@ -68,9 +70,9 @@ export const LoginForm = () => {
                                 description: "Add your address to enjoy a faster checkout experience.",
                                 duration: 8000, // Make it last a bit longer
                                 action: (
-                                  <ToastAction altText="Update Profile" onClick={() => router.push("/account")}>
-                                    Update Profile
-                                  </ToastAction>
+                                    <ToastAction altText="Update Profile" onClick={() => router.push("/account")}>
+                                        Update Profile
+                                    </ToastAction>
                                 ),
                             });
                         }

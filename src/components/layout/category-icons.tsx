@@ -84,7 +84,7 @@ const HoodieIcon = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const categories = [
+export const categories = [
   { name: "Oversize T-Shirts", value: "Oversize T-Shirts", icon: OversizeTShirtIcon },
   { name: "Kids T-Shirts", value: "Kids T-Shirts", icon: KidsTShirtIcon },
   { name: "Regular T-Shirts", value: "Regular T-Shirts", icon: RegularTShirtIcon },
@@ -105,7 +105,6 @@ export function CategoryIcons({ onCategorySelect, selectedCategory }: CategoryIc
             <button
               key={category.name}
               onClick={() => onCategorySelect(category.value)}
-              onMouseEnter={() => onCategorySelect(category.value)}
               aria-label={category.name}
               className={`p-2 group flex flex-col items-center relative cursor-pointer transition-all duration-300 ${selectedCategory === category.value
                 ? 'scale-110 drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.6)]'

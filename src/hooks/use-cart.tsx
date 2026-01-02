@@ -15,7 +15,7 @@ interface CartContextType {
   isLoading: boolean;
   isUpdating: boolean;
   refetchCart: () => void;
-  addToCart: (productId: number, quantity?: number, options?: { size?: string; color?: string }) => Promise<void>;
+  addToCart: (productId: number, quantity?: number, options?: { size?: string; color?: string; gsm?: string }) => Promise<void>;
   removeFromCart: (cartItemId: number) => Promise<void>;
   updateQuantity: (cartItemId: number, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -46,14 +46,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     fetchCartData();
   }, [fetchCartData]);
-  
+
   const refetchCart = useCallback(() => {
     startTransition(() => {
-        fetchCartData();
+      fetchCartData();
     });
   }, [fetchCartData]);
 
-  const addToCart = async (productId: number, quantity = 1, options?: { size?: string; color?: string }) => {
+  const addToCart = async (productId: number, quantity = 1, options?: { size?: string; color?: string; gsm?: string }) => {
     startTransition(async () => {
       const result = await addToCartAction(productId, quantity, options);
       if (result.error) {
@@ -64,7 +64,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
   };
-  
+
   const removeFromCart = async (cartItemId: number) => {
     startTransition(async () => {
       const result = await removeCartItem(cartItemId);
@@ -78,22 +78,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateQuantity = async (cartItemId: number, quantity: number) => {
-     startTransition(async () => {
-        const result = await updateCartItemQuantity(cartItemId, quantity);
-        if (result.error) {
-          toast({ title: "Error", description: result.error, variant: "destructive" });
-        } else {
-          await fetchCartData();
-        }
-     });
-  };
-  
-  const clearCart = async () => {
-      startTransition(async () => {
-        // This is assuming you have a `clearCart` action
-        // await clearCartAction(); 
+    startTransition(async () => {
+      const result = await updateCartItemQuantity(cartItemId, quantity);
+      if (result.error) {
+        toast({ title: "Error", description: result.error, variant: "destructive" });
+      } else {
         await fetchCartData();
-      });
+      }
+    });
+  };
+
+  const clearCart = async () => {
+    startTransition(async () => {
+      // This is assuming you have a `clearCart` action
+      // await clearCartAction(); 
+      await fetchCartData();
+    });
   };
 
   return (

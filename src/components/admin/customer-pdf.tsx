@@ -81,7 +81,7 @@ export const CustomerPdf = ({ user }: { user: any }) => (
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.title}>Customer Profile</Text>
-                <Text style={styles.subtitle}>Printastic User Database Record</Text>
+                <Text style={styles.subtitle}>Honesty Print House User Database Record</Text>
             </View>
 
             {/* Personal Info */}
@@ -140,7 +140,7 @@ export const CustomerPdf = ({ user }: { user: any }) => (
             </View>
 
             <View style={styles.footer}>
-                <Text>Generated on {new Date().toLocaleDateString()} by Printastic Admin Portal</Text>
+                <Text>Generated on {new Date().toLocaleDateString()} by Honest Print House Admin Portal</Text>
             </View>
 
         </Page>

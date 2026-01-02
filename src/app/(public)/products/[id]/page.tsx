@@ -1,5 +1,6 @@
 
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { getProduct, getProductPreviews, getProducts, getColorVariants } from "@/app/actions/products";
 import { ProductDetailClient } from "@/components/products/product-detail-client";
 import { ColorVariantsSection } from "@/components/products/color-variants";
@@ -19,7 +20,7 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { Home, ShoppingBag } from "lucide-react";
+import { Home, ShoppingBag, Loader2 } from "lucide-react";
 import type { Product } from "@/lib/types";
 
 function parseJsonOrString(data: any): string[] {
@@ -54,7 +55,12 @@ export default async function ProductDetailPage({
   }
 
   // Fetch color variants
-  const colorVariants = await getColorVariants(slug);
+  const rawColorVariants = await getColorVariants(slug);
+  const colorVariants = rawColorVariants.map(v => ({
+    ...v,
+    gsm180Price: v.gsm180Price || undefined,
+    gsm240Price: v.gsm240Price || undefined,
+  }));
 
   // Fetch related products
   const allProducts = await getProducts();
@@ -67,6 +73,8 @@ export default async function ProductDetailPage({
       isTrending: p.isTrending ?? undefined,
       price: Number(p.price),
       originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
+      gsm180Price: p.gsm180Price || undefined,
+      gsm240Price: p.gsm240Price || undefined,
       sizes: parseJsonOrString(p.sizes),
       colors: parseJsonOrString(p.colors),
       images: parseJsonOrString(p.images),
@@ -82,6 +90,8 @@ export default async function ProductDetailPage({
     isTrending: product.isTrending ?? undefined,
     price: Number(product.price),
     originalPrice: product.originalPrice ? Number(product.originalPrice) : undefined,
+    gsm180Price: product.gsm180Price || undefined,
+    gsm240Price: product.gsm240Price || undefined,
     sizes: parseJsonOrString(product.sizes),
     colors: parseJsonOrString(product.colors),
     images: parseJsonOrString(product.images),
@@ -126,14 +136,16 @@ export default async function ProductDetailPage({
         </BreadcrumbList>
       </Breadcrumb>
 
-      <ProductDetailClient 
-        product={formattedProduct} 
-        relatedProducts={[]}
-        user={user}
-        averageRating={ratingStats.avgRating}
-        totalReviews={ratingStats.totalReviews}
-      />
-      
+      <Suspense fallback={<div className="h-96 w-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+        <ProductDetailClient
+          product={formattedProduct}
+          relatedProducts={[]}
+          user={user}
+          averageRating={ratingStats.avgRating}
+          totalReviews={ratingStats.totalReviews}
+        />
+      </Suspense>
+
       <ProductReviews
         productId={product.id as number}
         reviews={reviews}
@@ -149,7 +161,7 @@ export default async function ProductDetailPage({
           <RelatedProducts products={relatedProducts} user={user} />
         </div>
       )}
-      
+
       <ColorVariantsSection variants={colorVariants} />
     </div>
   );

@@ -78,6 +78,7 @@ export function Footer({ showQuote = true }: { showQuote?: boolean }) {
                         <h3 className="font-semibold text-foreground mb-4">Company</h3>
                         <ul className="space-y-2">
                             <li><Link href="/about-us" className="hover:text-primary text-sm">About Us</Link></li>
+                            <li><Link href="/track-order" className="hover:text-primary text-sm">Track Order</Link></li>
                             <li><Link href="/contact-us" className="hover:text-primary text-sm">Contact Us</Link></li>
                         </ul>
                     </div>

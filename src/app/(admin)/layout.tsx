@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-    title: "Admin Portal - Printastic",
+    title: "Admin Portal - Honesty Print House",
     description: "Admin access only",
 };
 
@@ -20,7 +20,7 @@ export default async function AdminLayout({
 
     // The middleware now handles redirects for unauthenticated users,
     // so if we reach this layout, we are either on the login page or logged in.
-    
+
     // If not logged in, we are on the /admin/login page, so we don't show the sidebar.
     if (!isAdminLoggedIn) {
         return (

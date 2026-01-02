@@ -30,7 +30,7 @@ export function AdminSidebar() {
         <SidebarHeader>
           <Link href="/admin" className="flex items-center gap-2">
             <Brush className="h-6 w-6 text-sidebar-primary" />
-            <span className="font-semibold text-lg">Printastic Admin</span>
+            <span className="font-semibold text-lg">Honest Print House Admin</span>
           </Link>
         </SidebarHeader>
         <SidebarMenu>

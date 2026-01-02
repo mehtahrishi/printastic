@@ -14,8 +14,8 @@ export default function AboutUsPage() {
             The Art of Expression
           </h1>
           <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-foreground/70 leading-relaxed">
-            At Printastic, we believe that art is more than just decoration. It's a form of self-expression, 
-            a way to tell your story, and a means to transform a house into a home. Our mission is to connect 
+            At Honesty Print House, we believe that art is more than just decoration. It's a form of self-expression,
+            a way to tell your story, and a means to transform a house into a home. Our mission is to connect
             talented independent artists with art lovers everywhere.
           </p>
         </section>
@@ -39,13 +39,13 @@ export default function AboutUsPage() {
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Our Mission</h2>
             <p className="text-foreground/70 mb-6 leading-relaxed text-lg">
-              We are passionate about curating a diverse collection of high-quality, unique art prints that 
-              cater to every style and personality. We empower artists by providing them a platform to showcase 
+              We are passionate about curating a diverse collection of high-quality, unique art prints that
+              cater to every style and personality. We empower artists by providing them a platform to showcase
               their work and reach a global audience, ensuring they are fairly compensated for their creativity.
             </p>
             <p className="text-foreground/70 leading-relaxed text-lg">
-              For our customers, we strive to make the process of discovering and purchasing art an inspiring 
-              and seamless experience. Quality, affordability, and exceptional customer service are the pillars 
+              For our customers, we strive to make the process of discovering and purchasing art an inspiring
+              and seamless experience. Quality, affordability, and exceptional customer service are the pillars
               of our brand.
             </p>
           </div>

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { PrintPreview } from "@/components/products/print-preview";
 import type { Product } from "@/lib/types";
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { ToastAction } from "../ui/toast";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
@@ -40,6 +40,8 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     // Check if product has GSM pricing (oversize product)
     const hasGsmPricing = product.gsm180Price && product.gsm240Price;
@@ -48,9 +50,15 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
         { value: "240", label: "240 GSM (Premium)", price: Number(product.gsm240Price) }
     ] : null;
 
-    const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.length === 1 ? product.sizes[0] : null);
-    const [selectedGsm, setSelectedGsm] = useState<string | null>(gsmOptions ? "180" : null);
-    const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.length === 1 ? product.colors[0] : null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(
+        searchParams.get("size") || (product.sizes?.length === 1 ? product.sizes[0] : null)
+    );
+    const [selectedGsm, setSelectedGsm] = useState<string | null>(
+        searchParams.get("gsm") || (gsmOptions ? "180" : null)
+    );
+    const [selectedColor, setSelectedColor] = useState<string | null>(
+        searchParams.get("color") || (product.colors?.length === 1 ? product.colors[0] : null)
+    );
     const [animationState, setAnimationState] = useState<'idle' | 'animating' | 'added'>('idle');
     const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
 
@@ -63,12 +71,21 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
     const isWishlisted = isInWishlist(cartProduct.id);
 
     const showAuthToast = () => {
+        // Construct the return URL with current selections
+        const params = new URLSearchParams();
+        if (selectedSize) params.set("size", selectedSize);
+        if (selectedColor) params.set("color", selectedColor);
+        if (selectedGsm) params.set("gsm", selectedGsm);
+
+        const returnUrl = `${pathname}?${params.toString()}`;
+        const loginUrl = `/login?callbackUrl=${encodeURIComponent(returnUrl)}`;
+
         toast({
             title: "Authentication Required",
             description: "Please log in or create an account to continue.",
             variant: "destructive",
             action: (
-                <ToastAction altText="Login" onClick={() => router.push("/login")}>
+                <ToastAction altText="Login" onClick={() => router.push(loginUrl)}>
                     Login
                 </ToastAction>
             ),
@@ -77,11 +94,21 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
 
     const handleAddToCart = async () => {
         if (!user) {
-            showAuthToast();
+            // Construct the return URL with current selections
+            const params = new URLSearchParams();
+            if (selectedSize) params.set("size", selectedSize);
+            if (selectedColor) params.set("color", selectedColor);
+            if (selectedGsm) params.set("gsm", selectedGsm);
+
+            const returnUrl = `${pathname}?${params.toString()}`;
+            const loginUrl = `/login?callbackUrl=${encodeURIComponent(returnUrl)}`;
+
+            router.push(loginUrl);
             return;
         }
+
         if (isCartPending || animationState !== 'idle') return;
-        
+
         setAnimationState('animating');
         await addToCart(product.id, 1, {
             size: selectedSize || undefined,
@@ -149,8 +176,8 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                             <div className="flex items-center gap-2 mt-2">
                                 <div className="flex items-center">
                                     {[1, 2, 3, 4, 5].map((star) => (
-                                        <Star 
-                                            key={star} 
+                                        <Star
+                                            key={star}
                                             className={cn(
                                                 "w-3.5 h-3.5",
                                                 star <= Math.round(averageRating)
