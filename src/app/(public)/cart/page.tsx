@@ -26,10 +26,11 @@ export default async function CartPage() {
     return total + (itemPrice * item.quantity);
   }, 0);
 
-  const SHIPPING_COST = 50;
-  const FREE_SHIPPING_THRESHOLD = 500;
+  const SHIPPING_COST = 40;
+  const FREE_SHIPPING_THRESHOLD = 450;
   const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const cartTotal = subtotal + shippingCost;
+  const amountNeededForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
@@ -82,6 +83,11 @@ export default async function CartPage() {
                     <span>₹{shippingCost.toFixed(2)}</span>
                   )}
                 </div>
+                {amountNeededForFreeShipping > 0 && (
+                  <div className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-2 rounded">
+                    Add ₹{amountNeededForFreeShipping.toFixed(2)} more to save shipping cost and get free shipping! 🎉
+                  </div>
+                )}
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>

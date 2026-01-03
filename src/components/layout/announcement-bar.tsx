@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const announcements = [
-  "🎉 Free shipping on orders over ₹999!",
+  "🎉 Free shipping on orders over ₹450!",
   "✨ New arrivals just dropped - Shop now!",
   "💝 Get 10% off your first order with code: FIRST10",
   "🚚 Same day delivery available in select areas",

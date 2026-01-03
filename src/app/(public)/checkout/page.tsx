@@ -84,10 +84,11 @@ export default function CheckoutPage() {
     0
   );
 
-  const SHIPPING_COST = 50;
-  const FREE_SHIPPING_THRESHOLD = 500;
+  const SHIPPING_COST = 40;
+  const FREE_SHIPPING_THRESHOLD = 450;
   const shippingCost = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const total = subtotal + shippingCost;
+  const amountNeededForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const paymentMethod = form.watch("paymentMethod");
   
   const amountToPay = paymentMethod === "cod" ? 50 : total;
@@ -369,6 +370,11 @@ export default function CheckoutPage() {
                         <span>₹{shippingCost.toFixed(2)}</span>
                       )}
                     </div>
+                    {amountNeededForFreeShipping > 0 && (
+                      <div className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 p-2 rounded">
+                        Add ₹{amountNeededForFreeShipping.toFixed(2)} more to get free shipping! 🎉
+                      </div>
+                    )}
                   </div>
                   <Separator />
                   <div className="flex justify-between font-bold text-lg">
