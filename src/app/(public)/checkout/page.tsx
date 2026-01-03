@@ -49,6 +49,7 @@ export default function CheckoutPage() {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { clearCart: clearCartLocal } = useCart();
@@ -127,19 +128,6 @@ export default function CheckoutPage() {
     loadCheckoutData();
   }, [router, form]);
 
-  if (isLoading) {
-    return (
-      <div className="container py-12 md:py-16">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading checkout...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   async function onSubmit(values: FormValues) {
     setIsProcessing(true);
 
@@ -188,12 +176,21 @@ export default function CheckoutPage() {
                 const verificationResult = await verifyPayment(response, orderDataForDb);
                 if (verificationResult.success) {
                     clearCartLocal();
-                    toast({ title: "Order Placed!", description: "Thank you for your purchase." });
-                    router.push(`/orders?from=checkout`);
+                    // Show success animation
+                    setShowSuccessAnimation(true);
+                    // Wait 2 seconds then redirect
+                    setTimeout(() => {
+                        router.push(`/orders?from=checkout`);
+                    }, 2000);
                 } else {
                     toast({ title: "Payment Failed", description: verificationResult.error, variant: "destructive" });
                     // Unfreeze UI if verification fails, allowing user to retry
                     setIsPaymentSuccessful(false); 
+                }
+            },
+            modal: {
+                ondismiss: function() {
+                    setIsProcessing(false);
                 }
             },
             prefill: {
@@ -204,16 +201,24 @@ export default function CheckoutPage() {
             theme: {
                 color: "#30586b",
             },
+            config: {
+                display: {
+                    preferences: {
+                        show_default_blocks: true
+                    }
+                }
+            },
         };
 
         const rzp = new (window as any).Razorpay(options);
+        
         rzp.on('payment.failed', function (response: any) {
             toast({
                 title: "Payment Failed",
                 description: response.error.description || "Something went wrong.",
                 variant: "destructive"
             });
-            setIsProcessing(false); // Re-enable button on failure
+            setIsProcessing(false);
         });
 
         rzp.open();
@@ -224,9 +229,80 @@ export default function CheckoutPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="container py-12 md:py-16">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading checkout...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+      
+      {/* Success Animation Overlay */}
+      {showSuccessAnimation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm">
+          <div className="text-center">
+            <div className="relative mx-auto w-24 h-24 mb-6">
+              <svg className="w-24 h-24" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="4"
+                  style={{
+                    strokeDasharray: 283,
+                    strokeDashoffset: 283,
+                    animation: 'draw-circle 0.6s ease-out forwards',
+                  }}
+                />
+                <path
+                  d="M30 50 L45 65 L70 35"
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    strokeDasharray: 60,
+                    strokeDashoffset: 60,
+                    animation: 'draw-check 0.4s 0.4s ease-out forwards',
+                  }}
+                />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-primary mb-2">
+              Payment Successful! ✓
+            </h2>
+            <p className="text-muted-foreground">
+              Redirecting to your orders...
+            </p>
+          </div>
+        </div>
+      )}
+      
+      <style jsx>{`
+        @keyframes draw-circle {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+        @keyframes draw-check {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+      `}</style>
+      
       <div className="container py-12 md:py-16">
         <h1 className="text-3xl md:text-4xl font-bold mb-8">Checkout</h1>
         <div className="grid lg:grid-cols-3 gap-12">
