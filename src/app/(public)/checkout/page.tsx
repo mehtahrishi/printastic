@@ -167,7 +167,7 @@ export default function CheckoutPage() {
             amount: orderResponse.order.amount,
             currency: orderResponse.order.currency,
             name: "Honesty Print House",
-            description: "Test Transaction",
+            description: "Order Payment",
             order_id: orderResponse.order.id,
             handler: async function (response: any) {
                 // Immediately freeze the UI
