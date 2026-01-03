@@ -13,8 +13,8 @@ const globalForDb = globalThis as unknown as {
 const conn = globalForDb.conn ?? mysql.createPool({
     uri: connectionInfo,
     waitForConnections: true,
-    connectionLimit: 15, // Increased for better concurrency
-    maxIdle: 5, // Reduced to free up idle connections faster
+    connectionLimit: 10,
+    maxIdle: 10,
     idleTimeout: 60000,
     queueLimit: 0,
     enableKeepAlive: true,
