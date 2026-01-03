@@ -110,6 +110,97 @@ const getBrandConfig = () => ({
   border: "#E1E8F0",   // hsl(215, 20%, 90%) converted to hex
 });
 
+function renderAdminOrderNotification(order: any, user: any, brand: any) {
+  const itemsHtml = order.items.map((item: any) => `
+    <tr style="border-bottom:1px solid ${brand.border}">
+      <td style="padding:12px 0;font-size:14px;color:${brand.text}">
+        ${escapeHtml(item.productName)}
+        <div style="font-size:12px;color:${brand.muted}">
+          ${item.sku ? `SKU: ${escapeHtml(item.sku)} | ` : ''}Qty: ${item.quantity}
+          ${item.size ? ` | Size: ${item.size}` : ''}
+          ${item.color ? ` | Color: ${item.color}` : ''}
+        </div>
+      </td>
+      <td style="padding:12px 0;font-size:14px;color:${brand.text};text-align:right">₹${Number(item.price * item.quantity).toFixed(2)}</td>
+    </tr>
+  `).join('');
+
+  const isCod = order.paymentMethod === 'cod';
+  const total = Number(order.total);
+  const amountPaid = isCod ? 50.00 : total;
+  const amountDue = isCod ? total - 50.00 : 0;
+
+  const paymentDetailsHtml = `
+    <tr style="border-top:2px solid ${brand.border};">
+      <td style="padding:16px 0 4px;color:${brand.muted};font-size:14px">Total</td>
+      <td style="padding:16px 0 4px;color:${brand.muted};font-size:14px;text-align:right">₹${total.toFixed(2)}</td>
+    </tr>
+    ${isCod ? `
+    <tr>
+      <td style="padding:4px 0;color:${brand.muted};font-size:14px">Advance Paid</td>
+      <td style="padding:4px 0;color:${brand.muted};font-size:14px;text-align:right">₹${amountPaid.toFixed(2)}</td>
+    </tr>
+    <tr style="border-bottom:2px solid ${brand.border};">
+      <td style="padding:4px 0 16px;color:${brand.muted};font-size:14px">Amount Due on Delivery</td>
+      <td style="padding:4px 0 16px;color:${brand.muted};font-size:14px;text-align:right">₹${amountDue.toFixed(2)}</td>
+    </tr>
+    ` : ''}
+    <tr style="border-top:2px solid ${brand.border};">
+      <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px">Amount Paid</td>
+      <td style="padding-top:16px;font-weight:600;color:${brand.text};font-size:16px;text-align:right">₹${amountPaid.toFixed(2)}</td>
+    </tr>
+  `;
+
+  const body = `
+    <div style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);padding:20px;border-radius:8px;margin-bottom:24px;text-align:center">
+      <h2 style="margin:0;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.02em">🎉 New Order Received!</h2>
+      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:14px">Order #${order.id}</p>
+    </div>
+    
+    <div style="border:1px solid ${brand.border};border-radius:12px;padding:24px;margin-bottom:24px;">
+      <h3 style="margin:0 0 16px;font-size:16px;font-weight:600;color:${brand.text}">Order Items</h3>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+        ${itemsHtml}
+      </table>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-top:16px;">
+        ${paymentDetailsHtml}
+      </table>
+    </div>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td style="width:50%;vertical-align:top;padding-right:12px">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:600;color:${brand.text}">Customer Details</h3>
+          <p style="margin:0;font-size:14px;color:${brand.muted};line-height:1.6">
+            <strong>Name:</strong> ${escapeHtml(user.name)}<br>
+            <strong>Email:</strong> ${escapeHtml(user.email)}<br>
+            <strong>Phone:</strong> ${escapeHtml(user.phone || 'N/A')}
+          </p>
+        </td>
+        <td style="width:50%;vertical-align:top;padding-left:12px">
+          <h3 style="margin:0 0 12px;font-size:16px;font-weight:600;color:${brand.text}">Shipping Address</h3>
+          <p style="margin:0;font-size:14px;color:${brand.muted};line-height:1.6">
+            ${escapeHtml(order.shippingAddress)}
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <div style="background-color:rgba(59,130,246,0.1);border-left:4px solid #3b82f6;padding:16px 20px;border-radius:8px;margin:24px 0">
+      <p style="margin:0;font-size:14px;color:${brand.text};line-height:1.6">
+        <strong>Payment Method:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'Online Payment'}<br>
+        <strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString('en-IN', { dateStyle: 'full' })}
+      </p>
+    </div>
+
+    <div style="text-align:center;margin:32px 0">
+      <a href="${brand.url}admin/orders" style="display:inline-block;background:${brand.primary};color:#ffffff;text-decoration:none;padding:16px 32px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 2px 8px rgba(48,88,107,0.2)">View Order Details</a>
+    </div>
+  `;
+
+  return renderShell(body, brand);
+}
+
 function renderOrderConfirmationEmail(order: any, user: any, brand: any) {
   const itemsHtml = order.items.map((item: any) => `
     <tr style="border-bottom:1px solid ${brand.border}">
@@ -245,5 +336,31 @@ export const sendOrderConfirmationEmail = async (order: any, user: any) => {
   } catch (error) {
     console.error("Error sending order confirmation email:", error);
     throw new Error("Could not send order confirmation email.");
+  }
+};
+
+export const sendAdminOrderNotification = async (order: any, user: any) => {
+  const transporter = getTransporter();
+  const brand = getBrandConfig();
+  const adminEmail = process.env.SMTP_USER; // Send to the SMTP user email
+  
+  if (!adminEmail) {
+    console.error("Admin email not configured.");
+    return;
+  }
+
+  const htmlContent = renderAdminOrderNotification(order, user, brand);
+
+  try {
+    await transporter.sendMail({
+      from: `"${brand.name} Orders" <noreply@honestyprinthouse.in>`,
+      to: adminEmail,
+      replyTo: user.email,
+      subject: `🛒 New Order #${order.id} - ₹${Number(order.total).toFixed(2)}`,
+      html: htmlContent,
+    });
+  } catch (error) {
+    console.error("Error sending admin order notification:", error);
+    // Don't throw error, just log it so order processing isn't affected
   }
 };

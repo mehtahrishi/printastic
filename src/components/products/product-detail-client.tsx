@@ -347,13 +347,14 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                             onClick={handleAddToCart}
                             disabled={isAddToCartDisabled || animationState !== 'idle'}
                         >
-                            <AnimatePresence mode="popLayout" initial={false}>
+                            <AnimatePresence mode="wait" initial={false}>
                                 {animationState === 'idle' && (
                                     <motion.span
                                         key="idle"
                                         initial={{ x: -20, opacity: 0 }}
                                         animate={{ x: 0, opacity: 1 }}
-                                        exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
+                                        exit={{ x: 20, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
                                         className="flex items-center"
                                     >
                                         <ShoppingCart className="mr-2 h-4 w-4" />
@@ -363,10 +364,11 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                                 {animationState === 'animating' && (
                                     <motion.span
                                         key="animating"
-                                        initial={false}
-                                        animate={{ x: [0, 80], opacity: [1, 0] }}
+                                        initial={{ x: -20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: 80, opacity: 0 }}
                                         transition={{ duration: 0.4, ease: "easeIn" }}
-                                        className="flex items-center absolute"
+                                        className="flex items-center"
                                         onAnimationComplete={() => {
                                             setAnimationState('added');
                                             setTimeout(() => setAnimationState('idle'), 2000);
@@ -380,8 +382,9 @@ export function ProductDetailClient({ product, relatedProducts, user, averageRat
                                         key="added"
                                         initial={{ x: -20, opacity: 0 }}
                                         animate={{ x: 0, opacity: 1 }}
-                                        exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
-                                        className="flex items-center absolute"
+                                        exit={{ x: 20, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="flex items-center"
                                     >
                                         <ThumbsUp className="mr-2 h-5 w-5" />
                                         Added to Cart

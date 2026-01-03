@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, Mail } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 import Link from "next/link";
 import { SVGProps } from "react";
@@ -61,6 +61,7 @@ export function Footer({ showQuote = true }: { showQuote?: boolean }) {
                             <Link href="https://www.facebook.com/profile.php?id=61555891689595" target="_blank" className="hover:text-primary"><Facebook className="h-5 w-5" /></Link>
                             <Link href="https://www.instagram.com/honestyprinthouse/" target="_blank" className="hover:text-primary"><Instagram className="h-5 w-5" /></Link>
                             <Link href="https://api.whatsapp.com/send/?phone=9920214202&text=Hi%21+I%27d+like+to+get+in+touch+with+you.&type=phone_number&app_absent=0" target="_blank" className="hover:text-primary"><WhatsAppIcon className="h-5 w-5 fill-current" /></Link>
+                            <Link href="mailto:info@honestyprinthouse.in" className="hover:text-primary"><Mail className="h-5 w-5" /></Link>
                         </div>
                     </div>
 

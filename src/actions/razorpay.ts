@@ -1,4 +1,3 @@
-
 "use server";
 
 import Razorpay from "razorpay";
@@ -8,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { randomBytes } from "crypto";
 import { clearCart } from "./cart";
-import { sendOrderConfirmationEmail } from "@/lib/mail";
+import { sendOrderConfirmationEmail, sendAdminOrderNotification } from "@/lib/mail";
 
 async function getUserId() {
     const cookieStore = await cookies();
@@ -50,6 +49,7 @@ interface OrderData {
         price: number;
         size: string | null;
         color: string | null;
+        gsm?: string | null;
     }[];
 }
 
@@ -137,6 +137,7 @@ export async function verifyPayment(
 
                 if (user && orderDetails && items) {
                     await sendOrderConfirmationEmail({ ...orderDetails, items }, user);
+                    await sendAdminOrderNotification({ ...orderDetails, items }, user);
                 }
             } catch (emailError) {
                 console.error("Failed to send order confirmation email:", emailError);
